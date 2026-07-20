@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Página modelo de notícia do Portal Sampa na Ilha, com compartilhamento social e assinatura de newsletter." />
+  <title>Modelo de Notícia — Portal Sampa na Ilha</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <style>
+    .post-layout { display: grid; grid-template-columns: 56px 1fr 320px; gap: 32px; padding: 32px 0 48px; align-items: start; }
+    .post-body { max-width: 720px; }
+    .post-body h1 { font-family: var(--fonte-serif); font-size: 2rem; line-height: 1.2; margin-bottom: 16px; }
+    .post-body .meta { color: var(--cinza-4); margin-bottom: 20px; }
+    .post-body .meta i { color: var(--cinza-3); }
+    .post-cover { width: 100%; aspect-ratio: 16/9; border-radius: var(--radius); overflow: hidden; position: relative; margin-bottom: 24px; box-shadow: var(--shadow-md); }
+    .post-body p { font-size: 1rem; color: var(--escuro); margin-bottom: 18px; line-height: 1.85; }
+    @media (max-width: 1024px) {
+      .post-layout { grid-template-columns: 1fr; }
+      .share-bar--floating { position: static; flex-direction: row; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="breaking">
+  <div class="breaking__label"><i class="fas fa-bolt"></i> Urgente</div>
+  <div class="breaking__ticker">
+    <span>
+      Prefeitura anuncia obras de revitalização no calçadão da Praia Grande &nbsp;&bull;&nbsp;
+      Temporada de verão começa com recorde de turistas no litoral paulista
+    </span>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <img src="assets/img/logo.png" alt="Portal Sampa na Ilha" class="logo__img" />
+    </a>
+
+    <nav>
+      <div class="nav-item"><a class="nav-link" href="index.html">Início</a></div>
+      <div class="nav-item"><a class="nav-link" href="#">Notícias</a></div>
+      <div class="nav-item"><a class="nav-link" href="turismo.html">Turismo</a></div>
+      <div class="nav-item"><a class="nav-link" href="#">Esportes</a></div>
+      <div class="nav-item">
+        <a class="nav-link" href="cultura/cultura-arte.html">Cultura <i class="fas fa-chevron-down"></i></a>
+        <div class="dropdown-menu">
+          <a href="cultura/cultura-arte.html"><i class="fas fa-newspaper"></i> Cultura &amp; Arte</a>
+          <a href="cultura/o-projeto.html"><i class="fas fa-seedling"></i> O Projeto Sampa na Ilha</a>
+          <a href="cultura/grupo-danca.html"><i class="fas fa-music"></i> Grupo de Dança</a>
+          <a href="cultura/workshops.html"><i class="fas fa-hands-helping"></i> Workshops &amp; Artesanato</a>
+          <a href="cultura/eventos.html"><i class="fas fa-calendar-star"></i> Eventos &amp; Atrações</a>
+        </div>
+      </div>
+      <div class="nav-item"><a class="nav-link" href="vagas.html">Vagas</a></div>
+    </nav>
+
+    <div class="header-actions">
+      <button class="btn-search" title="Buscar"><i class="fas fa-search"></i></button>
+      <button class="btn-subscribe"><i class="fas fa-envelope-open-text"></i> Assinar</button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <div class="placeholder-notice" style="margin-top:24px;">
+    <i class="fas fa-info-circle"></i>
+    <div>
+      <strong>Página modelo de notícia:</strong> este layout serve de referência para todas as matérias publicadas — inclui compartilhamento social e assinatura de newsletter, conforme solicitado. O texto abaixo é apenas ilustrativo.
+    </div>
+  </div>
+
+  <div class="post-layout">
+
+    <!-- Compartilhamento flutuante -->
+    <div class="share-bar share-bar--floating">
+      <a href="#" class="share-btn share-btn--whatsapp" title="Compartilhar no WhatsApp"><i class="fab fa-whatsapp"></i></a>
+      <a href="#" class="share-btn share-btn--instagram" title="Compartilhar no Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" class="share-btn share-btn--facebook" title="Compartilhar no Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" class="share-btn share-btn--x" title="Compartilhar no X"><i class="fab fa-x-twitter"></i></a>
+      <button class="share-btn share-btn--copy" title="Copiar link"><i class="fas fa-link"></i></button>
+    </div>
+
+    <article class="post-body">
+      <span class="badge badge--blue"><i class="fas fa-surfing"></i> Surf</span>
+      <h1>Etapa brasileira do Mundial de Surf confirma data em Itacarambi para setembro</h1>
+      <div class="meta">
+        <span><i class="fas fa-calendar-alt"></i> 13 de julho de 2026</span>
+        <span><i class="fas fa-eye"></i> 4.2 mil leituras</span>
+        <span><i class="fas fa-pen"></i> Redação Portal</span>
+      </div>
+
+      <div class="post-cover">
+        <div class="img-bg bg-5"><i class="fas fa-water"></i></div>
+      </div>
+
+      <p>Este é um texto de exemplo para demonstrar a diagramação da página de notícia. Organização oficial anunciou o calendário completo com seis atletas brasileiros na disputa pelo título, reunindo público e imprensa de todo o país.</p>
+      <p>O conteúdo definitivo de cada matéria substituirá este texto quando o portal for alimentado com o material real de redação.</p>
+
+      <!-- Compartilhamento no rodapé do texto -->
+      <div class="share-bar">
+        <span class="share-bar__label">Compartilhe:</span>
+        <a href="#" class="share-btn share-btn--whatsapp" title="Compartilhar no WhatsApp"><i class="fab fa-whatsapp"></i></a>
+        <a href="#" class="share-btn share-btn--instagram" title="Compartilhar no Instagram"><i class="fab fa-instagram"></i></a>
+        <a href="#" class="share-btn share-btn--facebook" title="Compartilhar no Facebook"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" class="share-btn share-btn--x" title="Compartilhar no X"><i class="fab fa-x-twitter"></i></a>
+        <button class="share-btn share-btn--copy" title="Copiar link"><i class="fas fa-link"></i></button>
+      </div>
+
+      <!-- Newsletter ao final da matéria -->
+      <div class="widget newsletter-widget" style="margin-top:32px;">
+        <div class="widget-title"><i class="fas fa-envelope"></i> Newsletter</div>
+        <p>Receba os principais destaques, cultura e notícias de todo o Brasil diretamente no seu e-mail.</p>
+        <form class="nl-form" onsubmit="return false;">
+          <input type="text" class="nl-input" placeholder="Seu nome" />
+          <input type="email" class="nl-input" placeholder="Seu e-mail" />
+          <button class="nl-btn"><i class="fas fa-paper-plane"></i> Quero receber</button>
+        </form>
+      </div>
+    </article>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="widget newsletter-widget">
+        <div class="widget-title"><i class="fas fa-envelope"></i> Newsletter</div>
+        <p>Receba os principais destaques, cultura e notícias de todo o Brasil diretamente no seu e-mail.</p>
+        <form class="nl-form" onsubmit="return false;">
+          <input type="text" class="nl-input" placeholder="Seu nome" />
+          <input type="email" class="nl-input" placeholder="Seu e-mail" />
+          <button class="nl-btn"><i class="fas fa-paper-plane"></i> Quero receber</button>
+        </form>
+      </div>
+
+      <div class="widget">
+        <div class="widget-title"><i class="fas fa-fire-alt"></i> Mais Lidos</div>
+        <div class="popular-list">
+          <div class="popular-item">
+            <span class="popular-num">01</span>
+            <div>
+              <a href="#"><p class="popular-item__title">Praias mais limpas do litoral paulista segundo ranking do INEMA 2026</p></a>
+              <p class="popular-item__meta"><i class="fas fa-eye"></i> 8.4 mil leituras</p>
+            </div>
+          </div>
+          <div class="popular-item">
+            <span class="popular-num">02</span>
+            <div>
+              <a href="#"><p class="popular-item__title">Temporada de baleias jubarte começa em julho com avistamentos já registrados</p></a>
+              <p class="popular-item__meta"><i class="fas fa-eye"></i> 6.1 mil leituras</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="widget ad-widget">
+        <p><i class="fas fa-bullhorn"></i> Publicidade</p>
+        <h3>Anuncie no Portal Sampa na Ilha</h3>
+        <small>Alcance milhares de leitores em todo o Brasil</small>
+        <div class="ad-placeholder">
+          <i class="fas fa-image"></i>
+          <span>300 × 250</span>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <div class="logo">
+        <img src="assets/img/logo.png" alt="Portal Sampa na Ilha" class="logo__img" />
+        <div>
+          <div class="logo__name">Sampa na Ilha</div>
+          <div class="logo__tagline">Conectando São Paulo ao Brasil</div>
+        </div>
+      </div>
+      <p>O portal de referência para quem busca informação, cultura e notícias de todas as regiões do Brasil diretamente da capital paulista. Jornalismo com credibilidade e compromisso.</p>
+      <p style="margin-top:16px; font-size:.8rem; line-height:1.8;">
+        <i class="fas fa-envelope" style="color:var(--ciano); margin-right:6px;"></i> contato@portalsampanailha.com.br<br />
+        <i class="fas fa-phone" style="color:var(--ciano); margin-right:6px;"></i> (11) 91306-0670<br />
+        <span style="opacity:.6;">Sampa na Ilha Produções e Comunicação LTDA — CNPJ: 66.549.829/0001-56</span>
+      </p>
+    </div>
+    <div class="footer-col">
+      <h4><i class="fas fa-newspaper"></i> Editorias</h4>
+      <ul>
+        <li><a href="turismo.html"><i class="fas fa-chevron-right"></i> Turismo</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Meio Ambiente</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Gastronomia</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Esportes</a></li>
+        <li><a href="cultura/cultura-arte.html"><i class="fas fa-chevron-right"></i> Cultura</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4><i class="fas fa-map-marker-alt"></i> Regiões</h4>
+      <ul>
+        <li><a href="regioes/norte.html"><i class="fas fa-chevron-right"></i> Norte</a></li>
+        <li><a href="regioes/nordeste.html"><i class="fas fa-chevron-right"></i> Nordeste</a></li>
+        <li><a href="regioes/centro-oeste.html"><i class="fas fa-chevron-right"></i> Centro-Oeste</a></li>
+        <li><a href="regioes/sudeste.html"><i class="fas fa-chevron-right"></i> Sudeste</a></li>
+        <li><a href="regioes/sul.html"><i class="fas fa-chevron-right"></i> Sul</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4><i class="fas fa-info-circle"></i> Portal</h4>
+      <ul>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Sobre nós</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Redação</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Contato</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Anuncie</a></li>
+        <li><a href="vagas.html"><i class="fas fa-chevron-right"></i> Trabalhe Conosco</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Política de Privacidade</a></li>
+        <li><a href="#"><i class="fas fa-chevron-right"></i> Termos de Uso</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span><i class="far fa-copyright"></i> 2026 Portal Sampa na Ilha — Todos os direitos reservados</span>
+    <div class="social-links">
+      <a href="#" class="social-link" title="Instagram"><i class="fab fa-instagram"></i></a>
+      <a href="#" class="social-link" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+      <a href="#" class="social-link" title="YouTube"><i class="fab fa-youtube"></i></a>
+      <a href="#" class="social-link" title="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+      <a href="#" class="social-link" title="Twitter / X"><i class="fab fa-x-twitter"></i></a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
