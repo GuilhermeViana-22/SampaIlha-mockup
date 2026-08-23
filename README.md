@@ -43,14 +43,9 @@ linha compatível com Node 20; a partir do Nuxt 4.5 é exigido Node 22+).
 
 ## Painel da redação
 
-| | |
-|---|---|
-| URL | `/admin` |
-| E-mail | `admin@portalsampanailha.com.br` |
-| Senha | `Sampa2026!` |
-
-As credenciais são da API (`ADMIN_EMAIL` / `ADMIN_PASSWORD` no `.env` de
-`api_python_sampa`). O login troca e-mail e senha por um par de tokens JWT que fica
+O painel fica em `/admin`. As credenciais são definidas na API, no `.env` de
+`api_python_sampa` (`ADMIN_EMAIL` / `ADMIN_PASSWORD`) — nenhuma delas vive neste
+repositório. O login troca e-mail e senha por um par de tokens JWT que fica
 em cookies `httpOnly` (`sampa_acesso` / `sampa_refresh`) — o JavaScript da página
 nunca vê o token. A renovação pelo refresh token é automática, dentro do servidor
 Nuxt (`server/utils/api.ts`), e as páginas do painel são protegidas pelo middleware
