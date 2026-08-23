@@ -28,12 +28,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Back-end do portal (api_python_sampa). As rotas em server/api/ apenas
     // repassam para cá, guardando o token em cookie httpOnly.
-    apiBase: process.env.NUXT_API_BASE || 'http://localhost:9040/api/v1',
+    apiBase: process.env.NUXT_API_BASE || 'http://localhost:9041/api/v1',
     public: {
       siteName: 'Portal Sampa na Ilha',
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'http://localhost:3000',
       // Origem pública da API, usada para montar a URL absoluta das fotos.
-      apiOrigin: process.env.NUXT_PUBLIC_API_ORIGIN || 'http://localhost:9040',
+      apiOrigin: process.env.NUXT_PUBLIC_API_ORIGIN || 'http://localhost:9041',
     },
   },
 

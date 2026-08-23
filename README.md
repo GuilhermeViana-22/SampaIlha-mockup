@@ -17,7 +17,7 @@ cookie `httpOnly` e nunca expõem credencial ao navegador.
 O portal precisa da API no ar:
 
 ```bash
-cd ../api_python_sampa && docker compose up -d   # API em :9040, MySQL em :3312
+cd ../api_python_sampa && docker compose up -d   # API em :9041, MySQL em :3312
 cd ../SampaIlha-mockup
 npm install
 npm run dev                                       # portal em :3000
@@ -26,8 +26,8 @@ npm run dev                                       # portal em :3000
 Endereço da API (opcional, veja `.env.example`):
 
 ```bash
-NUXT_API_BASE=http://localhost:9040/api/v1        # usado pelo servidor Nuxt
-NUXT_PUBLIC_API_ORIGIN=http://localhost:9040      # usado para montar a URL das fotos
+NUXT_API_BASE=http://localhost:9041/api/v1        # usado pelo servidor Nuxt
+NUXT_PUBLIC_API_ORIGIN=http://localhost:9041      # usado para montar a URL das fotos
 ```
 
 Outros comandos:
