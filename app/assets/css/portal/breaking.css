@@ -1,0 +1,34 @@
+@layer portal {
+  /* ── BREAKING BAR ── */
+  .breaking {
+    background: var(--vermelho);
+    color: #fff;
+    font-size: .8rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    height: 34px;
+  }
+  .breaking__label {
+    background: #b91c1c;
+    padding: 0 16px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+  .breaking__ticker { flex: 1; overflow: hidden; }
+  .breaking__ticker span {
+    display: inline-block;
+    white-space: nowrap;
+    animation: ticker 30s linear infinite;
+    padding-left: 100%;
+  }
+  @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+}

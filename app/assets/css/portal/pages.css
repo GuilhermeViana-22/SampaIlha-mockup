@@ -1,0 +1,123 @@
+@layer portal {
+  /* ── PAGE HERO (inner pages) ── */
+  .page-hero {
+    background: linear-gradient(135deg, var(--azul), var(--ciano));
+    color: #fff; padding: 56px 24px; text-align: center;
+  }
+  .page-hero h1 { font-family: var(--fonte-serif); font-size: 2.1rem; margin-bottom: 10px; }
+  .page-hero p { opacity: .92; max-width: 640px; margin: 0 auto; font-size: 1rem; }
+  .page-hero .badge { margin-bottom: 14px; }
+
+  /* ── PLACEHOLDER NOTICE ── */
+  .placeholder-notice {
+    background: #fff8e1; border: 1.5px dashed #d9a441; border-radius: var(--raio);
+    padding: 16px 20px; margin: 28px 0; font-size: .85rem; color: #6b5116;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .placeholder-notice i { font-size: 1.1rem; margin-top: 2px; color: #b8860b; flex-shrink: 0; }
+
+  /* ── SIMPLE PAGE CONTENT WRAPPER ── */
+  .page-content { padding: 40px 0 56px; }
+  .page-content h2 { font-family: var(--fonte-serif); font-size: 1.4rem; margin: 28px 0 14px; }
+  .page-content p { font-size: .92rem; color: var(--cinza-4); margin-bottom: 14px; line-height: 1.75; }
+
+  /* ── ECOSYSTEM GRID (O Projeto) ── */
+  .eco-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; margin: 24px 0 8px; }
+  .eco-card { background: var(--branco); border-radius: var(--raio); padding: 24px; box-shadow: var(--sombra-sm); border-left: 4px solid var(--azul); }
+  .eco-card i { font-size: 1.6rem; color: var(--azul); margin-bottom: 12px; display: block; }
+  .eco-card h3 { font-family: var(--fonte-serif); font-size: 1.1rem; margin-bottom: 8px; }
+  .eco-card p { font-size: .88rem; color: var(--cinza-4); margin: 0; }
+
+  /* ── SUBPAGE NAV CARDS (Cultura hub) ── */
+  .subpage-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 20px; margin: 24px 0; }
+  .subpage-card {
+    background: var(--branco); border-radius: var(--raio); padding: 22px;
+    box-shadow: var(--sombra-sm); display: flex; gap: 16px; align-items: flex-start;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .subpage-card:hover { transform: translateY(-3px); box-shadow: var(--sombra-md); }
+  .subpage-card__icon {
+    width: 46px; height: 46px; border-radius: 10px; flex-shrink: 0;
+    background: var(--azul-leve); color: var(--azul);
+    display: flex; align-items: center; justify-content: center; font-size: 1.2rem;
+  }
+  .subpage-card h3 { font-family: var(--fonte-serif); font-size: 1.05rem; margin-bottom: 6px; }
+  .subpage-card p { font-size: .85rem; color: var(--cinza-4); margin: 0; }
+
+  /* ── SHARE BAR (post pages) ── */
+  .share-bar { display: flex; align-items: center; gap: 10px; margin: 24px 0; flex-wrap: wrap; }
+  .share-bar__label { font-size: .8rem; font-weight: 600; color: var(--cinza-4); margin-right: 4px; }
+  .share-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 1rem;
+    transition: transform .18s, opacity .18s;
+  }
+  .share-btn:hover { transform: translateY(-2px); opacity: .88; }
+  .share-btn--whatsapp { background: #25D366; }
+  .share-btn--instagram { background: linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888); }
+  .share-btn--facebook { background: #1877F2; }
+  .share-btn--x { background: #000; }
+  .share-btn--copy { background: var(--cinza-4); }
+  .share-bar--floating {
+    position: sticky; top: 96px; display: flex; flex-direction: column;
+    width: fit-content; margin-bottom: 0;
+  }
+
+  /* ── PODCAST / AO VIVO ── */
+  .badge--draft { background: var(--cinza-4); color: #fff; }
+  .live-badge {
+    background: var(--vermelho); color: #fff; padding: 5px 14px; border-radius: 20px;
+    font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    display: inline-flex; align-items: center; gap: 7px;
+  }
+  .live-dot { width: 8px; height: 8px; background: #fff; border-radius: 50%; animation: pulse 1.4s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+  .embed-block {
+    width: 100%; aspect-ratio: 16/9; background: #0d1b2a; border-radius: var(--raio);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: rgba(255,255,255,.5); gap: 10px; margin: 16px 0;
+  }
+  .embed-block i { font-size: 2.4rem; }
+  .podcast-player {
+    background: var(--branco); border-radius: var(--raio); box-shadow: var(--sombra-sm);
+    padding: 20px; display: flex; align-items: center; gap: 16px; margin-bottom: 14px;
+  }
+  .podcast-player__icon {
+    width: 52px; height: 52px; border-radius: 50%; background: var(--azul-leve); color: var(--azul);
+    display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;
+  }
+  .podcast-player h4 { font-family: var(--fonte-serif); font-size: 1rem; margin-bottom: 3px; }
+  .podcast-player p { font-size: .8rem; color: var(--cinza-4); margin: 0; }
+
+  /* ── VAGAS ── */
+  .job-card {
+    background: var(--branco); border-radius: var(--raio); box-shadow: var(--sombra-sm);
+    padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
+    gap: 16px; margin-bottom: 14px; flex-wrap: wrap;
+  }
+  .job-card__title { font-family: var(--fonte-serif); font-size: 1.05rem; margin-bottom: 6px; }
+  .job-card__meta { font-size: .8rem; color: var(--cinza-4); display: flex; gap: 14px; flex-wrap: wrap; }
+  .job-card__meta i { margin-right: 4px; color: var(--azul); }
+  .job-card__cta {
+    background: var(--azul); color: #fff; border: none; padding: 10px 20px;
+    border-radius: 6px; font-size: .85rem; font-weight: 600; cursor: pointer;
+    white-space: nowrap; transition: background .2s;
+  }
+  .job-card__cta:hover { background: var(--azul-mid); }
+
+  /* ── CRONOGRAMA (Festival) ── */
+  .schedule { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }
+  .schedule-item {
+    background: var(--branco); border-radius: var(--raio); box-shadow: var(--sombra-sm);
+    padding: 16px 20px; display: flex; gap: 18px; align-items: center;
+  }
+  .schedule-item__date {
+    background: var(--azul-leve); color: var(--azul); font-weight: 700;
+    border-radius: 8px; padding: 10px 14px; text-align: center; flex-shrink: 0; font-size: .8rem;
+    min-width: 64px;
+  }
+  .schedule-item__date strong { display: block; font-family: var(--fonte-serif); font-size: 1.3rem; }
+  .schedule-item h4 { font-family: var(--fonte-serif); font-size: 1rem; margin-bottom: 3px; }
+  .schedule-item p { font-size: .82rem; color: var(--cinza-4); margin: 0; }
+}

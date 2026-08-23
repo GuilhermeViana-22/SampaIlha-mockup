@@ -1,0 +1,16 @@
+/* ────────────────────────────────────────────────────────────────
+   Portal Sampa na Ilha — folha de estilo do site público.
+   Organizada por área de interesse; o dashboard /admin usa
+   Tailwind + shadcn/ui (assets/css/tailwind.css).
+   ──────────────────────────────────────────────────────────────── */
+@import './base.css';        /* reset, variáveis, tipografia */
+@import './breaking.css';    /* barra de urgente / ticker */
+@import './header.css';      /* cabeçalho, navegação, barra de categorias */
+@import './layout.css';      /* container, grid principal, hero, section-header */
+@import './cards.css';       /* cards de notícia (grid e lista) */
+@import './sidebar.css';     /* widgets: tempo, mais lidos, newsletter, tags, anúncio */
+@import './footer.css';      /* rodapé */
+@import './pages.css';       /* páginas internas: hero, conteúdo, vagas, podcast, cronograma */
+@import './noticia.css';     /* página de matéria */
+@import './dicas.css';       /* seção de dicas & guias */
+@import './responsive.css';  /* breakpoints — sempre por último */

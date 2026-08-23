@@ -1,0 +1,39 @@
+@layer portal {
+  /* ── NEWS GRID ── */
+  .news-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-bottom: 32px; }
+  .news-card {
+    background: var(--branco); border-radius: var(--raio);
+    overflow: hidden; box-shadow: var(--sombra-sm);
+    transition: transform .2s, box-shadow .2s;
+    display: flex; flex-direction: column;
+  }
+  .news-card:hover { transform: translateY(-3px); box-shadow: var(--sombra-md); }
+  .news-card__thumb {
+    width: 100%; aspect-ratio: 16/9;
+    overflow: hidden; position: relative;
+  }
+  .news-card__thumb .img-bg i { font-size: 2.5rem; }
+  .news-card__body { padding: 16px; display: flex; flex-direction: column; gap: 8px; flex: 1; }
+  .news-card__title { font-family: var(--fonte-serif); font-size: 1.05rem; line-height: 1.35; }
+  .news-card__title:hover { color: var(--azul); }
+  .news-card__excerpt { font-size: .83rem; color: var(--cinza-4); line-height: 1.55; flex: 1; }
+  .news-card__meta { font-size: .75rem; color: var(--cinza-3); display: flex; gap: 12px; margin-top: 4px; }
+  .news-card__meta i { margin-right: 3px; color: var(--cinza-3); }
+
+  /* ── LIST CARDS ── */
+  .news-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 32px; }
+  .list-card {
+    background: var(--branco); border-radius: var(--raio);
+    overflow: hidden; display: flex;
+    box-shadow: var(--sombra-sm);
+    transition: transform .2s, box-shadow .2s;
+  }
+  .list-card:hover { transform: translateY(-2px); box-shadow: var(--sombra-md); }
+  .list-card__thumb { width: 130px; flex-shrink: 0; overflow: hidden; position: relative; }
+  .list-card__thumb .img-bg i { font-size: 1.8rem; }
+  .list-card__body { padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .list-card__title { font-family: var(--fonte-serif); font-size: .95rem; line-height: 1.3; }
+  .list-card__title:hover { color: var(--azul); }
+  .list-card__meta { font-size: .73rem; color: var(--cinza-3); margin-top: auto; display: flex; gap: 10px; }
+  .list-card__meta i { margin-right: 3px; }
+}
