@@ -14,6 +14,7 @@ export const TIPOS_CONTEUDO = [
 
 export const STATUS_POST = [
   { valor: 'publicado', rotulo: 'Publicado', cor: 'green' },
+  { valor: 'em_revisao', rotulo: 'Em revisão', cor: 'gold' },
   { valor: 'rascunho', rotulo: 'Rascunho', cor: 'gray' },
   { valor: 'agendado', rotulo: 'Agendado', cor: 'gold' },
 ] as const

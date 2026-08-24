@@ -6,7 +6,8 @@
 /** Cada conteúdo do portal é uma dessas três coisas. */
 export type PostTipo = 'noticia' | 'dica' | 'informacao'
 
-export type PostStatus = 'publicado' | 'rascunho' | 'agendado'
+/** `em_revisao`: escrito por um editor e à espera da validação do editor-chefe. */
+export type PostStatus = 'publicado' | 'rascunho' | 'em_revisao' | 'agendado'
 
 /** Chave do gradiente usado como capa enquanto não há imagem real. */
 export type CapaGradiente =
@@ -61,6 +62,8 @@ export type PostInput = Omit<Post, 'id' | 'atualizadoEm' | 'leituras'> &
   Partial<Pick<Post, 'leituras'>>
 
 export interface Categoria {
+  /** Só vem da API; é o que a remoção usa. */
+  id?: string
   slug: string
   nome: string
   icone: string
@@ -124,11 +127,30 @@ export interface InscricaoNewsletter {
   criadoEm: string
 }
 
+export type PapelUsuario = 'editor-chefe' | 'editor'
+
 export interface Usuario {
   id: string
   nome: string
   email: string
-  papel: 'editor-chefe' | 'editor'
+  papel: PapelUsuario
+  bio?: string
+  avatarUrl?: string | null
+  ativo?: boolean
+  /** Quantos conteúdos a pessoa assina — mostrado na lista da equipe. */
+  totalPosts?: number
+  /** Senha vem de ADMIN_PASSWORD: o painel não consegue trocá-la. */
+  senhaDoAmbiente?: boolean
+  criadoEm?: string
+}
+
+/** Campos que o editor-chefe manda ao abrir acesso para mais alguém. */
+export interface NovoUsuario {
+  nome: string
+  email: string
+  senha: string
+  papel: PapelUsuario
+  bio?: string
 }
 
 /** Uma linha de contagem (editoria, região ou mês). */

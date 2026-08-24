@@ -56,6 +56,7 @@ export const usePostsStore = defineStore('posts', () => {
     baixados: itens.value.length,
     publicados: itens.value.filter(p => p.status === 'publicado').length,
     rascunhos: itens.value.filter(p => p.status === 'rascunho').length,
+    emRevisao: itens.value.filter(p => p.status === 'em_revisao').length,
     agendados: itens.value.filter(p => p.status === 'agendado').length,
     noticias: itens.value.filter(p => p.tipo === 'noticia').length,
     dicas: itens.value.filter(p => p.tipo === 'dica').length,
@@ -158,9 +159,13 @@ export const usePostsStore = defineStore('posts', () => {
     }
   }
 
-  /** Publica/despublica direto da tabela (PATCH dedicado na API). */
-  async function alternarStatus(post: Post): Promise<Post | null> {
-    const novo: PostStatus = post.status === 'publicado' ? 'rascunho' : 'publicado'
+  /**
+   * Muda o status direto da tabela (PATCH dedicado na API).
+   *
+   * A API tem a palavra final: um editor pedindo `publicado` recebe de volta
+   * `em_revisao`, e é esse valor que entra na lista.
+   */
+  async function mudarStatus(post: Post, novo: PostStatus): Promise<Post | null> {
     try {
       const atualizado = await $fetch<Post>(`/api/posts/${post.id}/status`, {
         method: 'PATCH',
@@ -173,6 +178,26 @@ export const usePostsStore = defineStore('posts', () => {
       erro.value = e?.data?.statusMessage || 'Não foi possível alterar o status.'
       return null
     }
+  }
+
+  /** Publica/despublica com um clique — o que o botão da tabela faz. */
+  function alternarStatus(post: Post): Promise<Post | null> {
+    return mudarStatus(post, post.status === 'publicado' ? 'rascunho' : 'publicado')
+  }
+
+  /** Editor manda o texto para a validação do editor-chefe. */
+  function enviarParaRevisao(post: Post): Promise<Post | null> {
+    return mudarStatus(post, 'em_revisao')
+  }
+
+  /** Editor-chefe aprova o que estava na fila. */
+  function aprovar(post: Post): Promise<Post | null> {
+    return mudarStatus(post, 'publicado')
+  }
+
+  /** Editor-chefe devolve para quem escreveu ajustar. */
+  function devolver(post: Post): Promise<Post | null> {
+    return mudarStatus(post, 'rascunho')
   }
 
   async function alternarDestaque(post: Post): Promise<Post | null> {
@@ -214,7 +239,8 @@ export const usePostsStore = defineStore('posts', () => {
   return {
     itens, total, carregando, salvando, erro, filtros, temMais,
     listaFiltrada, porId, contagem, autores,
-    carregar, carregarMais, criar, atualizar, remover, alternarStatus, alternarDestaque,
+    carregar, carregarMais, criar, atualizar, remover,
+    mudarStatus, alternarStatus, enviarParaRevisao, aprovar, devolver, alternarDestaque,
     buscarPorId, limparFiltros,
   }
 })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { FileTextIcon, InfoIcon, LightbulbIcon, LoaderCircleIcon, NewspaperIcon } from '@lucide/vue'
+import { ClipboardCheckIcon, FileTextIcon, InfoIcon, LightbulbIcon, LoaderCircleIcon, NewspaperIcon } from '@lucide/vue'
 import type { PostTipo } from '#shared/types/content'
 
 definePageMeta({
@@ -12,10 +12,19 @@ useSeoMeta({ title: 'Conteúdos — Painel Sampa na Ilha', robots: 'noindex, nof
 
 
 const posts = usePostsStore()
+const auth = useAuthStore()
 const rota = useRoute()
 
 // Permite chegar filtrado pelos atalhos do dashboard (?tipo=dica).
 if (rota.query.tipo) posts.filtros.tipo = rota.query.tipo as PostTipo
+
+/** Fila de validação: o editor-chefe precisa vê-la antes de qualquer outra coisa. */
+const emRevisao = computed(() => posts.contagem.emRevisao)
+
+function verFilaDeRevisao() {
+  posts.filtros.tipo = 'todos'
+  posts.filtros.status = 'em_revisao'
+}
 
 const resumo = computed(() => [
   { rotulo: 'Todos', valor: posts.contagem.total, icone: FileTextIcon, tipo: 'todos' as const },
@@ -43,6 +52,28 @@ const resumo = computed(() => [
         </div>
       </button>
     </div>
+
+    <button
+      v-if="emRevisao"
+      type="button"
+      class="flex items-center gap-3 rounded-xl border border-sky-500/40 bg-sky-500/10 p-4 text-left transition-colors hover:bg-sky-500/15"
+      @click="verFilaDeRevisao()"
+    >
+      <ClipboardCheckIcon class="size-5 shrink-0 text-sky-600 dark:text-sky-400" />
+      <div>
+        <p class="text-sm font-semibold">
+          {{ emRevisao }} conteúdo(s) aguardando validação
+        </p>
+        <p class="text-xs text-muted-foreground">
+          <template v-if="auth.ehChefe">
+            Clique para filtrar a fila e aprovar ou devolver cada matéria.
+          </template>
+          <template v-else>
+            Você já enviou; agora é com o editor-chefe. Clique para acompanhar.
+          </template>
+        </p>
+      </div>
+    </button>
 
     <AdminPostsFiltros />
 

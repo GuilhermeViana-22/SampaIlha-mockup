@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {
-  FileTextIcon, LayoutDashboardIcon, MailIcon, SettingsIcon,
+  FileTextIcon, LayoutDashboardIcon, MailIcon, SettingsIcon, TagsIcon, UserCircleIcon, UsersIcon,
 } from '@lucide/vue'
 
 /**
@@ -13,12 +13,16 @@ const icones: Record<string, unknown> = {
   FileText: FileTextIcon,
   Mail: MailIcon,
   Settings: SettingsIcon,
+  Tags: TagsIcon,
+  Users: UsersIcon,
+  UserCircle: UserCircleIcon,
 }
 
 const rota = useRoute()
 const posts = usePostsStore()
+const auth = useAuthStore()
 
-const itens = computed(() => MENU_ADMIN.map(item => ({
+const itens = computed(() => MENU_ADMIN.filter(item => !item.soChefe || auth.ehChefe).map(item => ({
   ...item,
   componente: icones[item.icone ?? ''],
   ativo: item.para === '/admin/posts'

@@ -32,10 +32,18 @@ export const MENU_PRINCIPAL: ItemMenu[] = [
  * Menu lateral do painel. Lista simples, sem seções: a ação de criar conteúdo
  * fica na barra superior, para não competir com o item "Conteúdos".
  */
-export const MENU_ADMIN: ItemMenu[] = [
+export interface ItemMenuAdmin extends ItemMenu {
+  /** Some do menu de quem não é editor-chefe. */
+  soChefe?: boolean
+}
+
+export const MENU_ADMIN: ItemMenuAdmin[] = [
   { rotulo: 'Dashboard', para: '/admin/dashboard', icone: 'LayoutDashboard' },
   { rotulo: 'Conteúdos', para: '/admin/posts', icone: 'FileText' },
+  { rotulo: 'Editorias', para: '/admin/editorias', icone: 'Tags', soChefe: true },
+  { rotulo: 'Equipe', para: '/admin/equipe', icone: 'Users', soChefe: true },
   { rotulo: 'Newsletter', para: '/admin/newsletter', icone: 'Mail' },
+  { rotulo: 'Meu perfil', para: '/admin/perfil', icone: 'UserCircle' },
   { rotulo: 'Configurações', para: '/admin/configuracoes', icone: 'Settings' },
 ]
 

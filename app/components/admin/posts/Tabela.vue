@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import {
-  ExternalLinkIcon, EyeIcon, EyeOffIcon, FileTextIcon, MoreHorizontalIcon, PencilIcon,
-  PlusCircleIcon, StarIcon, Trash2Icon,
+  CheckCircle2Icon, ExternalLinkIcon, EyeIcon, EyeOffIcon, FileTextIcon, MoreHorizontalIcon,
+  PencilIcon, PlusCircleIcon, SendIcon, StarIcon, Trash2Icon, UndoIcon,
 } from '@lucide/vue'
 import { toast } from 'vue-sonner'
 import type { Post } from '#shared/types/content'
 
 /** Tabela de conteúdos com as ações de CRUD. */
 const posts = usePostsStore()
+const auth = useAuthStore()
 const paraExcluir = ref<Post | null>(null)
 
 async function alternarStatus(post: Post) {
@@ -16,6 +17,24 @@ async function alternarStatus(post: Post) {
     toast.success(atualizado.status === 'publicado' ? 'Conteúdo publicado.' : 'Conteúdo voltou para rascunho.')
   }
   else { toast.error(posts.erro ?? 'Não foi possível alterar o status.') }
+}
+
+async function enviarParaRevisao(post: Post) {
+  const atualizado = await posts.enviarParaRevisao(post)
+  if (atualizado) toast.success('Enviado para a validação do editor-chefe.')
+  else toast.error(posts.erro ?? 'Não foi possível enviar para revisão.')
+}
+
+async function aprovar(post: Post) {
+  const atualizado = await posts.aprovar(post)
+  if (atualizado) toast.success(`“${post.titulo}” foi aprovado e está no ar.`)
+  else toast.error(posts.erro ?? 'Não foi possível aprovar.')
+}
+
+async function devolver(post: Post) {
+  const atualizado = await posts.devolver(post)
+  if (atualizado) toast.success('Devolvido como rascunho para quem escreveu ajustar.')
+  else toast.error(posts.erro ?? 'Não foi possível devolver.')
 }
 
 async function alternarDestaque(post: Post) {
@@ -93,7 +112,29 @@ const rotuloTipoCurto: Record<string, string> = { noticia: 'Notícia', dica: 'Di
                   <NuxtLink :to="`/admin/posts/${post.id}`"><PencilIcon class="size-4" /></NuxtLink>
                 </Button>
 
+                <!-- Editor não publica: o botão dele manda o texto para a fila. -->
                 <Button
+                  v-if="!auth.ehChefe"
+                  variant="ghost"
+                  size="icon-sm"
+                  :disabled="post.status === 'em_revisao'"
+                  :title="post.status === 'em_revisao' ? 'Aguardando validação do editor-chefe' : 'Enviar para revisão'"
+                  @click="enviarParaRevisao(post)"
+                >
+                  <SendIcon class="size-4" />
+                </Button>
+
+                <template v-else-if="post.status === 'em_revisao'">
+                  <Button variant="ghost" size="icon-sm" title="Aprovar e publicar" @click="aprovar(post)">
+                    <CheckCircle2Icon class="size-4 text-emerald-600" />
+                  </Button>
+                  <Button variant="ghost" size="icon-sm" title="Devolver para ajustes" @click="devolver(post)">
+                    <UndoIcon class="size-4" />
+                  </Button>
+                </template>
+
+                <Button
+                  v-else
                   variant="ghost"
                   size="icon-sm"
                   :title="post.status === 'publicado' ? 'Despublicar' : 'Publicar'"
@@ -110,7 +151,7 @@ const rotuloTipoCurto: Record<string, string> = { noticia: 'Notícia', dica: 'Di
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" class="w-52">
-                    <DropdownMenuItem @click="alternarDestaque(post)">
+                    <DropdownMenuItem v-if="auth.ehChefe" @click="alternarDestaque(post)">
                       <StarIcon class="size-4" />
                       {{ post.destaque ? 'Remover destaque' : 'Destacar na home' }}
                     </DropdownMenuItem>

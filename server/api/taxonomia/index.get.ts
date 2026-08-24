@@ -2,6 +2,7 @@ import type { BadgeCor, Categoria, Regiao } from '../../../shared/types/content'
 import { chamarApi } from '../../utils/api'
 
 interface ApiCategoria {
+  id: string
   slug: string
   name: string
   icon: string
@@ -28,6 +29,7 @@ export default defineEventHandler(async (event): Promise<{ categorias: Categoria
 
   return {
     categorias: categorias.map(item => ({
+      id: item.id,
       slug: item.slug,
       nome: item.name,
       icone: item.icon,

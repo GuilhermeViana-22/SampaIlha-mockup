@@ -9,6 +9,8 @@ export const useAuthStore = defineStore('auth', () => {
   const sessaoVerificada = ref(false)
 
   const autenticado = computed(() => usuario.value !== null)
+  /** Editor-chefe: publica, cuida da equipe e das editorias. */
+  const ehChefe = computed(() => usuario.value?.papel === 'editor-chefe')
   const iniciais = computed(() =>
     (usuario.value?.nome ?? '')
       .split(' ')
@@ -64,5 +66,8 @@ export const useAuthStore = defineStore('auth', () => {
     return usuario.value
   }
 
-  return { usuario, carregando, erro, autenticado, iniciais, sessaoVerificada, entrar, sair, verificarSessao }
+  return {
+    usuario, carregando, erro, autenticado, ehChefe, iniciais, sessaoVerificada,
+    entrar, sair, verificarSessao,
+  }
 })
