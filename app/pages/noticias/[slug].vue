@@ -8,6 +8,9 @@ if (error.value || !data.value) {
 
 const post = computed(() => data.value!.post)
 
+// Contagem de audiência: dispara sozinha quando o leitor demonstra estar lendo.
+useRegistroLeitura(() => post.value.id)
+
 useSeoMeta({
   title: () => `${post.value.titulo} — Portal Sampa na Ilha`,
   description: () => post.value.resumo,
