@@ -114,6 +114,20 @@ export interface EventoAgenda {
 }
 
 /** Assunto em alta (tag com contagem). */
+/** Recado da redação na faixa do topo — vale só pelo dia em que foi cadastrado. */
+export type TipoAviso = 'urgente' | 'informacao' | 'acontecendo'
+
+export interface Aviso {
+  id: string
+  mensagem: string
+  tipo: TipoAviso
+  /** Dia em que o aviso aparece no portal (data no fuso de São Paulo). */
+  exibirEm: string
+  /** Falso para avisos de outros dias, que já saíram (ou ainda não entraram) no ar. */
+  noAr: boolean
+  criadoEm: string
+}
+
 export interface TagEmAlta {
   slug: string
   nome: string

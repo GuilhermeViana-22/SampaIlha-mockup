@@ -23,6 +23,18 @@
     text-transform: uppercase;
     letter-spacing: .1em;
   }
+  /* Informação e cobertura ao vivo não podem gritar como uma urgência. */
+
+  /* Informação acompanha a cor principal do tema — o portal a redefine nas
+     Configurações, então o rótulo escurece por sobreposição em vez de fixar
+     um tom que só combina com a paleta padrão. */
+  .breaking--informacao { background: var(--azul); }
+  .breaking--informacao .breaking__label { background: rgba(0, 0, 0, .22); }
+
+  /* Cobertura ao vivo tem cor própria: é sinal de estado, não de marca. */
+  .breaking--acontecendo { background: #0f766e; }
+  .breaking--acontecendo .breaking__label { background: #0b544e; }
+
   .breaking__ticker { flex: 1; overflow: hidden; }
   .breaking__ticker span {
     display: inline-block;

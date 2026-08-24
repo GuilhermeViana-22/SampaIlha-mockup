@@ -1,22 +1,29 @@
 <script setup lang="ts">
-import type { Post } from '#shared/types/content'
+/**
+ * Faixa de avisos do topo.
+ *
+ * Antes ela ficava sempre no ar, rotulando as últimas notícias como "Urgente"
+ * mesmo num dia em que nada urgente havia acontecido. Agora mostra o que a
+ * redação escreveu, e só no dia em que escreveu — sem aviso do dia, a faixa
+ * não existe.
+ */
+const avisos = useAvisosStore()
+await avisos.carregarDoDia()
 
-/** Ticker "Urgente" — alimentado pelas últimas notícias publicadas. */
-const { data } = await useListaConteudo('breaking', { tipo: 'noticia', limite: 5 })
-
-/** Sem notícia publicada não há o que noticiar: a faixa some por completo. */
-const manchetes = computed<string[]>(() => data.value.itens.map((post: Post) => post.titulo))
+/** O rótulo da faixa segue o aviso mais grave que estiver no ar. */
+const destaque = computed(() => avisos.doDia[0] ?? null)
+const aparencia = computed(() => (destaque.value ? tipoDeAviso(destaque.value.tipo) : null))
 </script>
 
 <template>
-  <div v-if="manchetes.length" class="breaking">
+  <div v-if="destaque && aparencia" class="breaking" :class="`breaking--${destaque.tipo}`">
     <div class="breaking__label">
-      <i class="fas fa-bolt" /> Urgente
+      <i :class="aparencia.icone" /> {{ aparencia.rotulo }}
     </div>
     <div class="breaking__ticker">
       <span>
-        <template v-for="(manchete, i) in manchetes" :key="i">
-          {{ manchete }}<template v-if="i < manchetes.length - 1"> &nbsp;&bull;&nbsp; </template>
+        <template v-for="(aviso, i) in avisos.doDia" :key="aviso.id">
+          {{ aviso.mensagem }}<template v-if="i < avisos.doDia.length - 1"> &nbsp;&bull;&nbsp; </template>
         </template>
       </span>
     </div>
