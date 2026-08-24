@@ -31,7 +31,7 @@ useSeoMeta({
           </p>
 
           <ComumCabecalhoSecao titulo="Os Eixos do Nosso Movimento" />
-          <p>O nosso ecossistema atua de forma integrada em quatro grandes pilares fundamentais:</p>
+          <p>O nosso ecossistema atua de forma integrada através de grandes pilares fundamentais:</p>
           <CulturaEixos />
 
           <ComumCabecalhoSecao titulo="Nossas Frentes de Atuação" />

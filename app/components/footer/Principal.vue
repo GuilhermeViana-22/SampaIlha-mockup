@@ -23,8 +23,12 @@ const ano = new Date().getFullYear()
         </p>
         <p style="margin-top:16px;font-size:.8rem;line-height:1.8;">
           <i class="fas fa-envelope" style="color:var(--ciano);margin-right:6px;" /> {{ CONTATO.email }}<br>
-          <i class="fas fa-phone" style="color:var(--ciano);margin-right:6px;" /> {{ CONTATO.telefone }}<br>
-          <span style="opacity:.6;">{{ CONTATO.razaoSocial }} — CNPJ: {{ CONTATO.cnpj }}</span>
+          <a :href="CONTATO.whatsappUrl" target="_blank" rel="noopener">
+            <i class="fab fa-whatsapp" style="color:var(--ciano);margin-right:6px;" /> {{ CONTATO.whatsapp }}
+          </a><br>
+          <a :href="CONTATO.instagramUrl" target="_blank" rel="noopener">
+            <i class="fab fa-instagram" style="color:var(--ciano);margin-right:6px;" /> {{ CONTATO.instagram }}
+          </a>
         </p>
       </div>
 

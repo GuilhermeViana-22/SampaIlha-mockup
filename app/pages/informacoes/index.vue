@@ -13,7 +13,7 @@ const { data } = await useListaConteudo('lista-informacoes', { tipo: 'informacao
   <div>
     <ComumHeroPagina
       titulo="Informações & Serviço"
-      descricao="Quem somos, como falar com a redação e tudo o que você precisa saber sobre o portal e o projeto cultural."
+      descricao="Como falar com a redação e tudo o que você precisa saber sobre o portal e o projeto cultural."
       etiqueta="Institucional"
       etiqueta-icone="fas fa-circle-info"
       etiqueta-cor="gold"
@@ -31,18 +31,11 @@ const { data } = await useListaConteudo('lista-informacoes', { tipo: 'informacao
             icone="fas fa-circle-info"
           />
 
-          <ComumCabecalhoSecao titulo="Fale com a redação" />
+          <ComumCabecalhoSecao titulo="Canais de Atendimento" />
+          <ComumCanaisAtendimento />
+
+          <ComumCabecalhoSecao titulo="Dados do portal" />
           <div class="eco-grid">
-            <div class="eco-card">
-              <i class="fas fa-envelope" />
-              <h3>E-mail</h3>
-              <p>{{ CONTATO.email }}</p>
-            </div>
-            <div class="eco-card">
-              <i class="fas fa-phone" />
-              <h3>Telefone / WhatsApp</h3>
-              <p>{{ CONTATO.telefone }}</p>
-            </div>
             <div class="eco-card">
               <i class="fas fa-building" />
               <h3>Razão social</h3>

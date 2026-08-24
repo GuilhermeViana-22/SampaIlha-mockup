@@ -18,6 +18,7 @@ export const MENU_PRINCIPAL: ItemMenu[] = [
     icone: 'fas fa-theater-masks',
     filhos: [
       { rotulo: 'Cultura & Arte', para: '/cultura', icone: 'fas fa-newspaper' },
+      { rotulo: 'Quem Somos', para: '/quem-somos', icone: 'fas fa-users' },
       { rotulo: 'O Projeto Sampa na Ilha', para: '/cultura/o-projeto', icone: 'fas fa-seedling' },
       { rotulo: 'Grupo de Dança', para: '/cultura/grupo-danca', icone: 'fas fa-music' },
       { rotulo: 'Workshops & Artesanato', para: '/cultura/workshops', icone: 'fas fa-hands-helping' },
@@ -47,7 +48,7 @@ export const RODAPE_EDITORIAS: ItemMenu[] = [
 ]
 
 export const RODAPE_PORTAL: ItemMenu[] = [
-  { rotulo: 'Sobre nós', para: '/cultura/o-projeto' },
+  { rotulo: 'Quem Somos', para: '/quem-somos' },
   { rotulo: 'Informações & Serviço', para: '/informacoes' },
   { rotulo: 'Contato', para: '/informacoes' },
   { rotulo: 'Anuncie', para: '/informacoes' },
@@ -56,18 +57,33 @@ export const RODAPE_PORTAL: ItemMenu[] = [
   { rotulo: 'Área da redação', para: '/admin' },
 ]
 
-export const REDES_SOCIAIS = [
-  { rotulo: 'Instagram', icone: 'fab fa-instagram', url: 'https://instagram.com' },
-  { rotulo: 'Facebook', icone: 'fab fa-facebook-f', url: 'https://facebook.com' },
-  { rotulo: 'YouTube', icone: 'fab fa-youtube', url: 'https://youtube.com' },
-  { rotulo: 'WhatsApp', icone: 'fab fa-whatsapp', url: 'https://wa.me/5511913060670' },
-  { rotulo: 'Twitter / X', icone: 'fab fa-x-twitter', url: 'https://x.com' },
-]
+/** Número oficial de atendimento, só com dígitos — é o formato do wa.me. */
+const WHATSAPP_DIGITOS = '5511913060670'
 
 export const CONTATO = {
   email: 'contato@portalsampanailha.com.br',
   telefone: '(11) 91306-0670',
+  whatsapp: '(11) 91306-0670',
+  /** Redirect oficial do WhatsApp: abre o app no celular e o Web no desktop. */
+  whatsappUrl: `https://wa.me/${WHATSAPP_DIGITOS}`,
+  instagram: '@portalsampanailha',
+  instagramUrl: 'https://www.instagram.com/sampanailha.tur/',
+  facebookUrl: 'https://www.facebook.com/portalsampanailha',
   razaoSocial: 'Sampa na Ilha Produções e Comunicação LTDA',
   cnpj: '66.549.829/0001-56',
   tagline: 'Conectando São Paulo ao Brasil',
 }
+
+export const REDES_SOCIAIS = [
+  { rotulo: 'Instagram', icone: 'fab fa-instagram', url: CONTATO.instagramUrl },
+  { rotulo: 'Facebook', icone: 'fab fa-facebook-f', url: CONTATO.facebookUrl },
+  { rotulo: 'WhatsApp', icone: 'fab fa-whatsapp', url: CONTATO.whatsappUrl },
+]
+
+/** Canais de atendimento — usados no rodapé, em /quem-somos e em /informacoes. */
+export const CANAIS_ATENDIMENTO = [
+  { rotulo: 'WhatsApp oficial', valor: CONTATO.whatsapp, icone: 'fab fa-whatsapp', url: CONTATO.whatsappUrl },
+  { rotulo: 'E-mail', valor: CONTATO.email, icone: 'fas fa-envelope', url: `mailto:${CONTATO.email}` },
+  { rotulo: 'Instagram', valor: CONTATO.instagram, icone: 'fab fa-instagram', url: CONTATO.instagramUrl },
+  { rotulo: 'Facebook', valor: '/portalsampanailha', icone: 'fab fa-facebook-f', url: CONTATO.facebookUrl },
+]
