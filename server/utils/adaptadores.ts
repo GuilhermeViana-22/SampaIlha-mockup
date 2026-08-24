@@ -92,6 +92,20 @@ export function paraPost(api: ApiPost): Post {
   }
 }
 
+/**
+ * Desfaz o que `urlAbsoluta` fez, antes de a URL voltar para a API.
+ *
+ * O formulário recebe a foto já absoluta (`http://host/api/v1/uploads/...`)
+ * para conseguir exibi-la, e reenvia esse mesmo valor ao salvar. Sem desfazer
+ * aqui, o host do ambiente onde a matéria foi editada ficaria gravado no banco
+ * — e a imagem quebraria assim que o portal mudasse de domínio.
+ */
+export function urlRelativa(url: string | null | undefined): string | null {
+  if (!url) return null
+  const origem = useRuntimeConfig().public.apiOrigin
+  return origem && url.startsWith(origem) ? url.slice(origem.length) : url
+}
+
 /** Corpo de criação/edição de conteúdo, no formato que a API espera. */
 export function paraPayloadApi(dados: Record<string, any>): Record<string, unknown> {
   const mapa: Record<string, string> = {
@@ -118,6 +132,10 @@ export function paraPayloadApi(dados: Record<string, any>): Record<string, unkno
     const destino = mapa[chave]
     if (destino !== undefined && valor !== undefined) payload[destino] = valor
   }
+
+  // A capa volta do formulário como URL absoluta; a API guarda caminho relativo.
+  if (typeof payload.image_url === 'string') payload.image_url = urlRelativa(payload.image_url)
+
   return payload
 }
 
