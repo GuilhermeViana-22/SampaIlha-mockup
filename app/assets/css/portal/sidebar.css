@@ -94,4 +94,83 @@
     font-size: .8rem; opacity: .4; margin-top: 10px;
   }
   .ad-placeholder i { font-size: 1.6rem; }
+
+  /* O widget do tempo inteiro é um botão que abre os 15 dias. */
+  .weather-abrir {
+    display: block; width: 100%;
+    background: none; border: 0; padding: 0;
+    color: inherit; font: inherit; text-align: left; cursor: pointer;
+  }
+  .weather-cta {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin-top: 12px; padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,.2);
+    font-size: .78rem; font-weight: 600; opacity: .85;
+    transition: opacity .2s, gap .2s;
+  }
+  .weather-abrir:hover .weather-cta { opacity: 1; gap: 10px; }
+
+  /* ── Painel de 15 dias ── */
+  .tempo-modal {
+    position: fixed; inset: 0; z-index: 200;
+    background: rgba(10, 25, 47, .55);
+    backdrop-filter: blur(3px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .tempo-modal__caixa {
+    background: var(--branco); border-radius: var(--raio);
+    box-shadow: var(--sombra-md);
+    width: 100%; max-width: 560px;
+    max-height: 90vh; overflow-y: auto;
+  }
+  .tempo-modal__topo {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, var(--azul), var(--ciano));
+    color: #fff;
+    border-radius: var(--raio) var(--raio) 0 0;
+  }
+  .tempo-modal__topo h2 { font-family: var(--fonte-serif); font-size: 1.25rem; line-height: 1.2; }
+  .tempo-modal__topo p { font-size: .85rem; opacity: .85; margin-top: 2px; }
+  .tempo-modal__topo button {
+    background: rgba(255,255,255,.2); border: 0; color: #fff;
+    width: 32px; height: 32px; border-radius: 8px; cursor: pointer; flex-shrink: 0;
+    transition: background .2s;
+  }
+  .tempo-modal__topo button:hover { background: rgba(255,255,255,.35); }
+  .tempo-modal__agora {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 24px; border-bottom: 1px solid var(--cinza-2);
+  }
+  .tempo-modal__agora > i { font-size: 2.2rem; color: var(--azul); }
+  .tempo-modal__grau { font-family: var(--fonte-serif); font-size: 2.6rem; font-weight: 900; line-height: 1; }
+  .tempo-modal__agora p { font-weight: 600; font-size: .95rem; }
+  .tempo-modal__agora small { color: var(--cinza-4); font-size: .8rem; }
+  .tempo-modal__lista { list-style: none; padding: 8px 12px; }
+  .tempo-modal__lista li {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 20px minmax(0,1fr) 56px 72px;
+    align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    font-size: .85rem;
+  }
+  .tempo-modal__lista li:nth-child(odd) { background: var(--cinza-1); }
+  .tempo-modal__lista li > i { color: var(--azul); text-align: center; }
+  .tempo-modal__dia { font-weight: 600; }
+  .tempo-modal__rotulo { color: var(--cinza-4); font-size: .8rem; }
+  .tempo-modal__chuva { color: var(--ciano); font-size: .78rem; white-space: nowrap; }
+  .tempo-modal__faixa { text-align: right; white-space: nowrap; }
+  .tempo-modal__faixa strong { font-size: .95rem; }
+  .tempo-modal__faixa small { color: var(--cinza-4); margin-left: 4px; }
+  .tempo-modal__rodape {
+    padding: 14px 24px 20px; font-size: .75rem; color: var(--cinza-4);
+    border-top: 1px solid var(--cinza-2);
+  }
+  .tempo-modal__rodape a { color: var(--azul); font-weight: 600; }
+
+  @media (max-width: 560px) {
+    .tempo-modal__lista li { grid-template-columns: minmax(0,1fr) 20px 52px 64px; }
+    .tempo-modal__rotulo { display: none; }
+  }
 }

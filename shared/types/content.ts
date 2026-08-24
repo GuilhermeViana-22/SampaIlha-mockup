@@ -163,3 +163,34 @@ export interface RespostaLista<T> {
   itens: T[]
   total: number
 }
+
+/**
+ * Previsão do tempo (Open-Meteo). O front nunca fala com a API externa direto:
+ * quem busca e traduz os códigos WMO é `server/api/tempo.get.ts`.
+ */
+export interface TempoAgora {
+  temperatura: number
+  sensacao: number
+  umidade: number
+  vento: number
+  rotulo: string
+  icone: string
+  atualizadoEm: string
+}
+
+export interface TempoDia {
+  data: string
+  diaCurto: string
+  diaLongo: string
+  minima: number
+  maxima: number
+  chuva: number
+  rotulo: string
+  icone: string
+}
+
+export interface Previsao {
+  cidade: string
+  agora: TempoAgora
+  dias: TempoDia[]
+}
