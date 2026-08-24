@@ -10,6 +10,11 @@ export default defineNuxtConfig({
   css: [
     '~/assets/css/tailwind.css',
     '~/assets/css/portal/index.css',
+    // Estilo do vue-sonner. Sem ele o aviso monta no DOM como um <li> comum,
+    // sem posicionamento nem fundo, e cai no fim do documento — o código
+    // dispara, o elemento existe e ninguém vê nada. O wrapper em
+    // components/ui/sonner só define as variáveis de cor que este CSS consome.
+    'vue-sonner/style.css',
   ],
 
   vite: {
