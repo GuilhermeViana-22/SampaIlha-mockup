@@ -10,9 +10,7 @@ defineProps<{
 
 <template>
   <section class="page-hero">
-    <span v-if="etiqueta" class="badge" :class="`badge--${etiquetaCor ?? 'cyan'}`">
-      <i :class="etiquetaIcone ?? 'fas fa-star'" /> {{ etiqueta }}
-    </span>
+  
     <h1>{{ titulo }}</h1>
     <p v-if="descricao">{{ descricao }}</p>
   </section>
