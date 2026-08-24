@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AtSignIcon, EyeIcon, EyeOffIcon, LoaderCircleIcon, LockIcon, ShieldCheckIcon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
+import logo from '~/assets/logos/logo.png'
 
 /** Tela de acesso ao painel da redação. */
 const auth = useAuthStore()
@@ -25,9 +26,7 @@ async function entrar() {
 <template>
   <Card class="border-none shadow-2xl">
     <CardHeader class="items-center gap-2 text-center">
-      <div class="mx-auto flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#0a4fa8] to-[#00b4d8] text-xl text-white">
-        <i class="fas fa-water" />
-      </div>
+      <img :src="logo" class="mx-auto size-16 object-contain" alt="Portal Sampa na Ilha">
       <CardTitle class="font-serif text-2xl">Painel da Redação</CardTitle>
       <CardDescription>
         Portal Sampa na Ilha — acesso restrito à equipe editorial.

@@ -5,6 +5,7 @@
     max-width: 1280px; margin: 0 auto; padding: 40px 24px;
     display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 32px;
   }
+  .footer-brand .logo__img { height: 68px; }
   .footer-brand .logo__name { color: #fff; }
   .footer-brand .logo__tagline { color: rgba(255,255,255,.4); }
   .footer-brand p { font-size: .85rem; margin-top: 14px; line-height: 1.7; }

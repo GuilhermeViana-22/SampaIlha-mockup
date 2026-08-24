@@ -40,9 +40,9 @@
   }
 
   @media (max-width: 860px) {
-    .header-inner { padding: 0 16px; gap: 12px; height: 66px; }
+    .header-inner { padding: 0 16px; gap: 12px; height: 72px; }
     .logo { min-width: 0; }
-    .logo__img { height: 44px; }
+    .logo__img { height: 54px; }
     .logo__name { font-size: 1.05rem; white-space: nowrap; }
     .logo__tagline { display: none; }
     .container { padding: 0 16px; }

@@ -15,18 +15,11 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 76px;
+    height: 88px;
     gap: 24px;
   }
   .logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .logo__icon {
-    width: 40px; height: 40px;
-    background: linear-gradient(135deg, var(--azul), var(--ciano));
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    color: #fff; font-size: 1.1rem;
-  }
-  .logo__img { height: 58px; width: auto; display: block; }
+  .logo__img { height: 70px; width: auto; display: block; flex-shrink: 0; }
   .logo__name { font-family: var(--fonte-serif); font-size: 1.25rem; font-weight: 900; color: var(--azul); line-height: 1.1; }
   .logo__tagline { font-size: .65rem; color: var(--cinza-4); text-transform: uppercase; letter-spacing: .08em; }
 
