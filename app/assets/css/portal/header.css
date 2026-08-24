@@ -9,7 +9,6 @@
     box-shadow: var(--sombra-md);
   }
   .header-inner {
-    position: relative; z-index: 2;
     max-width: 1280px;
     margin: 0 auto;
     padding: 0 24px;
@@ -143,8 +142,9 @@
     overscroll-behavior: contain;
   }
   .mobile-nav.is-open { display: block; }
+  /* Fica abaixo do cabeçalho (z-index 100), que segue legível e clicável. */
   .mobile-nav__veu {
-    position: fixed; inset: 0; z-index: 1;
+    position: fixed; inset: 0; z-index: 90;
     background: rgba(0,0,0,.35);
     animation: veu-entra .18s ease;
   }

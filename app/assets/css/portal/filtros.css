@@ -78,7 +78,8 @@
      trocar de editoria no meio da lista não exige voltar ao topo. */
   @media (max-width: 860px) {
     .filtro {
-      position: sticky; top: 72px; z-index: 20;
+      /* 72px do cabeçalho + 3px da borda inferior dele. */
+      position: sticky; top: 75px; z-index: 20;
       margin: 16px 0 16px;
       padding: 10px 0 6px;
       background: var(--cor-fundo);

@@ -27,6 +27,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{ 'update:modelValue': [string] }>()
 
+const raiz = ref<HTMLElement | null>(null)
 const trilho = ref<HTMLElement | null>(null)
 const temAntes = ref(false)
 const temDepois = ref(false)
@@ -66,8 +67,23 @@ function centralizarAtiva() {
   }
 }
 
+/**
+ * Filtrar no meio da lista deixava o leitor olhando para a barriga de uma
+ * lista nova. Se a barra já saiu de vista, a página sobe até ela.
+ */
+function subirAteOFiltro() {
+  const el = raiz.value
+  if (!el) return
+  // `offsetTop` continua marcando a posição estática mesmo com a barra grudada.
+  const alvo = Math.max(0, el.offsetTop - 84)
+  if (window.scrollY <= alvo) return
+  const suave = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  window.scrollTo({ top: alvo, behavior: suave ? 'smooth' : 'auto' })
+}
+
 function selecionar(slug: string) {
   emit('update:modelValue', slug)
+  subirAteOFiltro()
   nextTick(centralizarAtiva)
 }
 
@@ -84,7 +100,7 @@ watch(() => props.opcoes.length, () => nextTick(medir))
 </script>
 
 <template>
-  <div class="filtro" :class="{ 'filtro--antes': temAntes, 'filtro--depois': temDepois }">
+  <div ref="raiz" class="filtro" :class="{ 'filtro--antes': temAntes, 'filtro--depois': temDepois }">
     <button
       class="filtro__seta filtro__seta--antes"
       type="button"

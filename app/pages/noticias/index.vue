@@ -10,8 +10,9 @@ const router = useRouter()
 
 /**
  * A editoria escolhida vive na URL (`?editoria=cultura`), não num ref solto:
- * assim o botão voltar desfaz o filtro, recarregar a página mantém a seleção
- * e o link compartilhado abre na mesma lista que o leitor estava vendo.
+ * recarregar a página mantém a seleção e o link compartilhado abre na mesma
+ * lista que o leitor estava vendo. É `replace` de propósito — trocar de
+ * pastilha cinco vezes não deve exigir cinco toques em "voltar" para sair.
  */
 const categoriaAtiva = computed({
   get: () => (rota.query.editoria as string | undefined) ?? '',

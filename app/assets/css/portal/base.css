@@ -50,6 +50,11 @@
   }
 
   html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
+
   body { font-family: var(--fonte-sans); color: var(--cor-texto); background: var(--cor-fundo); line-height: 1.6; }
   a { color: inherit; text-decoration: none; }
 
@@ -76,4 +81,49 @@
     .ad-widget,
     .tempo-modal__topo
   ) :is(h1, h2, h3, h4, h5, h6) { color: inherit; }
+}
+
+@layer portal {
+  /* ── ACESSIBILIDADE E NAVEGAÇÃO ───────────────────────────────────
+     O portal é navegado no teclado (redação) e no leitor de tela; o
+     contorno de foco tinha sumido junto com o reset.
+     ──────────────────────────────────────────────────────────────── */
+  .portal-tema :is(a, button, input, select, textarea, [tabindex]):focus-visible {
+    outline: 3px solid var(--cor-destaque);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  #conteudo:focus { outline: none; }
+
+  /* Primeiro Tab da página: pula cabeçalho, ticker e barra de editorias. */
+  .pular-conteudo {
+    position: fixed; top: 8px; left: 8px; z-index: 300;
+    transform: translateY(-160%);
+    background: var(--azul); color: #fff;
+    padding: 10px 16px; border-radius: 8px;
+    font-size: .85rem; font-weight: 600;
+    box-shadow: var(--sombra-md);
+    transition: transform .18s;
+  }
+  .pular-conteudo:focus { transform: translateY(0); }
+
+  /* ── VOLTAR AO TOPO ── */
+  .voltar-topo {
+    position: fixed; right: 18px; bottom: 18px; z-index: 90;
+    width: 46px; height: 46px; border-radius: 50%;
+    border: none; cursor: pointer;
+    background: var(--azul); color: var(--cor-primaria-contraste);
+    box-shadow: var(--sombra-lg);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem;
+    transition: background .2s, transform .2s;
+  }
+  .voltar-topo:hover { background: var(--azul-mid); transform: translateY(-2px); }
+  .voltar-topo-enter-active, .voltar-topo-leave-active { transition: opacity .2s, transform .2s; }
+  .voltar-topo-enter-from, .voltar-topo-leave-to { opacity: 0; transform: translateY(10px); }
+
+  /* No celular sobe um pouco para não brigar com a barra do navegador. */
+  @media (max-width: 640px) {
+    .voltar-topo { right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+  }
 }

@@ -24,13 +24,16 @@ function ativo(para: string) {
 
 <template>
   <div>
-    <!-- Véu: tocar fora fecha o menu, o gesto que todo mundo já espera. -->
-    <div
-      v-if="portal.menuAberto"
-      class="mobile-nav__veu"
-      aria-hidden="true"
-      @click="portal.fecharMenu()"
-    />
+    <!-- Véu: tocar fora fecha o menu, o gesto que todo mundo já espera. Vai
+         para o body para escurecer a página sem escurecer o cabeçalho. -->
+    <Teleport to="body">
+      <div
+        v-if="portal.menuAberto"
+        class="mobile-nav__veu"
+        aria-hidden="true"
+        @click="portal.fecharMenu()"
+      />
+    </Teleport>
 
     <nav
       id="menu-mobile"

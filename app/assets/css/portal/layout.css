@@ -2,6 +2,10 @@
   /* ── LAYOUT ── */
   .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
   .layout { display: grid; grid-template-columns: 1fr 320px; gap: 32px; padding: 32px 0 48px; }
+  /* Item de grid nasce com `min-width: auto` e cresce até caber o conteúdo mais
+     largo — basta um trilho rolável ou uma tabela dentro da coluna para a
+     página inteira ganhar rolagem horizontal no celular. */
+  .layout > * { min-width: 0; }
 
   /* ── HERO ── */
   .hero-grid { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; gap: 16px; margin-bottom: 32px; }
