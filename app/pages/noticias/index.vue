@@ -41,7 +41,7 @@ const titulo = computed(() => {
   <div>
     <ComumHeroPagina
       titulo="Notícias"
-      descricao="A cobertura completa do portal — de São Paulo às cinco regiões do Brasil."
+      descricao="A cobertura completa do portal de São Paulo às cinco regiões do Brasil."
       etiqueta="Editorias"
       etiqueta-icone="fas fa-newspaper"
     />

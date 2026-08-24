@@ -74,9 +74,18 @@ function centralizarAtiva() {
 function subirAteOFiltro() {
   const el = raiz.value
   if (!el) return
-  // `offsetTop` continua marcando a posição estática mesmo com a barra grudada.
-  const alvo = Math.max(0, el.offsetTop - 84)
-  if (window.scrollY <= alvo) return
+
+  /* Com a barra grudada no topo, tanto `offsetTop` quanto o rect devolvem a
+     posição de agora, não a de origem. Soltar a barra por um instante para
+     medir custa um reflow e não muda nada na tela: o espaço estático dela
+     continua reservado no fluxo. */
+  const posicao = el.style.position
+  el.style.position = 'static'
+  const estatico = el.getBoundingClientRect().top + window.scrollY
+  el.style.position = posicao
+
+  const alvo = Math.max(0, estatico - 84)
+  if (window.scrollY <= alvo + 4) return
   const suave = !window.matchMedia('(prefers-reduced-motion: reduce)').matches
   window.scrollTo({ top: alvo, behavior: suave ? 'smooth' : 'auto' })
 }
