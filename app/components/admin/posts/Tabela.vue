@@ -3,54 +3,131 @@ import {
   CheckCircle2Icon, ExternalLinkIcon, EyeIcon, EyeOffIcon, FileTextIcon, MoreHorizontalIcon,
   PencilIcon, PlusCircleIcon, SendIcon, StarIcon, Trash2Icon, UndoIcon,
 } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 import type { Post } from '#shared/types/content'
 
-/** Tabela de conteúdos com as ações de CRUD. */
+/**
+ * Tabela de conteúdos com as ações de CRUD.
+ *
+ * Toda ação aqui é assíncrona e termina em um aviso na tela: sucesso quando
+ * aconteceu o que foi pedido, alerta quando a API aceitou o pedido mas fez
+ * outra coisa (o editor pedindo publicação e recebendo revisão) e erro quando
+ * nada mudou. As chamadas passam pela store, que já converte a falha em `null`
+ * e guarda o texto em `posts.erro` — por isso o padrão abaixo é checar o
+ * retorno, e não um `try/catch`.
+ */
 const posts = usePostsStore()
 const auth = useAuthStore()
 const paraExcluir = ref<Post | null>(null)
+const excluindo = ref(false)
 
+/**
+ * Publica ou despublica com um clique.
+ *
+ * A API tem a palavra final: um editor pedindo publicação recebe de volta
+ * `em_revisao`. Nesse caso o aviso precisa ser de alerta — dizer "publicado"
+ * seria mentira, e dizer "erro" esconderia que o pedido foi aceito.
+ */
 async function alternarStatus(post: Post) {
   const atualizado = await posts.alternarStatus(post)
-  if (atualizado) {
-    toast.success(atualizado.status === 'publicado' ? 'Conteúdo publicado.' : 'Conteúdo voltou para rascunho.')
+
+  if (!atualizado) {
+    avisar.falha(posts.erro ?? 'Não foi possível alterar o status.')
+    return
   }
-  else { toast.error(posts.erro ?? 'Não foi possível alterar o status.') }
+
+  if (atualizado.status === 'publicado') {
+    avisar.sucesso('Conteúdo publicado.', `“${post.titulo}” já está no ar.`)
+  }
+  else if (atualizado.status === 'em_revisao') {
+    avisar.alerta(
+      'Enviado para revisão, não publicado.',
+      'Publicar é decisão do editor-chefe — o texto entrou na fila de validação.',
+    )
+  }
+  else {
+    avisar.sucesso('Conteúdo voltou para rascunho.', 'Saiu do ar, mas continua guardado no painel.')
+  }
 }
 
+/** Editor manda o próprio texto para a validação do editor-chefe. */
 async function enviarParaRevisao(post: Post) {
   const atualizado = await posts.enviarParaRevisao(post)
-  if (atualizado) toast.success('Enviado para a validação do editor-chefe.')
-  else toast.error(posts.erro ?? 'Não foi possível enviar para revisão.')
-}
 
-async function aprovar(post: Post) {
-  const atualizado = await posts.aprovar(post)
-  if (atualizado) toast.success(`“${post.titulo}” foi aprovado e está no ar.`)
-  else toast.error(posts.erro ?? 'Não foi possível aprovar.')
-}
-
-async function devolver(post: Post) {
-  const atualizado = await posts.devolver(post)
-  if (atualizado) toast.success('Devolvido como rascunho para quem escreveu ajustar.')
-  else toast.error(posts.erro ?? 'Não foi possível devolver.')
-}
-
-async function alternarDestaque(post: Post) {
-  const atualizado = await posts.alternarDestaque(post)
   if (atualizado) {
-    toast.success(atualizado.destaque ? 'Marcado como destaque da home.' : 'Removido dos destaques.')
+    avisar.sucesso('Enviado para a validação do editor-chefe.', `“${post.titulo}” está na fila.`)
+  }
+  else {
+    avisar.falha(posts.erro ?? 'Não foi possível enviar para revisão.')
   }
 }
 
+/** Editor-chefe aprova o que estava na fila e o conteúdo vai ao ar. */
+async function aprovar(post: Post) {
+  const atualizado = await posts.aprovar(post)
+
+  if (atualizado) avisar.sucesso(`“${post.titulo}” foi aprovado e está no ar.`)
+  else avisar.falha(posts.erro ?? 'Não foi possível aprovar.')
+}
+
+/** Editor-chefe devolve para quem escreveu ajustar. */
+async function devolver(post: Post) {
+  const atualizado = await posts.devolver(post)
+
+  if (atualizado) {
+    avisar.sucesso('Devolvido para ajustes.', `“${post.titulo}” voltou como rascunho para quem escreveu.`)
+  }
+  else {
+    avisar.falha(posts.erro ?? 'Não foi possível devolver.')
+  }
+}
+
+/** Liga/desliga o destaque na vitrine da home. Só o editor-chefe. */
+async function alternarDestaque(post: Post) {
+  const atualizado = await posts.alternarDestaque(post)
+
+  if (!atualizado) {
+    avisar.falha(posts.erro ?? 'Não foi possível alterar o destaque.')
+    return
+  }
+
+  if (atualizado.destaque) avisar.sucesso('Marcado como destaque da home.')
+  else avisar.sucesso('Removido dos destaques.')
+}
+
+/**
+ * Exclusão definitiva do conteúdo.
+ *
+ * Fecha o diálogo antes de chamar a API: `paraExcluir` é a fonte do `:open`, e
+ * quem confirma não deve ficar olhando o modal parado enquanto a requisição
+ * corre. O alvo é copiado para uma variável local justamente por isso — depois
+ * de `paraExcluir = null` não há mais de onde ler o id nem o título.
+ *
+ * `excluindo` bloqueia o clique repetido: o segundo DELETE do mesmo id voltaria
+ * 404 e mostraria um erro para uma exclusão que, na verdade, deu certo.
+ */
 async function confirmarExclusao() {
-  if (!paraExcluir.value) return
-  const titulo = paraExcluir.value.titulo
-  const ok = await posts.remover(paraExcluir.value.id)
+  const alvo = paraExcluir.value
+  if (!alvo || excluindo.value) return
+
+  excluindo.value = true
   paraExcluir.value = null
-  if (ok) toast.success(`“${titulo}” foi excluído.`)
-  else toast.error(posts.erro ?? 'Não foi possível excluir.')
+
+  try {
+    const excluido = await posts.remover(alvo.id)
+
+    if (excluido) {
+      avisar.sucesso(
+        `“${alvo.titulo}” foi excluído em definitivo.`,
+        'O texto, as fotos e as leituras saíram do servidor — não há como recuperar.',
+      )
+    }
+    else {
+      avisar.falha(posts.erro ?? 'Não foi possível excluir.', 'O conteúdo continua no painel.')
+    }
+  }
+  finally {
+    excluindo.value = false
+  }
 }
 
 const rotuloTipoCurto: Record<string, string> = { noticia: 'Notícia', dica: 'Dica', informacao: 'Informação' }
@@ -197,16 +274,34 @@ const rotuloTipoCurto: Record<string, string> = { noticia: 'Notícia', dica: 'Di
     <AlertDialog :open="!!paraExcluir" @update:open="valor => !valor && (paraExcluir = null)">
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Excluir este conteúdo?</AlertDialogTitle>
+          <AlertDialogTitle>Excluir “{{ paraExcluir?.titulo }}” para sempre?</AlertDialogTitle>
           <AlertDialogDescription>
-            “{{ paraExcluir?.titulo }}” será removido do portal. Esta ação não pode ser desfeita.
+            A exclusão é <strong class="text-foreground">permanente</strong>: o texto, as fotos e as
+            leituras registradas são apagados do servidor e não há como recuperar depois — não existe
+            lixeira.
+            <template v-if="paraExcluir?.status === 'publicado'">
+              A matéria também sai do ar na hora, e quem chegar pelo link antigo verá página não
+              encontrada.
+            </template>
+            <br>
+            <span class="mt-2 block">
+              Se a ideia é apenas tirar do portal, feche este aviso e use
+              <strong class="text-foreground">Despublicar</strong>: o conteúdo volta a rascunho e
+              continua guardado.
+            </span>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel @click="paraExcluir = null">Cancelar</AlertDialogCancel>
-          <AlertDialogAction class="bg-destructive text-white hover:bg-destructive/90" @click="confirmarExclusao()">
-            Excluir
-          </AlertDialogAction>
+          <!--
+            Botão comum, não `AlertDialogAction`: o primitivo fecha o diálogo no
+            próprio clique, e esse fechamento roda antes do nosso handler — que
+            então encontrava `paraExcluir` já nulo e saía sem excluir nada.
+            Aqui quem fecha é `confirmarExclusao`, depois de ler o alvo.
+          -->
+          <Button variant="destructive" :disabled="excluindo" @click="confirmarExclusao()">
+            Excluir para sempre
+          </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>

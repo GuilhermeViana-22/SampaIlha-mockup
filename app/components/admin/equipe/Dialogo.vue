@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { KeyRoundIcon, LoaderCircleIcon, SaveIcon, ShuffleIcon, UserPlusIcon } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 import type { PapelUsuario, Usuario } from '#shared/types/content'
 
 /**
@@ -62,12 +61,24 @@ function sortearSenha() {
   const sorteio = crypto.getRandomValues(new Uint32Array(14))
   form.senha = [...sorteio].map(n => alfabeto[n % alfabeto.length]).join('')
   navigator.clipboard?.writeText(form.senha).then(
-    () => toast.info('Senha sorteada e copiada para a área de transferência.'),
-    () => toast.info('Senha sorteada.'),
+    () => avisar.info('Senha sorteada e copiada.', 'Passe para a pessoa por um canal seguro.'),
+    () => avisar.alerta('Senha sorteada, mas não foi copiada.', 'Copie do campo à mão antes de salvar.'),
   )
 }
 
+/**
+ * Grava o membro da redação — cadastra um novo ou atualiza o existente.
+ *
+ * O diálogo só fecha quando a gravação passa: fechando antes, um e-mail
+ * duplicado ou uma senha curta levariam embora tudo o que foi digitado. Em caso
+ * de erro o formulário fica aberto com os dados no lugar, à espera do ajuste.
+ *
+ * A senha é opcional na edição: campo vazio quer dizer "não mexe na senha
+ * atual", e por isso ela só entra no corpo do pedido quando foi preenchida.
+ */
 async function salvar() {
+  if (redacao.salvando) return
+
   try {
     if (editando.value && props.pessoa) {
       await redacao.atualizar(props.pessoa.id, {
@@ -78,7 +89,11 @@ async function salvar() {
         ativo: form.ativo,
         ...(form.senha ? { senha: form.senha } : {}),
       })
-      toast.success(`Cadastro de ${form.nome} atualizado.`)
+
+      avisar.sucesso(
+        `Cadastro de ${form.nome} atualizado.`,
+        form.senha ? 'A senha também foi trocada.' : undefined,
+      )
     }
     else {
       await redacao.criar({
@@ -88,13 +103,19 @@ async function salvar() {
         papel: form.papel,
         bio: form.bio,
       })
-      toast.success(`${form.nome} já pode entrar no painel.`)
+
+      avisar.sucesso(`${form.nome} já pode entrar no painel.`, `Acesso por ${form.email}.`)
     }
+
     aberto.value = false
     emit('salvo')
   }
-  catch (e: any) {
-    toast.error(e.message)
+  catch (e: unknown) {
+    avisar.erro(
+      e,
+      editando.value ? 'Não foi possível salvar o cadastro.' : 'Não foi possível abrir o acesso.',
+      'O formulário continua aberto com o que você preencheu.',
+    )
   }
 }
 </script>

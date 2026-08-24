@@ -2,7 +2,6 @@
 import {
   ArrowLeftIcon, ExternalLinkIcon, ImagePlusIcon, LoaderCircleIcon, SaveIcon, Trash2Icon, XIcon,
 } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 import type { CapaGradiente, Post, PostImagem, PostInput } from '#shared/types/content'
 
 /** Campos que o formulário edita — o resto (id, leituras, datas) é do servidor. */
@@ -91,15 +90,27 @@ function removerTag(tag: string) {
 }
 
 /**
- * Toda matéria deve subir com foto. O arquivo vai para a API (que valida o
- * conteúdo real da imagem) e a primeira foto enviada vira a capa.
+ * Envia uma foto para a matéria.
+ *
+ * O arquivo vai para a API, que valida o conteúdo real da imagem (um `.exe`
+ * renomeado para `.jpg` é recusado lá, não aqui). A primeira foto enviada vira
+ * a capa automaticamente.
+ *
+ * O campo de arquivo é limpo no `finally` mesmo quando dá erro: sem isso,
+ * escolher o mesmo arquivo de novo não dispararia `change` e pareceria que o
+ * botão travou.
  */
 async function enviarFoto(evento: Event) {
   const arquivo = (evento.target as HTMLInputElement).files?.[0]
   if (!arquivo) return
 
+  // A API anexa a imagem a uma matéria existente; sem id não há onde pendurar.
   if (!edicao.value) {
-    toast.error('Salve o conteúdo primeiro — a foto é anexada à matéria já criada.')
+    avisar.alerta(
+      'Salve o conteúdo primeiro.',
+      'A foto é anexada a uma matéria que já existe — crie o rascunho e envie em seguida.',
+    )
+    if (campoArquivo.value) campoArquivo.value.value = ''
     return
   }
 
@@ -110,12 +121,14 @@ async function enviarFoto(evento: Event) {
     corpo.append('set_as_cover', String(fotos.value.length === 0))
 
     const foto = await $fetch<PostImagem>(`/api/posts/${props.post!.id}/foto`, { method: 'POST', body: corpo })
+
     fotos.value.push(foto)
     if (foto.capa) form.imagemUrl = foto.url
-    toast.success('Foto enviada.')
+
+    avisar.sucesso('Foto enviada.', foto.capa ? 'Ela entrou como capa da matéria.' : undefined)
   }
-  catch (e: any) {
-    toast.error(e?.data?.statusMessage ?? 'Não foi possível enviar a foto.')
+  catch (e: unknown) {
+    avisar.erro(e, 'Não foi possível enviar a foto.')
   }
   finally {
     enviandoFoto.value = false
@@ -123,23 +136,52 @@ async function enviarFoto(evento: Event) {
   }
 }
 
+/**
+ * Remove uma foto da matéria — arquivo incluído, do lado da API.
+ *
+ * Quando a foto removida era a capa, a próxima da lista assume o lugar para o
+ * card da matéria não ficar sem imagem no portal.
+ */
 async function removerFoto(foto: PostImagem) {
   try {
     await $fetch(`/api/posts/${props.post!.id}/foto`, { method: 'DELETE', params: { imagemId: foto.id } })
+
     fotos.value = fotos.value.filter(item => item.id !== foto.id)
-    if (form.imagemUrl === foto.url) form.imagemUrl = fotos.value[0]?.url ?? null
-    toast.success('Foto removida.')
+
+    const eraCapa = form.imagemUrl === foto.url
+    if (eraCapa) form.imagemUrl = fotos.value[0]?.url ?? null
+
+    if (eraCapa && !form.imagemUrl) {
+      avisar.alerta('Foto removida — a matéria ficou sem capa.', 'Envie outra imagem antes de publicar.')
+    }
+    else {
+      avisar.sucesso('Foto removida.')
+    }
   }
-  catch (e: any) {
-    toast.error(e?.data?.statusMessage ?? 'Não foi possível remover a foto.')
+  catch (e: unknown) {
+    avisar.erro(e, 'Não foi possível remover a foto.')
   }
 }
 
+/**
+ * Grava o conteúdo — cria na primeira vez, atualiza nas seguintes.
+ *
+ * `publicar` é o botão "Salvar e publicar". Vale lembrar que pedir publicação
+ * não garante publicação: vindo de um editor, a API devolve o texto como
+ * `em_revisao`. Por isso o aviso do fim olha o status que voltou do servidor, e
+ * não o que foi enviado — é a diferença entre avisar a verdade e mentir para
+ * quem acabou de clicar.
+ *
+ * Só há redirecionamento na criação: depois de existir um id, a matéria ganha a
+ * própria URL de edição (e é a partir dela que o upload de foto passa a
+ * funcionar).
+ */
 async function salvar(publicar = false) {
   if (!form.titulo.trim()) {
-    toast.error('Dê um título ao conteúdo antes de salvar.')
+    avisar.alerta('Dê um título ao conteúdo antes de salvar.')
     return
   }
+
   if (publicar) form.status = 'publicado'
 
   const dados: Partial<PostInput> = {
@@ -147,17 +189,36 @@ async function salvar(publicar = false) {
     tempoLeitura: form.tempoLeitura || Math.max(1, Math.round(palavras.value / 200)),
   }
 
-  const salvo = edicao.value
-    ? await posts.atualizar(props.post!.id, dados)
-    : await posts.criar(dados)
+  const criando = !edicao.value
+
+  const salvo = criando
+    ? await posts.criar(dados)
+    : await posts.atualizar(props.post!.id, dados)
 
   if (!salvo) {
-    toast.error(posts.erro ?? 'Não foi possível salvar.')
+    avisar.falha(posts.erro ?? 'Não foi possível salvar.', 'Nada foi gravado — o texto continua aqui na tela.')
     return
   }
 
-  toast.success(edicao.value ? 'Alterações salvas.' : 'Conteúdo criado.')
-  if (!edicao.value) await navigateTo(`/admin/posts/${salvo.id}`)
+  // Mantém a tela em sincronia com o que o servidor de fato gravou (status,
+  // slug e tempo de leitura podem voltar diferentes do que foi enviado).
+  form.status = salvo.status
+  form.slug = salvo.slug
+
+  if (publicar && salvo.status === 'em_revisao') {
+    avisar.alerta(
+      'Salvo e enviado para revisão.',
+      'Publicar é decisão do editor-chefe — o texto entrou na fila de validação.',
+    )
+  }
+  else if (salvo.status === 'publicado') {
+    avisar.sucesso(criando ? 'Conteúdo criado e publicado.' : 'Alterações salvas e no ar.')
+  }
+  else {
+    avisar.sucesso(criando ? 'Conteúdo criado.' : 'Alterações salvas.', 'Continua como rascunho, fora do ar.')
+  }
+
+  if (criando) await navigateTo(`/admin/posts/${salvo.id}`)
 }
 
 // Espalha o objeto reativo (não `toRaw`), senão o computed não acompanha as edições.

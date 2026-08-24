@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import Editor from '@tinymce/tinymce-vue'
-import { toast } from 'vue-sonner'
 
 /**
  * Editor do corpo da matéria.
@@ -55,8 +54,10 @@ async function enviarImagem(blobInfo: { blob: () => Blob, filename: () => string
     })
     return foto.url
   }
-  catch (e: any) {
-    throw new Error(e?.data?.statusMessage ?? 'Não foi possível enviar a imagem.')
+  catch (e: unknown) {
+    // O TinyMCE mostra esta mensagem na própria notificação dele, dentro do
+    // editor — por isso aqui se lança em vez de chamar `avisar`.
+    throw new Error(mensagemDoErro(e, 'Não foi possível enviar a imagem.'))
   }
 }
 
@@ -122,7 +123,7 @@ function aoIniciar({ editor }: { editor: any }) {
 const chaveDoEditor = computed(() => `${escuro.value ? 'dark' : 'light'}-${props.postId ?? 'novo'}`)
 
 function avisarSemImagem() {
-  if (!props.postId) toast.info('Salve o conteúdo primeiro para anexar imagens ao texto.')
+  if (!props.postId) avisar.info('Salve o conteúdo primeiro para anexar imagens ao texto.')
 }
 </script>
 

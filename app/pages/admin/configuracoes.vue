@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { LoaderCircleIcon, PaletteIcon, RotateCcwIcon, SaveIcon } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 import { NIVEIS_TITULO, TEMA_PADRAO } from '#shared/types/tema'
 
 definePageMeta({
@@ -38,40 +37,49 @@ const CORES_BASE = [
   { chave: 'texto', rotulo: 'Cor do texto', descricao: 'Texto corrido das matérias.' },
 ] as const
 
+/** Grava a paleta escolhida — ela passa a valer para todo o portal. */
 async function salvarTema() {
   try {
     await tema.salvar()
-    toast.success('Aparência do site atualizada.')
+    avisar.sucesso('Aparência do site atualizada.', 'As novas cores já valem para quem está lendo o portal.')
   }
-  catch {
-    toast.error('Não foi possível salvar a aparência.')
+  catch (e: unknown) {
+    avisar.erro(e, 'Não foi possível salvar a aparência.', 'As cores continuam como estavam.')
   }
 }
 
+/** Volta a paleta oficial do portal, desfazendo o que foi customizado. */
 async function restaurarTema() {
   restaurandoTema.value = true
   try {
     await tema.restaurarPadrao()
-    toast.success('Paleta oficial do portal restaurada.')
+    avisar.sucesso('Paleta oficial do portal restaurada.')
   }
-  catch {
-    toast.error('Não foi possível restaurar a paleta padrão.')
+  catch (e: unknown) {
+    avisar.erro(e, 'Não foi possível restaurar a paleta padrão.')
   }
   finally {
     restaurandoTema.value = false
   }
 }
 
+/**
+ * Recarrega o conteúdo original do mockup.
+ *
+ * É uma ação de bastidor destrutiva o bastante para merecer aviso próprio: ela
+ * repõe o material de demonstração por cima do que estiver lá.
+ */
 async function restaurar() {
   restaurando.value = true
   try {
     await $fetch('/api/restaurar-seed', { method: 'POST' })
     await posts.carregar()
     await refreshNuxtData()
-    toast.success('Conteúdo original do mockup restaurado.')
+
+    avisar.sucesso('Conteúdo original do mockup restaurado.', 'A listagem do painel já está atualizada.')
   }
-  catch {
-    toast.error('Não foi possível restaurar o conteúdo.')
+  catch (e: unknown) {
+    avisar.erro(e, 'Não foi possível restaurar o conteúdo.')
   }
   finally {
     restaurando.value = false

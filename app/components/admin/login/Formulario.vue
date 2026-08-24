@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { AtSignIcon, EyeIcon, EyeOffIcon, LoaderCircleIcon, LockIcon, ShieldCheckIcon } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 import logo from '~/assets/logos/logo.png'
 
 /** Tela de acesso ao painel da redação. */
@@ -15,10 +14,10 @@ const mostrarSenha = ref(false)
 async function entrar() {
   const ok = await auth.entrar(email.value, senha.value, lembrar.value)
   if (!ok) {
-    toast.error(auth.erro ?? 'Não foi possível entrar.')
+    avisar.falha(auth.erro ?? 'Não foi possível entrar.')
     return
   }
-  toast.success(`Bem-vindo(a), ${auth.usuario?.nome}!`)
+  avisar.sucesso(`Bem-vindo(a), ${auth.usuario?.nome}!`)
   await navigateTo((rota.query.redirecionar as string) || '/admin/dashboard')
 }
 </script>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { KeyRoundIcon, LoaderCircleIcon, SaveIcon, UserCircleIcon } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 
 definePageMeta({
   layout: 'admin',
@@ -38,26 +37,35 @@ const PAPEL = {
   },
 } as const
 
+/** Grava nome e bio de quem está logado. */
 async function salvar() {
   try {
     await redacao.salvarPerfil({ nome: nome.value, bio: bio.value })
-    toast.success('Perfil atualizado.')
+    avisar.sucesso('Perfil atualizado.', 'O novo nome passa a assinar o que você publicar.')
   }
-  catch (e: any) {
-    toast.error(e.message)
+  catch (e: unknown) {
+    avisar.erro(e, 'Não foi possível salvar o perfil.')
   }
 }
 
+/**
+ * Troca a senha do painel.
+ *
+ * Os campos só são limpos depois do sucesso: uma senha atual errada — o erro
+ * mais comum aqui — não pode custar a redigitação dos três campos.
+ */
 async function trocarSenha() {
   try {
     await redacao.trocarSenha(senhaAtual.value, novaSenha.value)
+
     senhaAtual.value = ''
     novaSenha.value = ''
     confirmacao.value = ''
-    toast.success('Senha trocada. As outras sessões foram encerradas.')
+
+    avisar.sucesso('Senha trocada.', 'As outras sessões foram encerradas — entre de novo nos outros aparelhos.')
   }
-  catch (e: any) {
-    toast.error(e.message)
+  catch (e: unknown) {
+    avisar.erro(e, 'Não foi possível trocar a senha.', 'Confira a senha atual e tente de novo.')
   }
 }
 </script>

@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { DownloadIcon, MailIcon, Trash2Icon } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 
 definePageMeta({
   layout: 'admin',
@@ -14,6 +13,8 @@ useSeoMeta({ title: 'Newsletter — Painel Sampa na Ilha', robots: 'noindex, nof
 
 const newsletter = useNewsletterStore()
 const busca = ref('')
+/** Id da linha em remoção — trava só o botão dela, não a tabela inteira. */
+const removendo = ref<string | null>(null)
 
 await newsletter.carregar()
 
@@ -24,9 +25,27 @@ const filtrados = computed(() => {
     `${i.nome} ${i.email}`.toLowerCase().includes(termo))
 })
 
+/**
+ * Tira um inscrito da base da newsletter.
+ *
+ * A store repassa a falha em vez de engolir, então o `try/catch` aqui é o que
+ * impede o pior caso anterior: a linha continuar na tela e mesmo assim aparecer
+ * um aviso de sucesso.
+ */
 async function remover(id: string, email: string) {
-  await newsletter.remover(id)
-  toast.success(`${email} removido da lista.`)
+  if (removendo.value) return
+
+  removendo.value = id
+  try {
+    await newsletter.remover(id)
+    avisar.sucesso(`${email} saiu da lista.`, 'Deixa de receber os boletins do portal.')
+  }
+  catch (e: unknown) {
+    avisar.erro(e, `Não foi possível remover ${email}.`)
+  }
+  finally {
+    removendo.value = null
+  }
 }
 
 /** Exporta a base em CSV para uso na ferramenta de disparo. */
@@ -83,7 +102,13 @@ function exportarCsv() {
               <TableCell class="text-muted-foreground">{{ inscricao.email }}</TableCell>
               <TableCell class="text-sm text-muted-foreground">{{ formatarDataHora(inscricao.criadoEm) }}</TableCell>
               <TableCell class="text-right">
-                <Button variant="ghost" size="icon-sm" title="Remover" @click="remover(inscricao.id, inscricao.email)">
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  title="Remover"
+                  :disabled="removendo === inscricao.id"
+                  @click="remover(inscricao.id, inscricao.email)"
+                >
                   <Trash2Icon class="size-4" />
                 </Button>
               </TableCell>

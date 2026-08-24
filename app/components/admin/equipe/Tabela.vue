@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { PencilIcon, ShieldCheckIcon, Trash2Icon, UserPlusIcon, UsersIcon } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 import type { Usuario } from '#shared/types/content'
 
 const emit = defineEmits<{ editar: [Usuario], adicionar: [] }>()
@@ -8,6 +7,7 @@ const emit = defineEmits<{ editar: [Usuario], adicionar: [] }>()
 const auth = useAuthStore()
 const redacao = useRedacaoStore()
 const paraRemover = ref<Usuario | null>(null)
+const encerrando = ref(false)
 
 function iniciais(nome: string): string {
   return nome.split(' ').filter(Boolean).slice(0, 2).map(p => p[0]?.toUpperCase() ?? '').join('')
@@ -18,29 +18,58 @@ function entrouEm(data?: string): string {
   return new Date(data).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' })
 }
 
+/**
+ * Promove a editor-chefe ou rebaixa a editor.
+ *
+ * Vale um aviso mais falante que "salvo": mudar de papel muda o que a pessoa
+ * consegue fazer no painel, e quem clicou precisa ver isso escrito.
+ */
 async function alternarPapel(pessoa: Usuario) {
-  const papel = pessoa.papel === 'editor-chefe' ? 'editor' : 'editor-chefe'
+  const virandoChefe = pessoa.papel !== 'editor-chefe'
+  const papel = virandoChefe ? 'editor-chefe' : 'editor'
+
   try {
     await redacao.atualizar(pessoa.id, { papel })
-    toast.success(`${pessoa.nome} agora é ${papel === 'editor-chefe' ? 'editor-chefe' : 'editor'}.`)
+
+    avisar.sucesso(
+      `${pessoa.nome} agora é ${papel}.`,
+      virandoChefe
+        ? 'Passa a publicar, validar a fila e mexer em editorias e acessos.'
+        : 'Deixa de publicar e de mexer nos acessos; segue escrevendo normalmente.',
+    )
   }
-  catch (e: any) {
-    toast.error(e.message)
+  catch (e: unknown) {
+    avisar.erro(e, `Não foi possível mudar o papel de ${pessoa.nome}.`)
   }
 }
 
+/**
+ * Encerra o acesso da pessoa ao painel.
+ *
+ * O alvo é copiado antes de o diálogo fechar: `paraRemover` alimenta o `:open`,
+ * e zerá-lo é o que fecha o modal. `encerrando` evita o clique repetido, que
+ * bateria de novo em um id já removido e mostraria erro para uma ação que deu
+ * certo.
+ */
 async function confirmarRemocao() {
-  if (!paraRemover.value) return
-  const nome = paraRemover.value.nome
+  const alvo = paraRemover.value
+  if (!alvo || encerrando.value) return
+
+  encerrando.value = true
+  paraRemover.value = null
+
   try {
-    await redacao.remover(paraRemover.value.id)
-    toast.success(`Acesso de ${nome} encerrado.`)
+    await redacao.remover(alvo.id)
+    avisar.sucesso(
+      `Acesso de ${alvo.nome} encerrado.`,
+      'As sessões abertas caem; o que a pessoa publicou continua no ar.',
+    )
   }
-  catch (e: any) {
-    toast.error(e.message)
+  catch (e: unknown) {
+    avisar.erro(e, `Não foi possível encerrar o acesso de ${alvo.nome}.`)
   }
   finally {
-    paraRemover.value = null
+    encerrando.value = false
   }
 }
 </script>
@@ -163,7 +192,8 @@ async function confirmarRemocao() {
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel @click="paraRemover = null">Cancelar</AlertDialogCancel>
-        <AlertDialogAction @click="confirmarRemocao()">Encerrar acesso</AlertDialogAction>
+        <!-- Botão comum: `AlertDialogAction` fecha o diálogo antes do handler rodar. -->
+        <Button variant="destructive" :disabled="encerrando" @click="confirmarRemocao()">Encerrar acesso</Button>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>

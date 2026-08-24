@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { LoaderCircleIcon, PlusIcon, TagsIcon, Trash2Icon } from '@lucide/vue'
-import { toast } from 'vue-sonner'
 import type { BadgeCor, Categoria } from '#shared/types/content'
 
 definePageMeta({
@@ -48,35 +47,67 @@ const slugPrevisto = computed(() =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, ''))
 
-function mensagem(e: any, padrao: string): string {
-  return e?.data?.data?.error?.message || e?.data?.statusMessage || e?.statusMessage || padrao
-}
-
+/**
+ * Cria a editoria e recarrega a taxonomia.
+ *
+ * O formulário só é limpo depois de a API confirmar — um nome repetido faria a
+ * redação redigitar tudo se a limpeza viesse antes. A recarga forçada é o que
+ * traz o slug definitivo, que pode sair diferente da prévia quando já existe
+ * outra editoria com nome parecido.
+ */
 async function criar() {
+  if (!podeCriar.value || salvando.value) return
+
+  const nome = nova.nome.trim()
   salvando.value = true
+
   try {
     await $fetch('/api/taxonomia/categorias', { method: 'POST', body: { ...nova } })
     await portal.carregarTaxonomia(true)
-    toast.success(`Editoria “${nova.nome}” criada.`)
+
     Object.assign(nova, { nome: '', icone: 'fas fa-newspaper', cor: 'blue', descricao: '', destaqueNoMenu: true })
     abrindo.value = false
+
+    avisar.sucesso(`Editoria “${nome}” criada.`, `Já aparece no site em /categoria/${slugPrevisto.value}.`)
   }
-  catch (e: any) {
-    toast.error(mensagem(e, 'Não foi possível criar a editoria.'))
+  catch (e: unknown) {
+    avisar.erro(e, 'Não foi possível criar a editoria.', 'O formulário continua preenchido.')
   }
   finally {
     salvando.value = false
   }
 }
 
+/**
+ * Remove a editoria.
+ *
+ * A API recusa enquanto houver conteúdo classificado nela — e essa recusa vem
+ * com o motivo escrito, que `avisar.erro` mostra no lugar do texto genérico.
+ * Isso é um alerta, não uma falha do sistema: quem clicou precisa mover as
+ * matérias antes.
+ */
 async function remover(categoria: Categoria) {
+  const temConteudo = (categoria.totalPosts ?? 0) > 0
+
   try {
     await $fetch(`/api/taxonomia/categorias/${categoria.id}`, { method: 'DELETE' })
     await portal.carregarTaxonomia(true)
-    toast.success(`Editoria “${categoria.nome}” removida.`)
+
+    avisar.sucesso(
+      `Editoria “${categoria.nome}” removida.`,
+      `A seção /categoria/${categoria.slug} deixou de existir no site.`,
+    )
   }
-  catch (e: any) {
-    toast.error(mensagem(e, 'Não foi possível remover a editoria.'))
+  catch (e: unknown) {
+    if (temConteudo) {
+      avisar.alerta(
+        mensagemDoErro(e, `“${categoria.nome}” ainda tem conteúdo.`),
+        'Mova essas matérias para outra editoria e tente de novo.',
+      )
+    }
+    else {
+      avisar.erro(e, 'Não foi possível remover a editoria.')
+    }
   }
 }
 </script>
