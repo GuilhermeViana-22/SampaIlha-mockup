@@ -63,7 +63,11 @@ async function enviarImagem(blobInfo: { blob: () => Blob, filename: () => string
 
 const configuracao = computed(() => ({
   language: 'pt_BR',
-  language_url: '/tinymce-i18n/pt_BR.js',
+  // A pasta NÃO pode começar com "tinymce": o `publicAssets` do nuxt.config
+  // serve node_modules/tinymce sob o baseURL `tinymce` e captura por prefixo,
+  // então `/tinymce-i18n/...` era engolido por ele e voltava 404 — o editor
+  // caía calado para o inglês.
+  language_url: '/editor-i18n/pt_BR.js',
   base_url: '/tinymce',
   suffix: '.min',
   height: 560,
@@ -109,15 +113,21 @@ const configuracao = computed(() => ({
 /**
  * O wrapper Vue monta o `setup` do init com o dele, então o aviso vai no
  * evento `init` do componente.
+ *
+ * Atenção à assinatura: `@init` é o único handler que o wrapper chama como
+ * `handler(evento, editor)`, com o editor no SEGUNDO argumento (os demais
+ * recebem `(evento, editor)` via `editor.on`). Ler o editor de dentro do
+ * primeiro argumento devolve `undefined` — foi o que quebrou a tela de novo
+ * conteúdo em produção.
  */
-function aoIniciar({ editor }: { editor: any }) {
-  if (!props.postId) {
-    editor.notificationManager?.open({
-      text: 'Salve o conteúdo uma vez para poder inserir imagens no texto.',
-      type: 'info',
-      timeout: 6000,
-    })
-  }
+function aoIniciar(_evento: unknown, editor: any) {
+  if (props.postId) return
+
+  editor?.notificationManager?.open({
+    text: 'Salve o conteúdo uma vez para poder inserir imagens no texto.',
+    type: 'info',
+    timeout: 6000,
+  })
 }
 
 const chaveDoEditor = computed(() => `${escuro.value ? 'dark' : 'light'}-${props.postId ?? 'novo'}`)
