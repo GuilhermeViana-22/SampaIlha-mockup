@@ -1,7 +1,24 @@
 <script setup lang="ts">
+/**
+ * Frente de Formação Cultural — as oficinas abertas à comunidade.
+ *
+ * A listagem vem inteira do painel — a página não tem texto próprio. Sem
+ * oficina cadastrada e no ar, o conteúdo fica vazio: é melhor não dizer nada do
+ * que anunciar seções que ainda não existem.
+ *
+ * O que está publicado e ainda vai acontecer aparece em destaque; o que já
+ * passou vai para um bloco de histórico. A inscrição mora sempre em outro site;
+ * aqui só existe a ponte.
+ */
+const workshops = useWorkshopsStore()
+
+await workshops.carregar(true)
+
 useSeoMeta({
   title: 'Workshops & Artesanato — Portal Sampa na Ilha',
   description: 'Oficinas de confecção de adereços, artesanato amazônico e formação artística abertas à comunidade paulistana.',
+  ogTitle: 'Workshops & Artesanato — Portal Sampa na Ilha',
+  ogDescription: 'Oficinas de confecção de adereços, artesanato amazônico e formação artística em São Paulo.',
 })
 </script>
 
@@ -18,21 +35,29 @@ useSeoMeta({
     <div class="container">
       <div class="layout">
         <main class="page-content">
-          <ComumAviso>
-            <strong>Página em construção:</strong> em breve, esta seção vai reunir o formulário de
-            inscrição para os workshops, o termo de participação e as fotos das atividades.
-          </ComumAviso>
+          <!--
+            Sem texto fixo: a página é só o que a redação cadastrou. Sem
+            oficinas no ar, o conteúdo fica vazio em vez de anunciar seções que
+            não existem.
+          -->
+          <template v-if="workshops.noAr.length">
+            <ComumCabecalhoSecao titulo="Próximas oficinas" />
+            <CulturaWorkshopCartao
+              v-for="oficina in workshops.noAr"
+              :key="oficina.id"
+              :oficina="oficina"
+            />
+          </template>
 
-          <p>
-            Os Workshops & Artesanato são a frente de Formação Cultural e Projeto Social do Sampa na
-            Ilha voltada à confecção de adereços, penachos, indumentárias e demais peças utilizadas no
-            Festival de Parintins — democratizando o acesso à arte e à renda para quem participa.
-          </p>
-
-          <CulturaFrente />
-
-          <ComumCabecalhoSecao titulo="Outras frentes do projeto" />
-          <CulturaSubpaginas exceto="/cultura/workshops" />
+          <template v-if="workshops.realizadas.length">
+            <ComumCabecalhoSecao titulo="Oficinas já realizadas" />
+            <CulturaWorkshopCartao
+              v-for="oficina in workshops.realizadas"
+              :key="oficina.id"
+              :oficina="oficina"
+              realizada
+            />
+          </template>
         </main>
 
         <SidebarPrincipal :tempo="false" />

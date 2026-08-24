@@ -41,6 +41,7 @@ export const MENU_ADMIN: ItemMenuAdmin[] = [
   { rotulo: 'Dashboard', para: '/admin/dashboard', icone: 'LayoutDashboard' },
   { rotulo: 'Conteúdos', para: '/admin/posts', icone: 'FileText' },
   { rotulo: 'Avisos', para: '/admin/avisos', icone: 'Megaphone', soChefe: true },
+  { rotulo: 'Workshops', para: '/admin/workshops', icone: 'GraduationCap' },
   { rotulo: 'Editorias', para: '/admin/editorias', icone: 'Tags', soChefe: true },
   { rotulo: 'Equipe', para: '/admin/equipe', icone: 'Users', soChefe: true },
   { rotulo: 'Newsletter', para: '/admin/newsletter', icone: 'Mail' },

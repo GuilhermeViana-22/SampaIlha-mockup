@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
-  FileTextIcon, LayoutDashboardIcon, MailIcon, MegaphoneIcon, SettingsIcon, TagsIcon,
-  UserCircleIcon, UsersIcon,
+  FileTextIcon, GraduationCapIcon, LayoutDashboardIcon, MailIcon, MegaphoneIcon, SettingsIcon,
+  TagsIcon, UserCircleIcon, UsersIcon,
 } from '@lucide/vue'
 
 /**
@@ -18,7 +18,11 @@ const icones: Record<string, unknown> = {
   Tags: TagsIcon,
   Users: UsersIcon,
   UserCircle: UserCircleIcon,
+  GraduationCap: GraduationCapIcon,
 }
+
+/** Onde o menu deve continuar aceso ao entrar em uma página filha. */
+const SECOES_COM_SUBROTAS = ['/admin/posts', '/admin/workshops']
 
 const rota = useRoute()
 const posts = usePostsStore()
@@ -27,8 +31,9 @@ const auth = useAuthStore()
 const itens = computed(() => MENU_ADMIN.filter(item => !item.soChefe || auth.ehChefe).map(item => ({
   ...item,
   componente: icones[item.icone ?? ''],
-  ativo: item.para === '/admin/posts'
-    ? rota.path.startsWith('/admin/posts')
+  // Seções com páginas filhas (formulários) mantêm o item aceso na edição.
+  ativo: SECOES_COM_SUBROTAS.includes(item.para)
+    ? rota.path.startsWith(item.para)
     : rota.path === item.para,
   contador: item.para === '/admin/posts' ? posts.total : undefined,
 })))
