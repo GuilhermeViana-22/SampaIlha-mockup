@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {
-  ArrowLeftIcon, ExternalLinkIcon, ImagePlusIcon, LoaderCircleIcon, SaveIcon, Trash2Icon,
+  ArrowLeftIcon, CheckCircle2Icon, ExternalLinkIcon, ImagePlusIcon, LoaderCircleIcon, SaveIcon,
+  TriangleAlertIcon, Trash2Icon,
 } from '@lucide/vue'
 import type { Workshop, WorkshopInput } from '#shared/types/workshop'
 import { STATUS_WORKSHOP, VISIBILIDADE_WORKSHOP } from '#shared/types/workshop'
@@ -19,7 +20,34 @@ const workshops = useWorkshopsStore()
 const edicao = computed(() => !!props.oficina)
 const enviandoCartaz = ref(false)
 const campoArquivo = ref<HTMLInputElement | null>(null)
-const cartaz = ref<string | null>(props.oficina?.imagemUrl ?? null)
+
+/**
+ * O cartaz que está gravado no servidor. É o que sobrevive a um recarregamento
+ * da página — e, por isso, a única prova de que o envio deu certo.
+ */
+const cartazSalvo = ref<string | null>(props.oficina?.imagemUrl ?? null)
+
+/**
+ * Espelho local do arquivo recém-escolhido, montado com `URL.createObjectURL`.
+ *
+ * Serve para a imagem aparecer no instante do clique, sem esperar a viagem até
+ * a API. Some assim que o servidor responde: a partir daí quem manda é
+ * `cartazSalvo`, que veio do banco.
+ */
+const cartazLocal = ref<string | null>(null)
+
+/** O que a moldura mostra: o arquivo escolhido agora, senão o que está salvo. */
+const cartaz = computed(() => cartazLocal.value ?? cartazSalvo.value)
+
+/** Libera o object URL — sem isso o blob fica preso na memória da aba. */
+function descartarPrevia() {
+  if (cartazLocal.value) {
+    URL.revokeObjectURL(cartazLocal.value)
+    cartazLocal.value = null
+  }
+}
+
+onBeforeUnmount(descartarPrevia)
 
 /**
  * O que os campos do formulário guardam.
@@ -94,16 +122,27 @@ async function enviarCartaz(evento: Event) {
     return
   }
 
+  // Mostra o arquivo escolhido na hora, antes mesmo de subir: assim dá para
+  // conferir que é a imagem certa enquanto o envio acontece.
+  descartarPrevia()
+  cartazLocal.value = URL.createObjectURL(arquivo)
+
   enviandoCartaz.value = true
   try {
     const salva = await workshops.enviarCartaz(props.oficina!.id, arquivo)
 
     if (salva) {
-      cartaz.value = salva.imagemUrl
-      avisar.sucesso('Cartaz enviado.')
+      // Troca a prévia local pela URL do servidor. É essa substituição que
+      // prova o salvamento: o que aparece agora veio do banco, não do disco de
+      // quem está editando.
+      cartazSalvo.value = salva.imagemUrl
+      descartarPrevia()
+      avisar.sucesso('Cartaz salvo no servidor.', 'A imagem já é a que o site vai mostrar.')
     }
     else {
-      avisar.falha(workshops.erro ?? 'Não foi possível enviar o cartaz.')
+      // Desfaz a prévia: deixá-la na tela faria parecer que salvou.
+      descartarPrevia()
+      avisar.falha(workshops.erro ?? 'Não foi possível enviar o cartaz.', 'A imagem anterior continua valendo.')
     }
   }
   finally {
@@ -118,7 +157,8 @@ async function removerCartaz() {
   const salva = await workshops.removerCartaz(props.oficina!.id)
 
   if (salva) {
-    cartaz.value = null
+    descartarPrevia()
+    cartazSalvo.value = null
     avisar.sucesso('Cartaz removido.', 'A oficina passa a usar a imagem padrão da seção.')
   }
   else {
@@ -340,7 +380,38 @@ async function salvar(publicar = false) {
         </CardHeader>
         <CardContent class="flex flex-col gap-3">
           <div v-if="cartaz" class="overflow-hidden rounded-lg border border-border">
-            <img :src="cartaz" alt="Cartaz da oficina" class="aspect-video w-full object-cover">
+            <div class="relative">
+              <img :src="cartaz" alt="Cartaz da oficina" class="aspect-video w-full object-cover">
+
+              <!-- Véu enquanto sobe: a imagem já aparece, mas ainda não é a gravada. -->
+              <div
+                v-if="enviandoCartaz"
+                class="absolute inset-0 flex items-center justify-center gap-2 bg-background/70 text-sm font-medium"
+              >
+                <LoaderCircleIcon class="size-4 animate-spin" /> Enviando…
+              </div>
+            </div>
+
+            <!--
+              Diz de onde vem o que está na moldura. Sem esta linha, prévia
+              local e imagem gravada ficam idênticas na tela — e é justamente a
+              diferença entre as duas que responde "salvou mesmo?".
+            -->
+            <p
+              class="flex items-center gap-1.5 border-t border-border px-3 py-2 text-xs"
+              :class="cartazSalvo && !cartazLocal ? 'text-muted-foreground' : 'text-amber-600 dark:text-amber-400'"
+            >
+              <template v-if="enviandoCartaz">
+                <LoaderCircleIcon class="size-3.5 animate-spin" /> Enviando para o servidor…
+              </template>
+              <template v-else-if="cartazSalvo && !cartazLocal">
+                <CheckCircle2Icon class="size-3.5 text-emerald-600 dark:text-emerald-400" />
+                Salvo no servidor — é o que o site mostra.
+              </template>
+              <template v-else>
+                <TriangleAlertIcon class="size-3.5" /> Prévia local, ainda não enviada.
+              </template>
+            </p>
           </div>
           <p v-else class="rounded-lg border border-dashed border-border px-3 py-6 text-center text-sm text-muted-foreground">
             {{ edicao ? 'Sem cartaz — a seção usa a imagem padrão.' : 'Disponível depois de salvar.' }}
