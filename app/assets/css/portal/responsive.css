@@ -12,7 +12,7 @@
   }
   /* A navegação horizontal dá lugar ao menu sanduíche já no tablet. */
   @media (max-width: 900px) {
-    .site-header nav { display: none; }
+    .nav-principal { display: none; }
     .btn-menu { display: flex; }
   }
 

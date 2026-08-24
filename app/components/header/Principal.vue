@@ -20,13 +20,29 @@ const marca = useMarcaStore()
       <HeaderNavegacao />
 
       <div class="header-actions">
-        <button class="btn-search" title="Buscar" aria-label="Buscar" @click="portal.alternarBusca()">
-          <i class="fas fa-search" />
+        <button
+          class="btn-search"
+          type="button"
+          :title="portal.buscaAberta ? 'Fechar busca' : 'Buscar'"
+          :aria-label="portal.buscaAberta ? 'Fechar busca' : 'Buscar'"
+          :aria-expanded="portal.buscaAberta"
+          aria-controls="busca-portal"
+          @click="portal.alternarBusca()"
+        >
+          <i class="fas" :class="portal.buscaAberta ? 'fa-times' : 'fa-search'" />
         </button>
         <NuxtLink class="btn-subscribe" to="/informacoes">
           <i class="fas fa-envelope-open-text" /> <span class="btn-subscribe__rotulo">Assinar</span>
         </NuxtLink>
-        <button class="btn-menu" title="Menu" aria-label="Abrir menu" @click="portal.alternarMenu()">
+        <button
+          class="btn-menu"
+          type="button"
+          :title="portal.menuAberto ? 'Fechar menu' : 'Menu'"
+          :aria-label="portal.menuAberto ? 'Fechar menu' : 'Abrir menu'"
+          :aria-expanded="portal.menuAberto"
+          aria-controls="menu-mobile"
+          @click="portal.alternarMenu()"
+        >
           <i class="fas" :class="portal.menuAberto ? 'fa-times' : 'fa-bars'" />
         </button>
       </div>

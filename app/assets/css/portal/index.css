@@ -13,4 +13,5 @@
 @import './pages.css';       /* páginas internas: hero, conteúdo, vagas, podcast, cronograma */
 @import './noticia.css';     /* página de matéria */
 @import './dicas.css';       /* seção de dicas & guias */
+@import './filtros.css';     /* trilho de filtro por editoria */
 @import './responsive.css';  /* breakpoints — sempre por último */

@@ -1,0 +1,102 @@
+@layer portal {
+  /* ── FILTRO DE EDITORIAS ──────────────────────────────────────────
+     Desktop: pastilhas quebram em linhas. Celular: um trilho horizontal
+     com sombra nas bordas mostrando que a lista continua fora da tela.
+     ──────────────────────────────────────────────────────────────── */
+  .filtro { position: relative; display: flex; align-items: center; gap: 6px; margin: 24px 0 20px; }
+  .filtro__trilho { flex: 1 1 auto; min-width: 0; }
+
+  /* Setas: só onde existe mouse — no toque o próprio arrasto resolve. */
+  .filtro__seta {
+    display: none;
+    flex: 0 0 auto;
+    width: 30px; height: 30px;
+    border: 1.5px solid var(--cinza-2); border-radius: 50%;
+    background: var(--branco); color: var(--cinza-4);
+    cursor: pointer; font-size: .7rem;
+    align-items: center; justify-content: center;
+    transition: background .2s, color .2s, border-color .2s, opacity .2s;
+  }
+  .filtro__seta:hover { background: var(--azul); border-color: var(--azul); color: #fff; }
+
+  /* Pastilha ativa: substitui o `style` inline que o filtro usava antes. */
+  .tag--ativa,
+  .tag--ativa:hover { background: var(--azul); border-color: var(--azul); color: #fff; }
+
+  /* `.tag` nasceu para links; como botão precisa herdar a fonte do portal. */
+  button.tag { font-family: inherit; line-height: 1.35; cursor: pointer; }
+
+  @media (max-width: 1024px) {
+    .filtro__trilho {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x proximity;
+      scroll-padding-inline: 8px;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      padding: 2px 2px 8px;
+      margin: -2px -2px -8px;
+    }
+    .filtro__trilho::-webkit-scrollbar { display: none; }
+    .filtro__trilho > .tag {
+      flex: 0 0 auto;
+      scroll-snap-align: start;
+      /* Alvo de toque confortável: 38px de altura mínima. */
+      padding: 9px 14px;
+      font-size: .8rem;
+    }
+
+    /* Sombras de borda — aparecem só quando há conteúdo para aquele lado. */
+    .filtro::before,
+    .filtro::after {
+      content: '';
+      position: absolute; top: 0; bottom: 0;
+      width: 34px; z-index: 1;
+      pointer-events: none;
+      opacity: 0; transition: opacity .2s;
+    }
+    .filtro::before {
+      left: 0;
+      background: linear-gradient(to right, var(--cor-fundo) 25%, transparent);
+    }
+    .filtro::after {
+      right: 0;
+      background: linear-gradient(to left, var(--cor-fundo) 25%, transparent);
+    }
+    .filtro--antes::before { opacity: 1; }
+    .filtro--depois::after { opacity: 1; }
+
+    @media (hover: hover) and (pointer: fine) {
+      .filtro__seta { display: flex; opacity: 0; pointer-events: none; }
+      .filtro--antes .filtro__seta--antes,
+      .filtro--depois .filtro__seta--depois { opacity: 1; pointer-events: auto; }
+    }
+  }
+
+  /* No celular o filtro acompanha a rolagem, logo abaixo do cabeçalho fixo:
+     trocar de editoria no meio da lista não exige voltar ao topo. */
+  @media (max-width: 860px) {
+    .filtro {
+      position: sticky; top: 72px; z-index: 20;
+      margin: 16px 0 16px;
+      padding: 10px 0 6px;
+      background: var(--cor-fundo);
+      border-bottom: 1px solid var(--cinza-2);
+    }
+    .filtro::before, .filtro::after { top: 10px; bottom: 6px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .filtro__trilho { scroll-behavior: auto; }
+  }
+}
+
+@layer portal {
+  /* A lista some por baixo enquanto a próxima editoria carrega — sem sumir
+     do lugar, para a página não pular sob o dedo do leitor. */
+  .lista-filtrada { transition: opacity .18s ease; }
+  .lista-filtrada--carregando { opacity: .45; pointer-events: none; }
+
+  .estado-vazio__acao { display: flex; justify-content: center; margin-top: 18px; }
+}
