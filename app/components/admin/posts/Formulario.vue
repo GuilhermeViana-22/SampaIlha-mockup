@@ -68,7 +68,12 @@ watch(() => form.categoria, (slug) => {
   if (categoria && form.icone === 'fas fa-newspaper') form.icone = categoria.icone
 })
 
-const palavras = computed(() => form.conteudo.split(/\s+/).filter(Boolean).length)
+const palavras = computed(() =>
+  form.conteudo
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean).length)
 const edicao = computed(() => !!props.post)
 const regiaoSelecionada = computed({
   get: () => form.regiao ?? 'nacional',
@@ -228,16 +233,13 @@ const previa = computed<Post>(() => ({
                 {{ palavras }} palavras · ~{{ Math.max(1, Math.round(palavras / 200)) }} min de leitura
               </span>
             </div>
-            <Textarea
-              id="conteudo"
-              v-model="form.conteudo"
-              rows="20"
-              class="font-mono text-sm leading-relaxed"
-              placeholder="Separe parágrafos com uma linha em branco. Use **negrito** para destacar trechos e comece a linha com &quot;1.&quot; para listas."
-            />
+            <AdminPostsEditor v-model="form.conteudo" :post-id="post?.id" />
             <p class="text-xs text-muted-foreground">
-              Linha em branco separa parágrafos · <code class="font-mono">**texto**</code> vira negrito ·
-              linha começando com <code class="font-mono">1.</code> vira item de lista.
+              Formate pela barra do editor. Para inserir fotos no meio do texto, use o botão de
+              imagem — elas ficam guardadas junto da matéria.
+              <template v-if="!post">
+                O envio de imagens fica disponível depois de salvar o conteúdo pela primeira vez.
+              </template>
             </p>
           </div>
         </CardContent>

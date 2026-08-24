@@ -9,13 +9,29 @@
   .post-cover { width: 100%; aspect-ratio: 16/9; border-radius: var(--raio); overflow: hidden; position: relative; margin-bottom: 24px; box-shadow: var(--sombra-md); }
   .post-cover .img-bg i { font-size: 4rem; }
   .post-body p { font-size: 1rem; color: var(--escuro); margin-bottom: 18px; line-height: 1.85; }
-  .post-body ul { margin: 0 0 18px 20px; color: var(--escuro); }
+  .post-body ul { margin: 0 0 18px 20px; color: var(--escuro); list-style: disc; }
   .post-body li { margin-bottom: 8px; line-height: 1.75; font-size: .97rem; }
+  .post-body li::marker { color: var(--azul); }
   .post-body blockquote {
     border-left: 4px solid var(--azul); background: var(--azul-leve);
     padding: 14px 20px; border-radius: 0 var(--raio) var(--raio) 0;
     font-family: var(--fonte-serif); font-size: 1.05rem; margin: 0 0 20px;
   }
+  /* ── Corpo vindo do editor ── */
+  .post-body h3 { font-family: var(--fonte-serif); font-size: 1.15rem; line-height: 1.35; margin: 22px 0 10px; }
+  .post-body ol { margin: 0 0 18px 22px; color: var(--escuro); list-style: decimal; }
+  .post-body a { color: var(--azul); text-decoration: underline; text-underline-offset: 2px; }
+  .post-body a:hover { opacity: .8; }
+  .post-body strong { font-weight: 700; }
+  .post-body figure { margin: 24px 0; }
+  .post-body img { max-width: 100%; height: auto; border-radius: var(--raio); display: block; margin: 0 auto; }
+  .post-body figcaption { font-size: .82rem; color: var(--cinza-4); text-align: center; margin-top: 8px; }
+  .post-body hr { border: 0; border-top: 1px solid var(--cinza-2); margin: 28px 0; }
+  /* Tabela larga rola dentro de si em vez de esticar a página no celular. */
+  .post-body table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: .92rem; display: block; overflow-x: auto; }
+  .post-body th, .post-body td { border: 1px solid var(--cinza-2); padding: 8px 10px; text-align: left; }
+  .post-body th { background: var(--cinza-1); font-weight: 700; }
+
   .post-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0; }
   .post-breadcrumb { font-size: .78rem; color: var(--cinza-4); padding: 16px 0 0; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .post-breadcrumb a:hover { color: var(--azul); }

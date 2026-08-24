@@ -4,7 +4,7 @@ import type { Post } from '#shared/types/content'
 /** Corpo da matéria: capa, texto, tags e barra de compartilhamento. */
 const props = defineProps<{ post: Post }>()
 
-const blocos = computed(() => paragrafos(props.post.conteudo))
+const corpo = computed(() => corpoDoPost(props.post.conteudo))
 </script>
 
 <template>
@@ -27,12 +27,8 @@ const blocos = computed(() => paragrafos(props.post.conteudo))
       {{ post.resumo }}
     </blockquote>
 
-    <template v-for="(bloco, i) in blocos" :key="i">
-      <ul v-if="bloco.tipo === 'li'">
-        <li v-html="bloco.html" />
-      </ul>
-      <p v-else v-html="bloco.html" />
-    </template>
+    <!-- eslint-disable-next-line vue/no-v-html -- HTML do editor, já filtrado na API ao salvar -->
+    <div class="post-conteudo" v-html="corpo" />
 
     <div v-if="post.tags.length" class="post-tags">
       <NuxtLink v-for="tag in post.tags" :key="tag" class="tag" :to="{ path: '/busca', query: { q: tag } }">

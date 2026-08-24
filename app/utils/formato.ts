@@ -63,6 +63,27 @@ export function tempoRelativo(iso: string): string {
 }
 
 /** Divide o corpo do post em parágrafos, destacando **negrito** e listas. */
+/** Marcas de bloco que só existem no HTML vindo do editor. */
+const TAGS_DE_BLOCO = /<(p|h2|h3|ul|ol|blockquote|figure|img|table|div|br)\b/i
+
+/**
+ * Corpo da matéria pronto para `v-html`.
+ *
+ * O editor grava HTML, mas o que foi escrito antes dele está em texto simples,
+ * com parágrafos separados por linha em branco e `**negrito**`. Em vez de
+ * migrar o acervo, reconhecemos os dois: o que já é HTML passa direto, o resto
+ * continua sendo convertido como sempre foi.
+ */
+export function corpoDoPost(conteudo: string): string {
+  const texto = (conteudo ?? '').trim()
+  if (!texto) return ''
+  if (TAGS_DE_BLOCO.test(texto)) return texto
+
+  return paragrafos(texto)
+    .map(bloco => (bloco.tipo === 'li' ? `<ul><li>${bloco.html}</li></ul>` : `<p>${bloco.html}</p>`))
+    .join('')
+}
+
 export function paragrafos(conteudo: string): { tipo: 'p' | 'li', html: string }[] {
   return conteudo
     .split(/\n{2,}/)

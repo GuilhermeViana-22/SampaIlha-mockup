@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
@@ -13,6 +14,21 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
+  },
+
+  nitro: {
+    /**
+     * TinyMCE roda self-hosted: os arquivos saem de node_modules direto para o
+     * bundle, sem CDN nem chave de API. O Nitro copia isto para .output/public
+     * no build, então o container não precisa de node_modules em runtime.
+     */
+    publicAssets: [
+      {
+        baseURL: 'tinymce',
+        dir: fileURLToPath(new URL('./node_modules/tinymce', import.meta.url)),
+        maxAge: 60 * 60 * 24 * 365,
+      },
+    ],
   },
 
   shadcn: {
