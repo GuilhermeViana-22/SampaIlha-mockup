@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { NovoUsuario, Usuario } from '#shared/types/content'
+import type { NovoUsuario, PapelUsuario, Usuario } from '#shared/types/content'
 
 /**
  * Equipe da redação e perfil de quem está logado.
@@ -7,11 +7,51 @@ import type { NovoUsuario, Usuario } from '#shared/types/content'
  * A lista de pessoas só carrega para o editor-chefe — a API recusa para os
  * demais, e a tela nem oferece o caminho.
  */
+export interface FiltrosEquipe {
+  busca: string
+  papel: PapelUsuario | 'todos'
+  situacao: 'todas' | 'ativos' | 'inativos'
+}
+
+function filtrosPadrao(): FiltrosEquipe {
+  return { busca: '', papel: 'todos', situacao: 'todas' }
+}
+
 export const useRedacaoStore = defineStore('redacao', () => {
   const equipe = ref<Usuario[]>([])
   const perfil = ref<Usuario | null>(null)
   const carregando = ref(false)
   const salvando = ref(false)
+  const filtros = ref<FiltrosEquipe>(filtrosPadrao())
+
+  /** Filtra no cliente: a equipe é curta e a lista responde na hora. */
+  const listaFiltrada = computed(() => {
+    const f = filtros.value
+    const termo = f.busca.trim().toLowerCase()
+    return equipe.value.filter((pessoa) => {
+      if (f.papel !== 'todos' && pessoa.papel !== f.papel) return false
+      if (f.situacao === 'ativos' && pessoa.ativo === false) return false
+      if (f.situacao === 'inativos' && pessoa.ativo !== false) return false
+      if (termo && !`${pessoa.nome} ${pessoa.email}`.toLowerCase().includes(termo)) return false
+      return true
+    })
+  })
+
+  const temFiltro = computed(() => {
+    const f = filtros.value
+    return !!f.busca || f.papel !== 'todos' || f.situacao !== 'todas'
+  })
+
+  function limparFiltros() {
+    filtros.value = filtrosPadrao()
+  }
+
+  const contagem = computed(() => ({
+    total: equipe.value.length,
+    chefes: equipe.value.filter(p => p.papel === 'editor-chefe').length,
+    editores: equipe.value.filter(p => p.papel === 'editor').length,
+    inativos: equipe.value.filter(p => p.ativo === false).length,
+  }))
 
   function mensagem(e: any, padrao: string): string {
     return e?.data?.data?.error?.message || e?.data?.statusMessage || e?.statusMessage || padrao
@@ -110,6 +150,7 @@ export const useRedacaoStore = defineStore('redacao', () => {
 
   return {
     equipe, perfil, carregando, salvando,
+    filtros, listaFiltrada, temFiltro, contagem, limparFiltros,
     carregarEquipe, carregarPerfil, criar, atualizar, remover, salvarPerfil, trocarSenha,
   }
 })
