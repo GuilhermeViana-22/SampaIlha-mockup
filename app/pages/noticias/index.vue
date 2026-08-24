@@ -18,7 +18,7 @@ const { data, status } = await useListaConteudo('lista-noticias', () => ({
   <div>
     <ComumHeroPagina
       titulo="Notícias"
-      descricao="A cobertura completa do portal — do litoral paulista ao coração da Amazônia."
+      descricao="A cobertura completa do portal — de São Paulo às cinco regiões do Brasil."
       etiqueta="Editorias"
       etiqueta-icone="fas fa-newspaper"
     />

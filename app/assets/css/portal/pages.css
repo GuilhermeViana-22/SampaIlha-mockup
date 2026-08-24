@@ -71,7 +71,9 @@
     font-size: .75rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
     display: inline-flex; align-items: center; gap: 7px;
   }
+  .live-badge--off { background: var(--cinza-4); }
   .live-dot { width: 8px; height: 8px; background: #fff; border-radius: 50%; animation: pulse 1.4s infinite; }
+  .live-dot--off { animation: none; opacity: .6; }
   @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
   .embed-block {
     width: 100%; aspect-ratio: 16/9; background: #0d1b2a; border-radius: var(--raio);

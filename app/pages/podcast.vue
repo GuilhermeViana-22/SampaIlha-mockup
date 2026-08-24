@@ -1,4 +1,10 @@
 <script setup lang="ts">
+/**
+ * Ligue esta constante à origem real da transmissão (API do YouTube/Twitch ou
+ * um campo no painel) no lançamento: é o único ponto que acende o selo "No Ar".
+ */
+const aoVivo = ref(false)
+
 useSeoMeta({
   title: 'Podcast & Ao Vivo (Rascunho) — Portal Sampa na Ilha',
   description: 'Podcast e Ao Vivo do Portal Sampa na Ilha — página em rascunho, ainda não divulgada ao público.',
@@ -37,10 +43,11 @@ useSeoMeta({
           <PodcastEmbed rotulo="Player do episódio — inserir código de embed aqui" icone="fas fa-podcast" />
 
           <ComumCabecalhoSecao titulo="Transmissão ao Vivo" />
-          <span class="live-badge"><span class="live-dot" /> No Ar</span>
+          <PodcastSeloAoVivo :ao-vivo="aoVivo" />
           <p style="margin-top:12px;">
             Bloco central para a integração/embed de transmissões ao vivo vindas do YouTube ou da
-            Twitch. O selo “No Ar” acima é dinâmico e deve aparecer apenas durante uma transmissão ativa.
+            Twitch. O selo acima acompanha o estado da transmissão: acende como “No Ar” enquanto ela
+            estiver ativa e volta para “Fora do ar” quando termina.
           </p>
           <PodcastEmbed rotulo="Player de transmissão ao vivo — inserir embed do YouTube/Twitch aqui" icone="fas fa-video" />
         </main>
