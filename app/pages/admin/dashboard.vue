@@ -61,14 +61,14 @@ const atalhos = [
         :valor="stats.totalPosts"
         :descricao="`${stats.publicados} publicados · ${stats.rascunhos} rascunhos · ${stats.agendados} agendados`"
         :icone="FileTextIcon"
-        tom="azul"
+        tom="marca"
       />
       <AdminDashboardCardEstatistica
         rotulo="Leituras acumuladas"
         :valor="formatarNumero(stats.leiturasTotais)"
         descricao="Somatório de todas as matérias"
         :icone="BookOpenIcon"
-        tom="ciano"
+        tom="destaque"
       />
       <AdminDashboardCardEstatistica
         rotulo="Inscritos na newsletter"
@@ -92,7 +92,7 @@ const atalhos = [
         :valor="stats.vagasAbertas"
         descricao="Publicadas na página de Vagas"
         :icone="BriefcaseIcon"
-        tom="azul"
+        tom="marca"
       />
       <AdminDashboardCardEstatistica
         rotulo="Eventos na agenda"
@@ -113,7 +113,7 @@ const atalhos = [
         :valor="stats.porRegiao.length"
         :descricao="`de ${portal.regioes.length} do país`"
         :icone="TrendingUpIcon"
-        tom="ciano"
+        tom="destaque"
       />
     </section>
 

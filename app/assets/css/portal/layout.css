@@ -23,11 +23,11 @@
   .img-bg { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
   .img-bg i { font-size: 3.5rem; opacity: .18; color: #fff; }
   .hero-secondary .img-bg i { font-size: 2.5rem; }
-  .bg-1 { background: linear-gradient(135deg, #0a4fa8, #00b4d8); }
+  .bg-1 { background: linear-gradient(135deg, var(--cor-primaria), var(--cor-primaria-media)); }
   .bg-2 { background: linear-gradient(135deg, #1b4332, #52b788); }
   .bg-3 { background: linear-gradient(135deg, #7b2d8b, #e040fb); }
   .bg-4 { background: linear-gradient(135deg, #e63946, #f4a261); }
-  .bg-5 { background: linear-gradient(135deg, #023e8a, #0096c7); }
+  .bg-5 { background: linear-gradient(135deg, #0b3d2e, #2d8a63); }
   .bg-6 { background: linear-gradient(135deg, #6c757d, #343a40); }
   .bg-7 { background: linear-gradient(135deg, #b5451b, #f4a261); }
   .bg-8 { background: linear-gradient(135deg, #1a1a2e, #16213e); }

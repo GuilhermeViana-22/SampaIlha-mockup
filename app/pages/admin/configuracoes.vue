@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { LoaderCircleIcon, RotateCcwIcon } from '@lucide/vue'
+import { LoaderCircleIcon, PaletteIcon, RotateCcwIcon, SaveIcon } from '@lucide/vue'
 import { toast } from 'vue-sonner'
+import { NIVEIS_TITULO, TEMA_PADRAO } from '#shared/types/tema'
 
 definePageMeta({
   layout: 'admin',
   middleware: 'admin',
   titulo: 'Configurações',
-  descricao: 'Taxonomia do portal, sessão e dados de demonstração.',
+  descricao: 'Aparência, taxonomia do portal, sessão e dados de demonstração.',
   acao: null,
 })
 useSeoMeta({ title: 'Configurações — Painel Sampa na Ilha', robots: 'noindex, nofollow' })
@@ -15,7 +16,51 @@ useSeoMeta({ title: 'Configurações — Painel Sampa na Ilha', robots: 'noindex
 const auth = useAuthStore()
 const portal = usePortalStore()
 const posts = usePostsStore()
+const tema = useTemaStore()
 const restaurando = ref(false)
+const restaurandoTema = ref(false)
+
+/**
+ * A aba de aparência edita `tema.rascunho`, que já é o que pinta a tela — a
+ * pré-visualização é o próprio site, ao vivo, sem gravar nada até salvar.
+ */
+await tema.carregar()
+tema.editar()
+onBeforeUnmount(() => tema.descartar())
+
+const rascunho = computed(() => tema.rascunho ?? tema.tema)
+
+const CORES_BASE = [
+  { chave: 'primaria', rotulo: 'Cor principal', descricao: 'Cabeçalho, links, botões e selos.' },
+  { chave: 'contrastePrimaria', rotulo: 'Texto sobre a cor principal', descricao: 'Precisa contrastar com ela.' },
+  { chave: 'destaque', rotulo: 'Cor de destaque', descricao: 'Ícones e detalhes de apoio.' },
+  { chave: 'fundo', rotulo: 'Cor de fundo', descricao: 'Fundo das páginas do site.' },
+  { chave: 'texto', rotulo: 'Cor do texto', descricao: 'Texto corrido das matérias.' },
+] as const
+
+async function salvarTema() {
+  try {
+    await tema.salvar()
+    toast.success('Aparência do site atualizada.')
+  }
+  catch {
+    toast.error('Não foi possível salvar a aparência.')
+  }
+}
+
+async function restaurarTema() {
+  restaurandoTema.value = true
+  try {
+    await tema.restaurarPadrao()
+    toast.success('Paleta oficial do portal restaurada.')
+  }
+  catch {
+    toast.error('Não foi possível restaurar a paleta padrão.')
+  }
+  finally {
+    restaurandoTema.value = false
+  }
+}
 
 async function restaurar() {
   restaurando.value = true
@@ -36,12 +81,115 @@ async function restaurar() {
 
 <template>
   <div class="flex flex-col gap-6">
-    <Tabs default-value="taxonomia">
+    <Tabs default-value="aparencia">
       <TabsList>
+        <TabsTrigger value="aparencia">Aparência</TabsTrigger>
         <TabsTrigger value="taxonomia">Taxonomia</TabsTrigger>
         <TabsTrigger value="conta">Conta</TabsTrigger>
         <TabsTrigger value="dados">Dados</TabsTrigger>
       </TabsList>
+
+      <TabsContent value="aparencia" class="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <Card>
+          <CardHeader>
+            <CardTitle class="flex items-center gap-2 text-base">
+              <PaletteIcon class="size-4 text-primary" /> Paleta do site
+            </CardTitle>
+            <CardDescription>
+              As cores viram variáveis CSS aplicadas no servidor, então o site já carrega pintado —
+              sem piscar a cor antiga. Os tons intermediários (hover, fundos suaves) são calculados
+              a partir da cor principal.
+            </CardDescription>
+          </CardHeader>
+          <CardContent class="flex flex-col gap-4">
+            <AdminConfiguracoesCampoCor
+              v-for="campo in CORES_BASE"
+              :key="campo.chave"
+              v-model="rascunho[campo.chave]"
+              :rotulo="campo.rotulo"
+              :descricao="campo.descricao"
+            />
+          </CardContent>
+        </Card>
+
+        <div class="flex flex-col gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle class="text-base">Títulos</CardTitle>
+              <CardDescription>
+                A cor padrão vale para todos os níveis. Ajuste um nível só quando ele precisar
+                destoar — o botão ao lado devolve o nível à cor padrão.
+              </CardDescription>
+            </CardHeader>
+            <CardContent class="flex flex-col gap-4">
+              <AdminConfiguracoesCampoCor
+                v-model="rascunho.titulo"
+                rotulo="Cor padrão dos títulos"
+                descricao="Herdada por h1…h6."
+              />
+              <Separator />
+              <AdminConfiguracoesCampoCor
+                v-for="nivel in NIVEIS_TITULO"
+                :key="nivel"
+                v-model="rascunho[nivel]"
+                :rotulo="nivel.toUpperCase()"
+                :herdada-de="rascunho.titulo"
+                permite-herdar
+              />
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle class="text-base">Prévia</CardTitle>
+              <CardDescription>Amostra com as cores deste rascunho, antes de salvar.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div class="overflow-hidden rounded-lg border border-border" :style="{ background: rascunho.fundo }">
+                <div
+                  class="px-4 py-3 text-sm font-semibold"
+                  :style="{ background: rascunho.primaria, color: rascunho.contrastePrimaria }"
+                >
+                  Portal Sampa na Ilha
+                  <i class="fas fa-leaf ml-1" :style="{ color: rascunho.destaque }" />
+                </div>
+                <div class="flex flex-col gap-1.5 p-4">
+                  <p
+                    v-for="nivel in NIVEIS_TITULO"
+                    :key="nivel"
+                    class="font-serif font-bold leading-tight"
+                    :class="{ 'text-xl': nivel === 'h1', 'text-lg': nivel === 'h2', 'text-base': nivel === 'h3' }"
+                    :style="{ color: rascunho[nivel] || rascunho.titulo, fontSize: nivel === 'h5' ? '.85rem' : nivel === 'h6' ? '.78rem' : undefined }"
+                  >
+                    {{ nivel.toUpperCase() }} — Cultura amazônica em São Paulo
+                  </p>
+                  <p class="mt-1 text-sm" :style="{ color: rascunho.texto }">
+                    Texto corrido da matéria, com um
+                    <span class="font-semibold underline" :style="{ color: rascunho.primaria }">link interno</span>
+                    no meio da frase.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <div class="flex flex-wrap items-center gap-2">
+            <Button :disabled="tema.salvando || !tema.alterado" @click="salvarTema()">
+              <LoaderCircleIcon v-if="tema.salvando" class="size-4 animate-spin" />
+              <SaveIcon v-else class="size-4" />
+              Salvar aparência
+            </Button>
+            <Button variant="outline" :disabled="!tema.alterado" @click="tema.descartar()">
+              Descartar alterações
+            </Button>
+            <Button variant="ghost" :disabled="restaurandoTema" @click="restaurarTema()">
+              <LoaderCircleIcon v-if="restaurandoTema" class="size-4 animate-spin" />
+              <RotateCcwIcon v-else class="size-4" />
+              Restaurar paleta padrão ({{ TEMA_PADRAO.primaria }})
+            </Button>
+          </div>
+        </div>
+      </TabsContent>
 
       <TabsContent value="taxonomia" class="mt-4 grid gap-4 lg:grid-cols-2">
         <Card>

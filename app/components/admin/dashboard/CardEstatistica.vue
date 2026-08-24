@@ -4,12 +4,12 @@ defineProps<{
   valor: string | number
   descricao?: string
   icone?: unknown
-  tom?: 'azul' | 'ciano' | 'verde' | 'ambar' | 'roxo'
+  tom?: 'marca' | 'destaque' | 'verde' | 'ambar' | 'roxo'
 }>()
 
 const tons: Record<string, string> = {
-  azul: 'bg-[#0a4fa8]/10 text-[#0a4fa8] dark:bg-[#0a4fa8]/25 dark:text-[#79b5ff]',
-  ciano: 'bg-[#00b4d8]/12 text-[#0184a3] dark:bg-[#00b4d8]/25 dark:text-[#68dcf5]',
+  marca: 'bg-[#0c560b]/10 text-[#0c560b] dark:bg-[#0c560b]/30 dark:text-[#7cc47a]',
+  destaque: 'bg-[#d9a441]/15 text-[#8a6414] dark:bg-[#d9a441]/25 dark:text-[#e9c37c]',
   verde: 'bg-emerald-500/12 text-emerald-600 dark:text-emerald-400',
   ambar: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
   roxo: 'bg-purple-500/12 text-purple-600 dark:text-purple-400',
@@ -19,7 +19,7 @@ const tons: Record<string, string> = {
 <template>
   <Card class="gap-0 py-5">
     <CardContent class="flex items-start gap-4 px-5">
-      <div class="flex size-11 shrink-0 items-center justify-center rounded-xl" :class="tons[tom ?? 'azul']">
+      <div class="flex size-11 shrink-0 items-center justify-center rounded-xl" :class="tons[tom ?? 'marca']">
         <component :is="icone" class="size-5" />
       </div>
       <div class="min-w-0">

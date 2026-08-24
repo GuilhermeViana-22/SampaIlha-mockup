@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div>
+  <div class="portal-tema">
     <HeaderBreakingNews />
     <HeaderPrincipal />
     <HeaderBarraCategorias />

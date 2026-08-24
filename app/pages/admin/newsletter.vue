@@ -53,7 +53,7 @@ function exportarCsv() {
         :valor="newsletter.inscricoes.length"
         descricao="Total na base do portal"
         :icone="MailIcon"
-        tom="ciano"
+        tom="destaque"
       />
     </div>
 

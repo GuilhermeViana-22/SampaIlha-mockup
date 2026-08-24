@@ -2,15 +2,41 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
-    --azul:      #0a4fa8;
-    --azul-mid:  #1565c0;
-    --azul-leve: #e8f0fe;
-    --ciano:     #00b4d8;
+    /* ── TEMA EDITÁVEL ──────────────────────────────────────────────
+       Valores padrão da marca. O painel (/admin/configuracoes → Aparência)
+       grava a escolha do administrador na API e o SSR injeta um <style> no
+       <head> que sobrescreve este bloco — por isso nada aqui é !important.
+       ──────────────────────────────────────────────────────────────── */
+    --cor-primaria:           #0c560b;
+    --cor-primaria-contraste: #ffffff;
+    --cor-destaque:           #d9a441;
+    --cor-fundo:              #f5f7fa;
+    --cor-texto:              #111827;
+    --cor-titulo:             #0c560b;
+    --cor-h1: var(--cor-titulo);
+    --cor-h2: var(--cor-titulo);
+    --cor-h3: var(--cor-titulo);
+    --cor-h4: var(--cor-titulo);
+    --cor-h5: var(--cor-titulo);
+    --cor-h6: var(--cor-titulo);
+
+    /* Tons derivados da cor principal — o painel não precisa pedi-los. */
+    --cor-primaria-media:  color-mix(in srgb, var(--cor-primaria) 72%, #ffffff);
+    --cor-primaria-suave:  color-mix(in srgb, var(--cor-primaria) 10%, #ffffff);
+    --cor-primaria-escura: color-mix(in srgb, var(--cor-primaria) 82%, #000000);
+
+    /* Apelidos históricos: o CSS do portal nasceu com a paleta azul e segue
+       usando estes nomes. Mantê-los evita reescrever ~90 declarações. */
+    --azul:      var(--cor-primaria);
+    --azul-mid:  var(--cor-primaria-media);
+    --azul-leve: var(--cor-primaria-suave);
+    --ciano:     var(--cor-destaque);
+    --escuro:    var(--cor-texto);
+
     --cinza-1:   #f5f7fa;
     --cinza-2:   #e9ecef;
     --cinza-3:   #adb5bd;
     --cinza-4:   #6c757d;
-    --escuro:    #111827;
     --branco:    #ffffff;
     --vermelho:  #e63946;
     --verde:     #2dc653;
@@ -24,6 +50,30 @@
   }
 
   html { scroll-behavior: smooth; }
-  body { font-family: var(--fonte-sans); color: var(--escuro); background: var(--cinza-1); line-height: 1.6; }
+  body { font-family: var(--fonte-sans); color: var(--cor-texto); background: var(--cor-fundo); line-height: 1.6; }
   a { color: inherit; text-decoration: none; }
+
+  /* ── COR DOS TÍTULOS ──────────────────────────────────────────────
+     Aplicada no site público (o layout `default` marca a raiz com
+     `.portal-tema`), nunca no painel, que segue o tema do shadcn.
+     ──────────────────────────────────────────────────────────────── */
+  .portal-tema h1 { color: var(--cor-h1); }
+  .portal-tema h2 { color: var(--cor-h2); }
+  .portal-tema h3 { color: var(--cor-h3); }
+  .portal-tema h4 { color: var(--cor-h4); }
+  .portal-tema h5 { color: var(--cor-h5); }
+  .portal-tema h6 { color: var(--cor-h6); }
+
+  /* Blocos de fundo escuro ou colorido: o título continua herdando o branco
+     do container. Um bloco escuro novo entra nesta lista. */
+  .portal-tema :is(
+    .page-hero,
+    .site-footer,
+    .breaking,
+    .hero-main__content,
+    .hero-secondary__content,
+    .weather-widget,
+    .ad-widget,
+    .tempo-modal__topo
+  ) :is(h1, h2, h3, h4, h5, h6) { color: inherit; }
 }

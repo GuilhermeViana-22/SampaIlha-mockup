@@ -9,8 +9,8 @@ const soma = computed(() => props.dados.noticia + props.dados.dica + props.dados
 const total = computed(() => Math.max(1, soma.value))
 
 const linhas = computed(() => [
-  { tipo: 'noticia', rotulo: 'Notícias', icone: NewspaperIcon, valor: props.dados.noticia, classe: 'bg-[#0a4fa8]' },
-  { tipo: 'dica', rotulo: 'Dicas & Guias', icone: LightbulbIcon, valor: props.dados.dica, classe: 'bg-[#00b4d8]' },
+  { tipo: 'noticia', rotulo: 'Notícias', icone: NewspaperIcon, valor: props.dados.noticia, classe: 'bg-[#0c560b]' },
+  { tipo: 'dica', rotulo: 'Dicas & Guias', icone: LightbulbIcon, valor: props.dados.dica, classe: 'bg-[#d9a441]' },
   { tipo: 'informacao', rotulo: 'Informações', icone: InfoIcon, valor: props.dados.informacao, classe: 'bg-amber-500' },
 ])
 </script>

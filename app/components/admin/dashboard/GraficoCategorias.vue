@@ -40,7 +40,7 @@ const maior = computed(() => Math.max(1, ...props.dados.map(d => d.total)))
         <span v-else class="truncate text-sm font-medium">{{ linha.nome }}</span>
         <div class="h-2.5 overflow-hidden rounded-full bg-muted">
           <div
-            class="h-full rounded-full bg-gradient-to-r from-[#0a4fa8] to-[#00b4d8] transition-[width] duration-500"
+            class="h-full rounded-full bg-gradient-to-r from-[#0c560b] to-[#3fa03c] transition-[width] duration-500"
             :style="{ width: `${Math.round((linha.total / maior) * 100)}%` }"
           />
         </div>
