@@ -13,6 +13,8 @@ export interface ApiTema {
   background: string
   text: string
   heading: string
+  footer: string
+  footer_contrast: string
   heading_1: string | null
   heading_2: string | null
   heading_3: string | null
@@ -31,6 +33,8 @@ export function daApi(bruto: Partial<ApiTema> | null | undefined): Tema {
     fundo: api.background,
     texto: api.text,
     titulo: api.heading,
+    rodape: api.footer,
+    contrasteRodape: api.footer_contrast,
     h1: api.heading_1 ?? '',
     h2: api.heading_2 ?? '',
     h3: api.heading_3 ?? '',
@@ -52,6 +56,8 @@ export function paraApi(tema: Tema): ApiTema {
     background: tema.fundo,
     text: tema.texto,
     heading: tema.titulo,
+    footer: tema.rodape,
+    footer_contrast: tema.contrasteRodape,
     ...titulos,
   }
 }

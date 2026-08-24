@@ -37,6 +37,11 @@ const CORES_BASE = [
   { chave: 'texto', rotulo: 'Cor do texto', descricao: 'Texto corrido das matérias.' },
 ] as const
 
+const CORES_RODAPE = [
+  { chave: 'rodape', rotulo: 'Fundo do rodapé', descricao: 'A faixa escura no pé de todas as páginas.' },
+  { chave: 'contrasteRodape', rotulo: 'Texto sobre o rodapé', descricao: 'Precisa contrastar com o fundo dele.' },
+] as const
+
 /** Grava a paleta escolhida — ela passa a valer para todo o portal. */
 async function salvarTema() {
   try {
@@ -92,6 +97,7 @@ async function restaurar() {
     <Tabs default-value="aparencia">
       <TabsList>
         <TabsTrigger value="aparencia">Aparência</TabsTrigger>
+        <TabsTrigger value="logo">Logo</TabsTrigger>
         <TabsTrigger value="taxonomia">Taxonomia</TabsTrigger>
         <TabsTrigger value="conta">Conta</TabsTrigger>
         <TabsTrigger value="dados">Dados</TabsTrigger>
@@ -117,6 +123,33 @@ async function restaurar() {
               :rotulo="campo.rotulo"
               :descricao="campo.descricao"
             />
+
+            <Separator />
+
+            <div>
+              <p class="text-sm font-medium">Rodapé</p>
+              <p class="mt-0.5 text-xs text-muted-foreground">
+                Escolher um fundo claro exige trocar o texto junto — senão ele some.
+              </p>
+            </div>
+            <AdminConfiguracoesCampoCor
+              v-for="campo in CORES_RODAPE"
+              :key="campo.chave"
+              v-model="rascunho[campo.chave]"
+              :rotulo="campo.rotulo"
+              :descricao="campo.descricao"
+            />
+
+            <!-- Prévia com as duas cores aplicadas, para conferir o contraste. -->
+            <div
+              class="rounded-lg px-4 py-3"
+              :style="{ background: rascunho.rodape, color: rascunho.contrasteRodape }"
+            >
+              <p class="font-serif text-sm font-bold">Sampa na Ilha</p>
+              <p class="text-xs" style="opacity:.7">
+                O portal de referência para quem busca informação, cultura e notícias.
+              </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -197,6 +230,10 @@ async function restaurar() {
             </Button>
           </div>
         </div>
+      </TabsContent>
+
+      <TabsContent value="logo" class="mt-4">
+        <AdminConfiguracoesLogo />
       </TabsContent>
 
       <TabsContent value="taxonomia" class="mt-4 grid gap-4 lg:grid-cols-2">

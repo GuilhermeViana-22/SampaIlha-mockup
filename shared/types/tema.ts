@@ -18,6 +18,10 @@ export interface Tema {
   texto: string
   /** Cor padrão dos títulos; cada nível pode sobrescrever. */
   titulo: string
+  /** Cor de fundo do rodapé. */
+  rodape: string
+  /** Cor do texto sobre o rodapé — o texto some se ela não contrastar. */
+  contrasteRodape: string
   /** Vazio (`''`) herda `titulo`. */
   h1: string
   h2: string
@@ -35,6 +39,8 @@ export const TEMA_PADRAO: Tema = {
   fundo: '#f5f7fa',
   texto: '#111827',
   titulo: '#0c560b',
+  rodape: '#0d1b2a',
+  contrasteRodape: '#ffffff',
   h1: '',
   h2: '',
   h3: '',
@@ -64,6 +70,8 @@ export function normalizarTema(bruto: Partial<Tema> | null | undefined): Tema {
     fundo: cor(base.fundo, TEMA_PADRAO.fundo),
     texto: cor(base.texto, TEMA_PADRAO.texto),
     titulo: cor(base.titulo, TEMA_PADRAO.titulo),
+    rodape: cor(base.rodape, TEMA_PADRAO.rodape),
+    contrasteRodape: cor(base.contrasteRodape, TEMA_PADRAO.contrasteRodape),
     h1: '', h2: '', h3: '', h4: '', h5: '', h6: '',
   }
 
@@ -97,6 +105,8 @@ export function cssDoTema(bruto: Partial<Tema> | null | undefined): string {
     + `--cor-fundo:${tema.fundo};`
     + `--cor-texto:${tema.texto};`
     + `--cor-titulo:${tema.titulo};`
+    + `--cor-rodape:${tema.rodape};`
+    + `--cor-rodape-contraste:${tema.contrasteRodape};`
     + titulos
     + '}'
 }

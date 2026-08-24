@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { CONTATO } from '~/utils/navegacao'
-import logo from '~/assets/logos/logo.png'
 
 /** Cabeçalho fixo: logo, navegação, busca e ações. */
 const portal = usePortalStore()
+const marca = useMarcaStore()
 </script>
 
 <template>
   <header class="site-header">
     <div class="header-inner">
       <NuxtLink to="/" class="logo">
-        <img :src="logo" class="logo__img" alt="Portal Sampa na Ilha" width="235" height="240">
+        <img :src="marca.logo" class="logo__img" alt="Portal Sampa na Ilha" width="235" height="240">
         <div>
           <div class="logo__name">Sampa na Ilha</div>
           <div class="logo__tagline">{{ CONTATO.tagline }}</div>

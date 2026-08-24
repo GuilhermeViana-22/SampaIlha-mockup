@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { CONTATO, RODAPE_EDITORIAS, RODAPE_PORTAL, REDES_SOCIAIS } from '~/utils/navegacao'
-import logo from '~/assets/logos/logo.png'
 
 const portal = usePortalStore()
+const marca = useMarcaStore()
 const ano = new Date().getFullYear()
 </script>
 
@@ -11,7 +11,7 @@ const ano = new Date().getFullYear()
     <div class="footer-top">
       <div class="footer-brand">
         <div class="logo">
-          <img :src="logo" class="logo__img" alt="Portal Sampa na Ilha" width="235" height="240">
+          <img :src="marca.logo" class="logo__img" alt="Portal Sampa na Ilha" width="235" height="240">
           <div>
             <div class="logo__name">Sampa na Ilha</div>
             <div class="logo__tagline">{{ CONTATO.tagline }}</div>
