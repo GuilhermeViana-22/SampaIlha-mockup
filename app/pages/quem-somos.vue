@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { CONTATO } from '~/utils/navegacao'
-
 useSeoMeta({
   title: 'Quem Somos — Portal Sampa na Ilha',
-  description: 'Ecossistema de informação, utilidade pública e cultura amazônica em São Paulo: quem somos, nossos eixos de atuação e os canais oficiais de atendimento.',
+  description: 'Ecossistema de informação, utilidade pública e cultura amazônica em São Paulo: quem somos e os eixos do nosso movimento.',
   ogTitle: 'Quem Somos — Portal Sampa na Ilha',
   ogDescription: 'Ecossistema de informação, utilidade pública e cultura amazônica em São Paulo.',
 })
@@ -46,16 +44,6 @@ useSeoMeta({
             O Sampa na Ilha é a união perfeita entre informação em tempo real, utilidade diária e a
             celebração da nossa ancestralidade.
           </p>
-
-          <ComumCabecalhoSecao titulo="Canais de Atendimento" />
-          <p>
-            Falar com a gente é direto: o WhatsApp <strong>{{ CONTATO.whatsapp }}</strong> é o canal
-            oficial de atendimento, e as redes sociais concentram a agenda e os bastidores do projeto.
-          </p>
-          <ComumCanaisAtendimento />
-
-          <ComumCabecalhoSecao titulo="Nossas Frentes de Atuação" />
-          <CulturaSubpaginas />
         </main>
 
         <SidebarPrincipal :tempo="false" />
