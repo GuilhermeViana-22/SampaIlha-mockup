@@ -26,14 +26,17 @@ const conteudo = defineModel<string>({ required: true })
 const escuro = useState('admin-tema-escuro', () => false)
 
 const CONTEUDO_CSS = `
-  body { font-family: Inter, system-ui, sans-serif; font-size: 16px; line-height: 1.75; padding: 12px 16px; }
-  h2 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.5rem; font-weight: 700; margin: 1.6em 0 .5em; }
-  h3 { font-family: 'Playfair Display', Georgia, serif; font-size: 1.2rem; font-weight: 700; margin: 1.4em 0 .4em; }
+  body { font-family: Arial, Helvetica, sans-serif; font-size: 16px; line-height: 1.75; padding: 12px 16px; }
+  h2 { font-family: Arial, Helvetica, sans-serif; font-size: 1.5rem; font-weight: 700; margin: 1.6em 0 .5em; }
+  h3 { font-family: Arial, Helvetica, sans-serif; font-size: 1.2rem; font-weight: 700; margin: 1.4em 0 .4em; }
   p { margin: 0 0 1.1em; }
   blockquote { margin: 1.4em 0; padding: .2em 0 .2em 1em; border-left: 3px solid #0a4fa8; font-style: italic; }
   img { max-width: 100%; height: auto; border-radius: 8px; }
   figure { margin: 1.4em 0; }
-  figcaption { font-size: .85rem; color: #6b7280; text-align: center; margin-top: .5em; }
+  figcaption { font-size: .82rem; line-height: 1.45; color: #6b7280; text-align: center; margin-top: .5em; }
+  .texto-esquerda { text-align: left; }
+  .texto-centro   { text-align: center; }
+  .texto-direita  { text-align: right; }
   a { color: #0a4fa8; }
 `
 
@@ -104,9 +107,24 @@ const configuracao = computed(() => ({
   link_default_target: '_blank',
   link_assume_external_targets: true,
   // Só o que o portal sabe renderizar; o resto é limpo na entrada.
-  valid_elements: 'p,br,strong/b,em/i,u,s,h2,h3,blockquote,ul,ol,li,'
-    + 'a[href|target|rel],img[src|alt|width|height],figure[class],figcaption,'
+  valid_elements: 'p[class],br,strong/b,em/i,u,s,h2[class],h3[class],blockquote[class],ul,ol,li[class],'
+    + 'a[href|target|rel],img[src|alt|width|height],figure[class],figcaption[class],'
     + 'table[border],thead,tbody,tr,th,td,hr',
+  /**
+   * Alinhamento como classe, não como `style="text-align"`.
+   *
+   * O `valid_elements` acima existe para o portal só receber o que sabe
+   * renderizar, e atributo `style` não está na lista. Com o padrão do TinyMCE
+   * — que alinha por style — o botão centralizava na tela do editor e o
+   * serializador jogava o style fora ao salvar: o texto voltava para a
+   * esquerda depois de publicado, sem nenhum aviso. As três classes abaixo
+   * têm regra correspondente em assets/css/portal/noticia.css.
+   */
+  formats: {
+    alignleft: { selector: 'p,h2,h3,blockquote,figure,figcaption,li', classes: 'texto-esquerda' },
+    aligncenter: { selector: 'p,h2,h3,blockquote,figure,figcaption,li', classes: 'texto-centro' },
+    alignright: { selector: 'p,h2,h3,blockquote,figure,figcaption,li', classes: 'texto-direita' },
+  },
   extended_valid_elements: '',
 }))
 

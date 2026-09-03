@@ -6,6 +6,8 @@
   .post-body h2 { font-family: var(--fonte-serif); font-size: 1.35rem; line-height: 1.3; margin: 26px 0 12px; }
   .post-body .meta { color: var(--cinza-4); margin-bottom: 20px; }
   .post-body .meta i { color: var(--cinza-3); }
+  .post-capa { margin: 0 0 24px; }
+  .post-capa .post-cover { margin-bottom: 0; }
   .post-cover { width: 100%; aspect-ratio: 16/9; border-radius: var(--raio); overflow: hidden; position: relative; margin-bottom: 24px; box-shadow: var(--sombra-md); }
   .post-cover .img-bg i { font-size: 4rem; }
   .post-body p { font-size: 1rem; color: var(--escuro); margin-bottom: 18px; line-height: 1.85; }
@@ -25,7 +27,20 @@
   .post-body strong { font-weight: 700; }
   .post-body figure { margin: 24px 0; }
   .post-body img { max-width: 100%; height: auto; border-radius: var(--raio); display: block; margin: 0 auto; }
-  .post-body figcaption { font-size: .82rem; color: var(--cinza-4); text-align: center; margin-top: 8px; }
+  /* Legenda e crédito sob a foto. Capa e imagens do corpo usam a mesma régua:
+     sem isso a mesma matéria mostra o crédito em dois tamanhos diferentes,
+     dependendo de a foto ser a de cima ou uma do meio do texto. */
+  .post-body figcaption { font-size: .82rem; line-height: 1.45; color: var(--cinza-4); text-align: center; margin-top: 8px; }
+  /* O crédito é subordinado à legenda: linha própria e um degrau menor. */
+  .post-body .foto-texto__credito { display: block; font-size: .72rem; color: var(--cinza-3); margin-top: 3px; }
+
+  /* Alinhamento vindo da barra do editor. Chega como classe, não como
+     `style="text-align"`: o valid_elements limpa atributo que o portal não
+     conhece, então o style era descartado ao salvar — o botão parecia
+     funcionar na tela e o texto voltava para a esquerda depois de publicado. */
+  .post-body .texto-esquerda { text-align: left; }
+  .post-body .texto-centro   { text-align: center; }
+  .post-body .texto-direita  { text-align: right; }
   .post-body hr { border: 0; border-top: 1px solid var(--cinza-2); margin: 28px 0; }
   /* Tabela larga rola dentro de si em vez de esticar a página no celular. */
   .post-body table { width: 100%; border-collapse: collapse; margin: 0 0 20px; font-size: .92rem; display: block; overflow-x: auto; }
