@@ -1,0 +1,36 @@
+# Portal Sampa na Ilha — frontend local (Nuxt 4 SSR).
+# Producao usa docker-compose.dokploy.yml; este arquivo e so para testar na maquina.
+#
+# Sobe junto da API, que ja roda pelo compose de api_python_sampa. Por isso a
+# rede dela entra aqui como `external` em vez de ser criada de novo.
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production-stage
+    container_name: sampa_ilha_web
+    ports:
+      - "${WEB_PORT:-9042}:9042"
+    environment:
+      NITRO_HOST: 0.0.0.0
+      NITRO_PORT: 9042
+
+      # Chamada servidor->servidor: sai de dentro do container, entao usa o nome
+      # do servico da API na rede do docker.
+      NUXT_API_BASE: http://api:9041/api/v1
+
+      # Estas duas viram URL no HTML entregue ao navegador. Se apontarem para
+      # `api:9041` o browser do host nao resolve o nome e as fotos quebram —
+      # tem de ser o endereco publicado no host.
+      NUXT_PUBLIC_API_ORIGIN: http://localhost:9041
+      NUXT_PUBLIC_SITE_URL: http://localhost:9042
+    networks:
+      - sampa_ilha_net
+    restart: unless-stopped
+
+networks:
+  sampa_ilha_net:
+    external: true
+    name: api_python_sampa_sampa_ilha_net
