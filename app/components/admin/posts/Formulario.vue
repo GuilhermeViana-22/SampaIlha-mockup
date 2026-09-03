@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import {
-  ArrowLeftIcon, ExternalLinkIcon, ImagePlusIcon, LoaderCircleIcon, SaveIcon, Trash2Icon, XIcon,
+  ArrowLeftIcon, ExternalLinkIcon, LoaderCircleIcon, SaveIcon, XIcon,
 } from '@lucide/vue'
 import type { CapaGradiente, Post, PostImagem, PostInput } from '#shared/types/content'
 
 /** Campos que o formulário edita — o resto (id, leituras, datas) é do servidor. */
 type CamposFormulario = Omit<PostInput, 'imagens' | 'caminho' | 'categoriaNome' | 'categoriaIcone' | 'categoriaCor' | 'regiaoNome'>
-import { CAPAS, STATUS_POST, TIPOS_CONTEUDO, gerarSlug } from '#shared/utils/taxonomia'
+import { CAPAS, ICONES, STATUS_POST, TIPOS_CONTEUDO, gerarSlug, rotuloDoIcone } from '#shared/utils/taxonomia'
 
 /** Formulário único de criação e edição de conteúdo. */
 const props = defineProps<{ post?: Post | null }>()
@@ -14,13 +14,6 @@ const props = defineProps<{ post?: Post | null }>()
 const posts = usePostsStore()
 const portal = usePortalStore()
 const rota = useRoute()
-
-const ICONES_SUGERIDOS = [
-  'fas fa-newspaper', 'fas fa-umbrella-beach', 'fas fa-theater-masks', 'fas fa-music',
-  'fas fa-drum', 'fas fa-leaf', 'fas fa-utensils', 'fas fa-futbol', 'fas fa-fish',
-  'fas fa-ship', 'fas fa-tree', 'fas fa-sun', 'fas fa-lightbulb', 'fas fa-route',
-  'fas fa-circle-info', 'fas fa-briefcase', 'fas fa-hands-helping', 'fas fa-palette',
-]
 
 function estadoInicial(): CamposFormulario {
   const tipoDaQuery = rota.query.tipo as PostInput['tipo'] | undefined
@@ -46,9 +39,9 @@ function estadoInicial(): CamposFormulario {
 
 const form = reactive<CamposFormulario>(estadoInicial())
 const novaTag = ref('')
-const enviandoFoto = ref(false)
-const campoArquivo = ref<HTMLInputElement | null>(null)
 const fotos = ref<PostImagem[]>([...(props.post?.imagens ?? [])])
+/** O bloco de fotos guarda a fila do que foi escolhido antes de a matéria existir. */
+const blocoFotos = ref<{ enviarPendentes: (postId: string) => Promise<void> } | null>(null)
 const slugManual = ref(!!props.post)
 const dataPublicacao = ref(paraInputDataHora(form.publicadoEm))
 
@@ -90,80 +83,6 @@ function removerTag(tag: string) {
 }
 
 /**
- * Envia uma foto para a matéria.
- *
- * O arquivo vai para a API, que valida o conteúdo real da imagem (um `.exe`
- * renomeado para `.jpg` é recusado lá, não aqui). A primeira foto enviada vira
- * a capa automaticamente.
- *
- * O campo de arquivo é limpo no `finally` mesmo quando dá erro: sem isso,
- * escolher o mesmo arquivo de novo não dispararia `change` e pareceria que o
- * botão travou.
- */
-async function enviarFoto(evento: Event) {
-  const arquivo = (evento.target as HTMLInputElement).files?.[0]
-  if (!arquivo) return
-
-  // A API anexa a imagem a uma matéria existente; sem id não há onde pendurar.
-  if (!edicao.value) {
-    avisar.alerta(
-      'Salve o conteúdo primeiro.',
-      'A foto é anexada a uma matéria que já existe — crie o rascunho e envie em seguida.',
-    )
-    if (campoArquivo.value) campoArquivo.value.value = ''
-    return
-  }
-
-  enviandoFoto.value = true
-  try {
-    const corpo = new FormData()
-    corpo.append('file', arquivo)
-    corpo.append('set_as_cover', String(fotos.value.length === 0))
-
-    const foto = await $fetch<PostImagem>(`/api/posts/${props.post!.id}/foto`, { method: 'POST', body: corpo })
-
-    fotos.value.push(foto)
-    if (foto.capa) form.imagemUrl = foto.url
-
-    avisar.sucesso('Foto enviada.', foto.capa ? 'Ela entrou como capa da matéria.' : undefined)
-  }
-  catch (e: unknown) {
-    avisar.erro(e, 'Não foi possível enviar a foto.')
-  }
-  finally {
-    enviandoFoto.value = false
-    if (campoArquivo.value) campoArquivo.value.value = ''
-  }
-}
-
-/**
- * Remove uma foto da matéria — arquivo incluído, do lado da API.
- *
- * Quando a foto removida era a capa, a próxima da lista assume o lugar para o
- * card da matéria não ficar sem imagem no portal.
- */
-async function removerFoto(foto: PostImagem) {
-  try {
-    await $fetch(`/api/posts/${props.post!.id}/foto`, { method: 'DELETE', params: { imagemId: foto.id } })
-
-    fotos.value = fotos.value.filter(item => item.id !== foto.id)
-
-    const eraCapa = form.imagemUrl === foto.url
-    if (eraCapa) form.imagemUrl = fotos.value[0]?.url ?? null
-
-    if (eraCapa && !form.imagemUrl) {
-      avisar.alerta('Foto removida — a matéria ficou sem capa.', 'Envie outra imagem antes de publicar.')
-    }
-    else {
-      avisar.sucesso('Foto removida.')
-    }
-  }
-  catch (e: unknown) {
-    avisar.erro(e, 'Não foi possível remover a foto.')
-  }
-}
-
-/**
  * Grava o conteúdo — cria na primeira vez, atualiza nas seguintes.
  *
  * `publicar` é o botão "Salvar e publicar". Vale lembrar que pedir publicação
@@ -173,8 +92,8 @@ async function removerFoto(foto: PostImagem) {
  * quem acabou de clicar.
  *
  * Só há redirecionamento na criação: depois de existir um id, a matéria ganha a
- * própria URL de edição (e é a partir dela que o upload de foto passa a
- * funcionar).
+ * própria URL de edição — e é neste ponto que as fotos escolhidas antes de ela
+ * existir finalmente têm onde ser anexadas.
  */
 async function salvar(publicar = false) {
   if (!form.titulo.trim()) {
@@ -218,7 +137,12 @@ async function salvar(publicar = false) {
     avisar.sucesso(criando ? 'Conteúdo criado.' : 'Alterações salvas.', 'Continua como rascunho, fora do ar.')
   }
 
-  if (criando) await navigateTo(`/admin/posts/${salvo.id}`)
+  // As fotos escolhidas antes de existir a matéria só têm onde ser anexadas
+  // agora — e sobem antes da navegação para já aparecerem na tela de edição.
+  if (criando) {
+    await blocoFotos.value?.enviarPendentes(salvo.id)
+    await navigateTo(`/admin/posts/${salvo.id}`)
+  }
 }
 
 // Espalha o objeto reativo (não `toRaw`), senão o computed não acompanha as edições.
@@ -240,6 +164,15 @@ const previa = computed<Post>(() => ({
   <form class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]" @submit.prevent="salvar()">
     <!-- Coluna principal -->
     <div class="flex flex-col gap-6">
+      <!-- Fotos primeiro: a capa é decisão de pauta, não acabamento do fim. -->
+      <AdminPostsFotos
+        ref="blocoFotos"
+        v-model:fotos="fotos"
+        v-model:capa-url="form.imagemUrl"
+        :post-id="post?.id"
+        :titulo="form.titulo"
+      />
+
       <Card>
         <CardHeader>
           <CardTitle class="text-base">Conteúdo</CardTitle>
@@ -383,58 +316,12 @@ const previa = computed<Post>(() => ({
 
       <Card>
         <CardHeader>
-          <CardTitle class="text-base">Fotos da matéria</CardTitle>
+          <CardTitle class="text-base">Capa reserva</CardTitle>
           <CardDescription>
-            Toda matéria vai ao ar com foto. A primeira enviada vira a capa; o gradiente abaixo
-            é só o reserva enquanto não houver imagem.
+            O gradiente e o ícone que seguram o card enquanto a matéria não tiver foto.
           </CardDescription>
         </CardHeader>
         <CardContent class="flex flex-col gap-4">
-          <div v-if="fotos.length" class="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <figure v-for="foto in fotos" :key="foto.id" class="group relative overflow-hidden rounded-lg border border-border">
-              <img :src="foto.url" :alt="foto.legenda ?? form.titulo" class="aspect-video w-full object-cover">
-              <figcaption
-                v-if="foto.capa"
-                class="absolute left-2 top-2 rounded-full bg-primary px-2 py-0.5 text-[11px] font-semibold text-primary-foreground"
-              >
-                Capa
-              </figcaption>
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon-sm"
-                class="absolute right-2 top-2 opacity-0 transition-opacity group-hover:opacity-100"
-                title="Remover foto"
-                @click="removerFoto(foto)"
-              >
-                <Trash2Icon class="size-4" />
-              </Button>
-            </figure>
-          </div>
-
-          <div class="flex flex-wrap items-center gap-3">
-            <input
-              ref="campoArquivo"
-              type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif"
-              class="hidden"
-              @change="enviarFoto"
-            >
-            <Button type="button" variant="outline" :disabled="enviandoFoto" @click="campoArquivo?.click()">
-              <LoaderCircleIcon v-if="enviandoFoto" class="size-4 animate-spin" />
-              <ImagePlusIcon v-else class="size-4" />
-              {{ enviandoFoto ? 'Enviando…' : 'Enviar foto' }}
-            </Button>
-            <p v-if="!edicao" class="text-xs text-muted-foreground">
-              Disponível depois de criar o conteúdo.
-            </p>
-            <p v-else-if="!fotos.length" class="text-xs text-amber-600 dark:text-amber-400">
-              Esta matéria ainda está sem foto.
-            </p>
-          </div>
-
-          <Separator />
-
           <div class="grid grid-cols-5 gap-2 sm:grid-cols-10">
             <button
               v-for="capa in CAPAS"
@@ -449,23 +336,40 @@ const previa = computed<Post>(() => ({
             </button>
           </div>
 
-          <div class="grid gap-2 sm:grid-cols-2">
-            <div class="grid gap-2">
-              <Label for="icone">Ícone (Font Awesome)</Label>
-              <Input id="icone" v-model="form.icone" list="icones-sugeridos" class="font-mono text-xs" />
-              <datalist id="icones-sugeridos">
-                <option v-for="icone in ICONES_SUGERIDOS" :key="icone" :value="icone" />
-              </datalist>
+          <div class="grid gap-2">
+            <div class="flex items-baseline justify-between">
+              <Label>Ícone</Label>
+              <span class="text-xs text-muted-foreground">{{ rotuloDoIcone(form.icone) }}</span>
             </div>
-            <div class="grid gap-2">
-              <Label for="imagem">URL da imagem (opcional)</Label>
-              <Input
-                id="imagem"
-                :model-value="form.imagemUrl ?? ''"
-                placeholder="https://…"
-                @update:model-value="form.imagemUrl = String($event) || null"
-              />
+            <div class="grid max-h-56 grid-cols-4 gap-2 overflow-y-auto rounded-lg border border-border p-2 sm:grid-cols-6 lg:grid-cols-8">
+              <button
+                v-for="icone in ICONES"
+                :key="icone.valor"
+                type="button"
+                class="flex flex-col items-center gap-1 rounded-md border px-1 py-2 text-center transition"
+                :class="form.icone === icone.valor
+                  ? 'border-primary bg-primary/10 text-primary'
+                  : 'border-transparent hover:border-input hover:bg-muted'"
+                @click="form.icone = icone.valor"
+              >
+                <i :class="icone.valor" class="text-base" />
+                <span class="w-full truncate text-[10px] leading-4 text-muted-foreground">{{ icone.rotulo }}</span>
+              </button>
             </div>
+          </div>
+
+          <div class="grid gap-2">
+            <Label for="imagem">URL da capa</Label>
+            <Input
+              id="imagem"
+              :model-value="form.imagemUrl ?? ''"
+              placeholder="https://…"
+              @update:model-value="form.imagemUrl = String($event) || null"
+            />
+            <p class="text-xs text-muted-foreground">
+              Preenchida sozinha pela foto escolhida como capa. Só edite para apontar
+              uma imagem hospedada fora do portal.
+            </p>
           </div>
         </CardContent>
       </Card>
