@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { LoaderCircleIcon, PlusIcon, TagsIcon, Trash2Icon } from '@lucide/vue'
 import type { BadgeCor, Categoria } from '#shared/types/content'
+import { ICONES } from '#shared/utils/taxonomia'
 
 definePageMeta({
   layout: 'admin',
@@ -31,12 +32,6 @@ const nova = reactive({
 })
 
 const CORES: BadgeCor[] = ['blue', 'cyan', 'red', 'green', 'purple', 'gold', 'gray']
-
-const ICONES = [
-  'fas fa-newspaper', 'fas fa-theater-masks', 'fas fa-suitcase-rolling', 'fas fa-landmark',
-  'fas fa-chart-line', 'fas fa-city', 'fas fa-leaf', 'fas fa-microchip', 'fas fa-futbol',
-  'fas fa-utensils', 'fas fa-briefcase', 'fas fa-circle-info', 'fas fa-music', 'fas fa-heart',
-]
 
 const podeCriar = computed(() => nova.nome.trim().length >= 2)
 
@@ -159,16 +154,16 @@ async function remover(categoria: Categoria) {
           <div class="flex flex-wrap gap-1.5">
             <button
               v-for="icone in ICONES"
-              :key="icone"
+              :key="icone.valor"
               type="button"
               class="flex size-9 items-center justify-center rounded-md border text-sm transition"
-              :class="nova.icone === icone
+              :class="nova.icone === icone.valor
                 ? 'border-primary bg-primary text-primary-foreground'
                 : 'border-input hover:bg-muted'"
-              :title="icone"
-              @click="nova.icone = icone"
+              :title="icone.rotulo"
+              @click="nova.icone = icone.valor"
             >
-              <i :class="icone" />
+              <i :class="icone.valor" />
             </button>
           </div>
         </div>
