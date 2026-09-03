@@ -6,6 +6,16 @@
 /** Cada conteúdo do portal é uma dessas três coisas. */
 export type PostTipo = 'noticia' | 'dica' | 'informacao'
 
+/**
+ * O que a peça do mídia kit é.
+ *
+ * Ninguém escolhe isto no formulário: a API deduz do conteúdo do arquivo. Serve
+ * para o card saber que ícone mostrar — o que a peça significa ("logo
+ * horizontal", "apresentação comercial") está no título que quem subiu deu a
+ * ela.
+ */
+export type MidiaKitTipo = 'imagem' | 'pdf' | 'documento'
+
 /** `em_revisao`: escrito por um editor e à espera da validação do editor-chefe. */
 export type PostStatus = 'publicado' | 'rascunho' | 'em_revisao' | 'agendado'
 
@@ -60,6 +70,26 @@ export interface PostImagem {
 /** Campos aceitos ao criar/editar um post pelo dashboard. */
 export type PostInput = Omit<Post, 'id' | 'atualizadoEm' | 'leituras'> &
   Partial<Pick<Post, 'leituras'>>
+
+/**
+ * Peça do mídia kit — o material que o comercial manda para patrocinador.
+ *
+ * Acervo interno: nenhuma página pública lista isto, e por isso a peça não tem
+ * status, slug nem data de publicação como o resto do conteúdo do portal.
+ */
+export interface MidiaKit {
+  id: string
+  titulo: string
+  /** Dimensões, formato e regras de uso — o texto que iria solto no e-mail. */
+  descricao: string
+  url: string
+  nomeArquivo: string
+  tipo: MidiaKitTipo
+  /** Tamanho em bytes. */
+  tamanho: number
+  criadoEm: string
+  atualizadoEm: string
+}
 
 export interface Categoria {
   /** Só vem da API; é o que a remoção usa. */

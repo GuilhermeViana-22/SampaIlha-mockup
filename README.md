@@ -137,6 +137,7 @@ legacy/                         # o mockup HTML original, preservado para consul
 | `/admin/dashboard` | Visão geral: números, editorias, tipos, atividade |
 | `/admin/posts` | Listagem com filtros e ações (publicar, destacar, excluir) |
 | `/admin/posts/novo` · `/admin/posts/[id]` | Formulário de criação/edição com prévia |
+| `/admin/midia-kit` | Acervo para patrocinadores: logos, PDFs e documentos (só no painel) |
 | `/admin/newsletter` | Inscritos + exportação CSV |
 | `/admin/configuracoes` | Taxonomia, sessão e restauração do conteúdo original |
 

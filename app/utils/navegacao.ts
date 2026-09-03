@@ -40,6 +40,7 @@ export interface ItemMenuAdmin extends ItemMenu {
 export const MENU_ADMIN: ItemMenuAdmin[] = [
   { rotulo: 'Dashboard', para: '/admin/dashboard', icone: 'LayoutDashboard' },
   { rotulo: 'Conteúdos', para: '/admin/posts', icone: 'FileText' },
+  { rotulo: 'Mídia Kit', para: '/admin/midia-kit', icone: 'File' },
   { rotulo: 'Avisos', para: '/admin/avisos', icone: 'Megaphone', soChefe: true },
   { rotulo: 'Workshops', para: '/admin/workshops', icone: 'GraduationCap' },
   { rotulo: 'Editorias', para: '/admin/editorias', icone: 'Tags', soChefe: true },
