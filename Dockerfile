@@ -24,9 +24,9 @@ ENV NITRO_HOST=0.0.0.0
 ENV NITRO_PORT=9042
 
 # Back-end do portal (api_python_sampa). Sobrescrevivel pelo ambiente.
-ENV NUXT_API_BASE=https://apisampailha.guilhermeviana.com/api/v1
-ENV NUXT_PUBLIC_API_ORIGIN=https://apisampailha.guilhermeviana.com
-ENV NUXT_PUBLIC_SITE_URL=https://sampailha.guilhermeviana.com
+ENV NUXT_API_BASE=https://api.portalsampanailha.com.br/api/v1
+ENV NUXT_PUBLIC_API_ORIGIN=https://api.portalsampanailha.com.br
+ENV NUXT_PUBLIC_SITE_URL=https://portalsampanailha.com.br
 
 COPY --from=build-stage /app/.output ./.output
 

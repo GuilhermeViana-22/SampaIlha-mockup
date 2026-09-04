@@ -1,7 +1,7 @@
 # Dokploy — frontend Portal Sampa na Ilha (Nuxt 4 SSR)
-# URL: https://sampailha.guilhermeviana.com
+# URL: https://portalsampanailha.com.br
 # Container port: 9042 (uma acima da API, que roda na 9041)
-# API: https://apisampailha.guilhermeviana.com/api/v1
+# API: https://api.portalsampanailha.com.br/api/v1
 
 services:
   web:
@@ -14,23 +14,23 @@ services:
     environment:
       NITRO_HOST: 0.0.0.0
       NITRO_PORT: 9042
-      NUXT_API_BASE: https://apisampailha.guilhermeviana.com/api/v1
-      NUXT_PUBLIC_API_ORIGIN: https://apisampailha.guilhermeviana.com
-      NUXT_PUBLIC_SITE_URL: https://sampailha.guilhermeviana.com
+      NUXT_API_BASE: https://api.portalsampanailha.com.br/api/v1
+      NUXT_PUBLIC_API_ORIGIN: https://api.portalsampanailha.com.br
+      NUXT_PUBLIC_SITE_URL: https://portalsampanailha.com.br
     networks:
       - dokploy-network
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=dokploy-network"
 
-      - "traefik.http.routers.sampa-ilha-web.rule=Host(`sampailha.guilhermeviana.com`)"
+      - "traefik.http.routers.sampa-ilha-web.rule=Host(`portalsampanailha.com.br`)"
       - "traefik.http.routers.sampa-ilha-web.entrypoints=websecure"
       - "traefik.http.routers.sampa-ilha-web.tls=true"
       - "traefik.http.routers.sampa-ilha-web.tls.certresolver=letsencrypt"
       - "traefik.http.routers.sampa-ilha-web.service=sampa-ilha-web"
       - "traefik.http.services.sampa-ilha-web.loadbalancer.server.port=9042"
 
-      - "traefik.http.routers.sampa-ilha-web-http.rule=Host(`sampailha.guilhermeviana.com`)"
+      - "traefik.http.routers.sampa-ilha-web-http.rule=Host(`portalsampanailha.com.br`)"
       - "traefik.http.routers.sampa-ilha-web-http.entrypoints=web"
       - "traefik.http.routers.sampa-ilha-web-http.middlewares=sampa-ilha-web-https"
       - "traefik.http.middlewares.sampa-ilha-web-https.redirectscheme.scheme=https"
