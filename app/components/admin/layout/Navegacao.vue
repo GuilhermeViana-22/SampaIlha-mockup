@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
-  FileIcon, FileTextIcon, GraduationCapIcon, LayoutDashboardIcon, MailIcon, MegaphoneIcon, SettingsIcon,
-  TagsIcon, UserCircleIcon, UsersIcon,
+  FileIcon, FileTextIcon, GraduationCapIcon, ImageIcon, LayoutDashboardIcon, MailIcon, MegaphoneIcon,
+  SettingsIcon, TagsIcon, UserCircleIcon, UsersIcon,
 } from '@lucide/vue'
 
 /**
@@ -16,6 +16,7 @@ const icones: Record<string, unknown> = {
   Mail: MailIcon,
   Settings: SettingsIcon,
   Megaphone: MegaphoneIcon,
+  Image: ImageIcon,
   Tags: TagsIcon,
   Users: UsersIcon,
   UserCircle: UserCircleIcon,

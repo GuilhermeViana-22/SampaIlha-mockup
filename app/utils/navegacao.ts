@@ -42,6 +42,9 @@ export const MENU_ADMIN: ItemMenuAdmin[] = [
   { rotulo: 'Conteúdos', para: '/admin/posts', icone: 'FileText' },
   { rotulo: 'Mídia Kit', para: '/admin/midia-kit', icone: 'File' },
   { rotulo: 'Avisos', para: '/admin/avisos', icone: 'Megaphone', soChefe: true },
+  // Cadastrar e tirar banner do ar é decisão comercial: a API só aceita de
+  // quem administra o portal, e o menu segue a mesma régua.
+  { rotulo: 'Publicidade', para: '/admin/publicidade', icone: 'Image', soChefe: true },
   { rotulo: 'Workshops', para: '/admin/workshops', icone: 'GraduationCap' },
   { rotulo: 'Editorias', para: '/admin/editorias', icone: 'Tags', soChefe: true },
   { rotulo: 'Equipe', para: '/admin/equipe', icone: 'Users', soChefe: true },

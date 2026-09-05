@@ -91,6 +91,72 @@ export interface MidiaKit {
   atualizadoEm: string
 }
 
+/**
+ * Situação de um anúncio no painel.
+ *
+ * `status` responde à decisão de quem administra; a visibilidade responde ao
+ * que o leitor vê. As duas divergem sempre que há janela contratada: um
+ * anúncio publicado com data futura ainda não estreou, e um com data vencida
+ * já saiu da coluna sozinho.
+ */
+export type PublicidadeStatus = 'publicado' | 'rascunho'
+export type PublicidadeVisibilidade = 'no_ar' | 'agendado' | 'encerrado' | 'rascunho'
+
+/**
+ * Anúncio da coluna lateral do portal.
+ *
+ * O anúncio é a arte: `imagemUrl` é obrigatório na API, e é ele que o card
+ * mostra. Sem nenhum anúncio no ar, o portal não desenha card de publicidade
+ * nenhum — nem moldura vazia, nem convite para anunciar.
+ */
+export interface Publicidade {
+  id: string
+  /** Nome da campanha. Aparece acima da arte e identifica o anúncio no painel. */
+  titulo: string
+  /** Linha de apoio, abaixo do título. Pode ser vazia. */
+  descricao: string
+  imagemUrl: string
+  /** Para onde o clique leva. Nulo deixa o banner sem link. */
+  linkUrl: string | null
+  status: PublicidadeStatus
+  /** Janela contratada, em ISO (aaaa-mm-dd). Nula não restringe nada. */
+  publicarDe: string | null
+  publicarAte: string | null
+  /** Ordem na coluna. Menor primeiro. */
+  ordem: number
+  visibilidade: PublicidadeVisibilidade
+  criadoEm: string
+  atualizadoEm: string
+}
+
+/** Campos que o formulário do painel envia — a arte vai separada. */
+export interface PublicidadeInput {
+  titulo: string
+  descricao: string
+  linkUrl: string | null
+  status: PublicidadeStatus
+  publicarDe: string | null
+  publicarAte: string | null
+  ordem: number
+}
+
+/** As duas escolhas do formulário, com o que cada uma significa na coluna. */
+export const STATUS_PUBLICIDADE: { valor: PublicidadeStatus, rotulo: string, descricao: string }[] = [
+  { valor: 'rascunho', rotulo: 'Rascunho', descricao: 'Fica só no painel; não vai para a coluna do portal.' },
+  { valor: 'publicado', rotulo: 'Publicado', descricao: 'Vai ao ar, respeitando a janela contratada.' },
+]
+
+/** Como cada situação aparece na listagem do painel. */
+export const VISIBILIDADE_PUBLICIDADE: Record<
+  PublicidadeVisibilidade,
+  { rotulo: string, variante: 'default' | 'secondary' | 'outline', ajuda: string }
+> = {
+  no_ar: { rotulo: 'No ar', variante: 'default', ajuda: 'Aparecendo na coluna do portal agora.' },
+  agendado: { rotulo: 'Agendado', variante: 'outline', ajuda: 'Publicado, mas a data de início ainda não chegou.' },
+  encerrado: { rotulo: 'Encerrado', variante: 'outline', ajuda: 'Saiu da coluna sozinho: a data de fim já passou.' },
+  rascunho: { rotulo: 'Rascunho', variante: 'secondary', ajuda: 'Só o painel enxerga.' },
+}
+
 export interface Categoria {
   /** Só vem da API; é o que a remoção usa. */
   id?: string

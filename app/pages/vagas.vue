@@ -34,9 +34,7 @@ const { data } = await useListaConteudo('vagas-conteudo', { categoria: 'vagas', 
           </template>
         </main>
 
-        <SidebarPrincipal :tempo="false">
-          <SidebarWidgetAnuncio titulo="Anuncie sua vaga no Portal" />
-        </SidebarPrincipal>
+        <SidebarPrincipal :tempo="false" />
       </div>
     </div>
   </div>
