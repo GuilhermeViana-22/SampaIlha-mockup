@@ -94,13 +94,7 @@ async function entrar() {
       </form>
     </CardContent>
 
-    <CardFooter class="flex-col gap-3 border-t pt-4 text-center">
-      <p class="text-xs text-muted-foreground">
-        Acesso restrito à equipe. As credenciais são definidas na API, em
-        <code class="font-mono text-foreground">ADMIN_EMAIL</code> /
-        <code class="font-mono text-foreground">ADMIN_PASSWORD</code> —
-        fale com quem administra o portal se precisar de acesso.
-      </p>
+    <CardFooter class="flex-col border-t pt-4 text-center">
       <NuxtLink to="/" class="text-xs font-medium text-primary hover:underline">
         ← Voltar para o portal
       </NuxtLink>
