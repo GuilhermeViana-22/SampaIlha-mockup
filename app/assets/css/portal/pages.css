@@ -120,6 +120,17 @@
     min-width: 64px;
   }
   .schedule-item__date strong { display: block; font-family: var(--fonte-serif); font-size: 1.3rem; }
+  /*
+     O cartaz do evento entra na altura da linha, e é a orientação escolhida no
+     painel que decide a largura: a mesma caixa nos dois formatos cortaria o
+     flyer em pé justamente onde ele concentra a arte.
+  */
+  .schedule-item__cartaz {
+    height: 64px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+    background: var(--cinza-1);
+  }
+  .schedule-item__cartaz--horizontal { width: 96px; }
+  .schedule-item__cartaz--vertical { width: 48px; }
   .schedule-item h4 { font-family: var(--fonte-serif); font-size: 1rem; margin-bottom: 3px; }
   .schedule-item p { font-size: .82rem; color: var(--cinza-4); margin: 0; }
 }

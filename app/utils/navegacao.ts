@@ -46,6 +46,7 @@ export const MENU_ADMIN: ItemMenuAdmin[] = [
   // quem administra o portal, e o menu segue a mesma régua.
   { rotulo: 'Publicidade', para: '/admin/publicidade', icone: 'Image', soChefe: true },
   { rotulo: 'Workshops', para: '/admin/workshops', icone: 'GraduationCap' },
+  { rotulo: 'Eventos', para: '/admin/eventos', icone: 'CalendarDays' },
   { rotulo: 'Categorias', para: '/admin/categorias', icone: 'Tags', soChefe: true },
   { rotulo: 'Equipe', para: '/admin/equipe', icone: 'Users', soChefe: true },
   { rotulo: 'Newsletter', para: '/admin/newsletter', icone: 'Mail' },

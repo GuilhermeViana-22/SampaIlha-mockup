@@ -198,20 +198,6 @@ export interface Vaga {
   publicadoEm: string
 }
 
-/** Item da agenda cultural (ensaios, mostras, shows, festival). */
-export interface EventoAgenda {
-  id: string
-  titulo: string
-  slug: string
-  descricao: string
-  tipo: string
-  local: string | null
-  inicioEm: string
-  /** Dia e mês já formatados pela API para o bloco de agenda. */
-  dia: string
-  mes: string
-}
-
 /** Assunto em alta (tag com contagem). */
 /** Recado da redação na faixa do topo — vale só pelo dia em que foi cadastrado. */
 export type TipoAviso = 'urgente' | 'informacao' | 'acontecendo'
