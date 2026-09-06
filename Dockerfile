@@ -8,10 +8,34 @@ FROM node:22-alpine AS build-stage
 
 WORKDIR /app
 
+# Teto do heap do V8 durante o build.
+#
+# Sem limite, o build do Nuxt chega a ~3 GB de RSS, e numa VPS pequena quem
+# encerra a festa e o OOM killer do kernel — que mata o processo sem imprimir
+# erro nenhum. O log para no meio de uma fase ("621 modules transformed" e
+# silencio), o Dokploy tenta de novo e o deploy entra em loop sem nada que
+# explique a falha.
+#
+# Com teto o V8 coleta lixo com mais agressividade em vez de crescer ate ser
+# morto. E se um dia estourar de verdade, o erro vem escrito na tela
+# ("JavaScript heap out of memory") em vez de sumico.
+ENV NODE_OPTIONS=--max-old-space-size=2048
+
+# As dependencias entram antes do codigo-fonte de proposito: a camada do
+# `npm ci` so e refeita quando o package-lock muda, entao um deploy que mexe
+# apenas em .vue/.ts reaproveita os 400 MB de node_modules ja instalados. Na
+# ordem antiga o `COPY . .` vinha primeiro e invalidava essa camada a cada
+# commit — reinstalando tudo, e pagando a memoria disso, em todo deploy.
 COPY package.json package-lock.json ./
+
+# `--ignore-scripts` pula o postinstall (`nuxt prepare`), que nao teria como
+# rodar aqui: o nuxt.config e o app/ so chegam no COPY seguinte. O `nuxt build`
+# gera por conta propria o que o prepare geraria.
+RUN npm ci --ignore-scripts --no-audit --no-fund
+
 COPY . .
 
-RUN npm ci && npm run build
+RUN npm run build
 
 FROM node:22-alpine AS production-stage
 
