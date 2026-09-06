@@ -9,7 +9,7 @@ const props = withDefaults(defineProps<{
   /** Prefixo do link de cada linha; sem ele, a linha não vira link. */
   linkBase?: string
 }>(), {
-  titulo: 'Conteúdos por editoria',
+  titulo: 'Conteúdos por categoria',
   descricao: 'Distribuição de tudo o que está no banco do portal.',
   linkBase: '',
 })

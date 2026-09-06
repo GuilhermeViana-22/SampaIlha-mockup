@@ -64,7 +64,7 @@ function ativo(para: string) {
       </template>
 
       <div v-if="portal.categoriasDoMenu.length" class="mobile-nav__group">
-        <span>Editorias</span>
+        <span>Categorias</span>
         <NuxtLink
           v-for="categoria in portal.categoriasDoMenu"
           :key="categoria.slug"

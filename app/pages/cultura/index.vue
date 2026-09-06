@@ -26,7 +26,7 @@ const { data } = await useListaConteudo('cultura', { categoria: 'cultura', limit
           <ComumEstadoVazio
             v-if="!data.itens.length"
             titulo="Ainda não foram cadastrados conteúdos de cultura"
-            descricao="As matérias da editoria Cultura & Arte aparecem aqui assim que forem publicadas."
+            descricao="As matérias da categoria Cultura & Arte aparecem aqui assim que forem publicadas."
             icone="fas fa-theater-masks"
           />
 

@@ -6,17 +6,17 @@ import { ICONES } from '#shared/utils/taxonomia'
 definePageMeta({
   layout: 'admin',
   middleware: 'admin',
-  titulo: 'Editorias',
+  titulo: 'Categorias',
   descricao: 'As seções em que o conteúdo do portal é organizado.',
   acao: null,
 })
-useSeoMeta({ title: 'Editorias — Painel Sampa na Ilha', robots: 'noindex, nofollow' })
+useSeoMeta({ title: 'Categorias — Painel Sampa na Ilha', robots: 'noindex, nofollow' })
 
 const auth = useAuthStore()
 const portal = usePortalStore()
 
 if (!auth.ehChefe) {
-  throw createError({ statusCode: 403, statusMessage: 'Só o editor-chefe mexe nas editorias.', fatal: true })
+  throw createError({ statusCode: 403, statusMessage: 'Só o editor-chefe mexe nas categorias.', fatal: true })
 }
 
 await portal.carregarTaxonomia()
@@ -43,12 +43,12 @@ const slugPrevisto = computed(() =>
     .replace(/^-|-$/g, ''))
 
 /**
- * Cria a editoria e recarrega a taxonomia.
+ * Cria a categoria e recarrega a taxonomia.
  *
  * O formulário só é limpo depois de a API confirmar — um nome repetido faria a
  * redação redigitar tudo se a limpeza viesse antes. A recarga forçada é o que
  * traz o slug definitivo, que pode sair diferente da prévia quando já existe
- * outra editoria com nome parecido.
+ * outra categoria com nome parecido.
  */
 async function criar() {
   if (!podeCriar.value || salvando.value) return
@@ -63,10 +63,10 @@ async function criar() {
     Object.assign(nova, { nome: '', icone: 'fas fa-newspaper', cor: 'blue', descricao: '', destaqueNoMenu: true })
     abrindo.value = false
 
-    avisar.sucesso(`Editoria “${nome}” criada.`, `Já aparece no site em /categoria/${slugPrevisto.value}.`)
+    avisar.sucesso(`Categoria “${nome}” criada.`, `Já aparece no site em /categoria/${slugPrevisto.value}.`)
   }
   catch (e: unknown) {
-    avisar.erro(e, 'Não foi possível criar a editoria.', 'O formulário continua preenchido.')
+    avisar.erro(e, 'Não foi possível criar a categoria.', 'O formulário continua preenchido.')
   }
   finally {
     salvando.value = false
@@ -74,7 +74,7 @@ async function criar() {
 }
 
 /**
- * Remove a editoria.
+ * Remove a categoria.
  *
  * A API recusa enquanto houver conteúdo classificado nela — e essa recusa vem
  * com o motivo escrito, que `avisar.erro` mostra no lugar do texto genérico.
@@ -89,7 +89,7 @@ async function remover(categoria: Categoria) {
     await portal.carregarTaxonomia(true)
 
     avisar.sucesso(
-      `Editoria “${categoria.nome}” removida.`,
+      `Categoria “${categoria.nome}” removida.`,
       `A seção /categoria/${categoria.slug} deixou de existir no site.`,
     )
   }
@@ -97,11 +97,11 @@ async function remover(categoria: Categoria) {
     if (temConteudo) {
       avisar.alerta(
         mensagemDoErro(e, `“${categoria.nome}” ainda tem conteúdo.`),
-        'Mova essas matérias para outra editoria e tente de novo.',
+        'Mova essas matérias para outra categoria e tente de novo.',
       )
     }
     else {
-      avisar.erro(e, 'Não foi possível remover a editoria.')
+      avisar.erro(e, 'Não foi possível remover a categoria.')
     }
   }
 }
@@ -111,7 +111,7 @@ async function remover(categoria: Categoria) {
   <div class="flex flex-col gap-5">
     <div class="grid gap-3 sm:grid-cols-3">
       <AdminDashboardCardEstatistica
-        rotulo="Editorias"
+        rotulo="Categorias"
         :valor="portal.categorias.length"
         descricao="Seções do portal"
         :icone="TagsIcon"
@@ -123,13 +123,13 @@ async function remover(categoria: Categoria) {
       <CardHeader>
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <CardTitle class="text-base">Nova editoria</CardTitle>
+            <CardTitle class="text-base">Nova categoria</CardTitle>
             <CardDescription>
               Vira uma seção do site em <code>/categoria/&lt;slug&gt;</code> e uma opção no formulário de matéria.
             </CardDescription>
           </div>
           <Button size="sm" :variant="abrindo ? 'ghost' : 'default'" @click="abrindo = !abrindo">
-            <PlusIcon class="size-4" /> {{ abrindo ? 'Cancelar' : 'Criar editoria' }}
+            <PlusIcon class="size-4" /> {{ abrindo ? 'Cancelar' : 'Criar categoria' }}
           </Button>
         </div>
       </CardHeader>
@@ -194,7 +194,7 @@ async function remover(categoria: Categoria) {
         <Button :disabled="salvando || !podeCriar" @click="criar()">
           <LoaderCircleIcon v-if="salvando" class="size-4 animate-spin" />
           <PlusIcon v-else class="size-4" />
-          Criar editoria
+          Criar categoria
         </Button>
       </CardFooter>
     </Card>
@@ -204,7 +204,7 @@ async function remover(categoria: Categoria) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Editoria</TableHead>
+              <TableHead>Categoria</TableHead>
               <TableHead>Endereço</TableHead>
               <TableHead>No topo</TableHead>
               <TableHead class="text-right">Conteúdos</TableHead>
@@ -232,17 +232,17 @@ async function remover(categoria: Categoria) {
               <TableCell class="text-right">
                 <AlertDialog>
                   <AlertDialogTrigger as-child>
-                    <Button variant="ghost" size="sm" title="Remover editoria">
+                    <Button variant="ghost" size="sm" title="Remover categoria">
                       <Trash2Icon class="size-4 text-destructive" />
                     </Button>
                   </AlertDialogTrigger>
                   <AlertDialogContent>
                     <AlertDialogHeader>
-                      <AlertDialogTitle>Remover a editoria “{{ categoria.nome }}”?</AlertDialogTitle>
+                      <AlertDialogTitle>Remover a categoria “{{ categoria.nome }}”?</AlertDialogTitle>
                       <AlertDialogDescription>
                         <template v-if="categoria.totalPosts">
                           Ela ainda tem {{ categoria.totalPosts }} conteúdo(s). Mova essas matérias para
-                          outra editoria antes — a remoção será recusada enquanto houver conteúdo aqui.
+                          outra categoria antes — a remoção será recusada enquanto houver conteúdo aqui.
                         </template>
                         <template v-else>
                           A seção <code>/categoria/{{ categoria.slug }}</code> deixa de existir no site.

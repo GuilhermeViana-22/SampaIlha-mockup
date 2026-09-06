@@ -141,7 +141,7 @@ const rotuloTipoCurto: Record<string, string> = { noticia: 'Notícia', dica: 'Di
           <TableRow class="hover:bg-transparent">
             <TableHead>Conteúdo</TableHead>
             <TableHead class="w-[110px]">Tipo</TableHead>
-            <TableHead class="w-[130px]">Editoria</TableHead>
+            <TableHead class="w-[130px]">Categoria</TableHead>
             <TableHead class="w-[110px]">Status</TableHead>
             <TableHead class="w-[120px]">Publicado</TableHead>
             <TableHead class="w-[90px] text-right">Leituras</TableHead>

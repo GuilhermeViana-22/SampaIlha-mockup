@@ -10,6 +10,7 @@ interface ApiImagem {
   credit: string | null
   sort_order: number
   is_featured: boolean
+  orientation: string | null
 }
 
 /**
@@ -31,6 +32,7 @@ export default defineEventHandler(async (event): Promise<PostImagem> => {
   formulario.append('file', new Blob([new Uint8Array(arquivo.data)], { type: arquivo.type }), arquivo.filename)
   if (campo('caption')) formulario.append('caption', campo('caption')!)
   if (campo('credit')) formulario.append('credit', campo('credit')!)
+  if (campo('orientation')) formulario.append('orientation', campo('orientation')!)
   formulario.append('set_as_cover', campo('set_as_cover') ?? 'true')
 
   // FormData precisa ir direto no $fetch para o boundary ser montado corretamente.
@@ -56,6 +58,7 @@ export default defineEventHandler(async (event): Promise<PostImagem> => {
       credito: imagem.credit,
       ordem: imagem.sort_order,
       capa: imagem.is_featured,
+      orientacao: imagem.orientation as 'horizontal' | 'vertical' | null,
     }
   }
   catch (erro: any) {

@@ -9,6 +9,7 @@ interface ApiImagem {
   credit: string | null
   sort_order: number
   is_featured: boolean
+  orientation: string | null
 }
 
 /**
@@ -30,6 +31,7 @@ export default defineEventHandler(async (event): Promise<PostImagem> => {
     credito?: string | null
     ordem?: number
     capa?: boolean
+    orientacao?: 'horizontal' | 'vertical' | null
   }>(event) ?? {}
 
   const payload: Record<string, unknown> = {}
@@ -37,6 +39,7 @@ export default defineEventHandler(async (event): Promise<PostImagem> => {
   if ('credito' in corpo) payload.credit = corpo.credito || null
   if ('ordem' in corpo) payload.sort_order = corpo.ordem
   if ('capa' in corpo) payload.set_as_cover = corpo.capa
+  if ('orientacao' in corpo) payload.orientation = corpo.orientacao
 
   const imagem = await chamarApi<ApiImagem>(event, `/posts/${id}/images/${imagemId}`, {
     method: 'PATCH',
@@ -51,5 +54,6 @@ export default defineEventHandler(async (event): Promise<PostImagem> => {
     credito: imagem.credit,
     ordem: imagem.sort_order,
     capa: imagem.is_featured,
+    orientacao: imagem.orientation as 'horizontal' | 'vertical' | null,
   }
 })

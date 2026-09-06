@@ -46,7 +46,7 @@ export const MENU_ADMIN: ItemMenuAdmin[] = [
   // quem administra o portal, e o menu segue a mesma régua.
   { rotulo: 'Publicidade', para: '/admin/publicidade', icone: 'Image', soChefe: true },
   { rotulo: 'Workshops', para: '/admin/workshops', icone: 'GraduationCap' },
-  { rotulo: 'Editorias', para: '/admin/editorias', icone: 'Tags', soChefe: true },
+  { rotulo: 'Categorias', para: '/admin/categorias', icone: 'Tags', soChefe: true },
   { rotulo: 'Equipe', para: '/admin/equipe', icone: 'Users', soChefe: true },
   { rotulo: 'Newsletter', para: '/admin/newsletter', icone: 'Mail' },
   { rotulo: 'Meu perfil', para: '/admin/perfil', icone: 'UserCircle' },
@@ -81,7 +81,7 @@ export const CONTATO = {
   /** Redirect oficial do WhatsApp: abre o app no celular e o Web no desktop. */
   whatsappUrl: `https://wa.me/${WHATSAPP_DIGITOS}`,
   instagram: '@portalsampanailha',
-  instagramUrl: 'https://www.instagram.com/sampanailha.tur/',
+  instagramUrl: 'https://www.instagram.com/portalsampanailha/',
   facebookUrl: 'https://www.facebook.com/portalsampanailha',
   razaoSocial: 'Sampa na Ilha Produções e Comunicação LTDA',
   cnpj: '66.549.829/0001-56',

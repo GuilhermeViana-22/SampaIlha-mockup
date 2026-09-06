@@ -1,4 +1,4 @@
-import type { Usuario } from '../../shared/types/content'
+import type { PedidoSenha, Usuario } from '../../shared/types/content'
 
 /** Como a API descreve alguém da redação. */
 export interface ApiUsuario {
@@ -10,7 +10,17 @@ export interface ApiUsuario {
   avatar_url: string | null
   is_active: boolean
   posts_count: number
-  password_managed_by_env: boolean
+  password_request_at: string | null
+  created_at: string
+}
+
+/** Um pedido de senha nova, como a API o descreve. */
+export interface ApiPedidoSenha {
+  id: string
+  user_id: string
+  user_name: string
+  note: string | null
+  status: string
   created_at: string
 }
 
@@ -28,7 +38,17 @@ export function paraUsuario(api: ApiUsuario): Usuario {
     avatarUrl: api.avatar_url,
     ativo: api.is_active,
     totalPosts: api.posts_count,
-    senhaDoAmbiente: api.password_managed_by_env,
+    pedidoSenhaEm: api.password_request_at,
+    criadoEm: api.created_at,
+  }
+}
+
+export function paraPedidoSenha(api: ApiPedidoSenha): PedidoSenha {
+  return {
+    id: api.id,
+    usuarioId: api.user_id,
+    usuarioNome: api.user_name,
+    recado: api.note,
     criadoEm: api.created_at,
   }
 }

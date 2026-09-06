@@ -58,6 +58,8 @@ export interface Post {
   caminho: string
 }
 
+export type OrientacaoFoto = 'horizontal' | 'vertical'
+
 export interface PostImagem {
   id: string
   url: string
@@ -65,6 +67,7 @@ export interface PostImagem {
   credito: string | null
   ordem: number
   capa: boolean
+  orientacao: OrientacaoFoto | null
 }
 
 /** Campos aceitos ao criar/editar um post pelo dashboard. */
@@ -249,9 +252,23 @@ export interface Usuario {
   ativo?: boolean
   /** Quantos conteúdos a pessoa assina — mostrado na lista da equipe. */
   totalPosts?: number
-  /** Senha vem de ADMIN_PASSWORD: o painel não consegue trocá-la. */
-  senhaDoAmbiente?: boolean
+  /** Desde quando esta pessoa espera uma senha nova; nulo quando não pediu. */
+  pedidoSenhaEm?: string | null
   criadoEm?: string
+}
+
+/**
+ * Pedido de senha nova, feito por quem não troca a própria pelo painel.
+ *
+ * O portal não manda e-mail: o pedido fica em aberto no painel até o
+ * editor-chefe definir a senha da pessoa, e é isso que o dá por atendido.
+ */
+export interface PedidoSenha {
+  id: string
+  usuarioId: string
+  usuarioNome: string
+  recado: string | null
+  criadoEm: string
 }
 
 /** Campos que o editor-chefe manda ao abrir acesso para mais alguém. */

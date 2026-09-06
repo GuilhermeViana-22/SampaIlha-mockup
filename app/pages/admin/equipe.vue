@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PencilRulerIcon, ShieldCheckIcon, UserPlusIcon, UsersIcon } from '@lucide/vue'
+import { KeyRoundIcon, PencilRulerIcon, ShieldCheckIcon, UserPlusIcon, UsersIcon } from '@lucide/vue'
 import type { Usuario } from '#shared/types/content'
 
 definePageMeta({
@@ -20,6 +20,9 @@ if (!auth.ehChefe) {
 }
 
 await redacao.carregarEquipe(true)
+// A fila também é carregada pelo menu; refazer aqui garante que abrir a tela
+// mostre o estado do momento, e não o de quando o painel foi aberto.
+await redacao.carregarPedidosSenha()
 
 const dialogoAberto = ref(false)
 const emEdicao = ref<Usuario | null>(null)
@@ -54,12 +57,20 @@ const cartoes = computed(() => [
     descricao: 'Escrevem e enviam para revisão',
     icone: PencilRulerIcon,
   },
+  {
+    rotulo: 'Pedidos de senha',
+    valor: redacao.totalPedidosSenha,
+    descricao: redacao.totalPedidosSenha
+      ? 'Defina a senha no cadastro da pessoa'
+      : 'Ninguém esperando',
+    icone: KeyRoundIcon,
+  },
 ])
 </script>
 
 <template>
   <div class="flex flex-col gap-5">
-    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+    <div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
       <AdminDashboardCardEstatistica
         v-for="cartao in cartoes"
         :key="cartao.rotulo"

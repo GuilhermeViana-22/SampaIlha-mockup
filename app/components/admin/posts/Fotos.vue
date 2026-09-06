@@ -31,16 +31,39 @@ const fotos = defineModel<PostImagem[]>('fotos', { required: true })
 /** Capa da matéria (o `imagemUrl` do post). */
 const capaUrl = defineModel<string | null>('capaUrl', { required: true })
 
-/** O que o portal espera — as mesmas medidas das capas geradas pela API. */
-const IDEAL = { largura: 1600, altura: 900 }
-const MINIMA = { largura: 1200, altura: 675 }
-const PROPORCAO = 16 / 9
+/**
+ * Os dois enquadramentos que a redação usa, com a medida certa de cada um.
+ *
+ * Paisagem é o do portal: card, topo da matéria e capa cortam em 16:9, e as
+ * capas que a própria API gera saem em 1600 × 900. Vertical existe porque a
+ * foto de celular chega assim e rende bem no meio do texto — só não pode virar
+ * capa sem perder o topo e a base.
+ */
+const FORMATOS = {
+  paisagem: {
+    rotulo: 'Paisagem (16:9)',
+    razao: '16:9',
+    proporcao: 16 / 9,
+    ideal: { largura: 1600, altura: 900 },
+    minima: { largura: 1200, altura: 675 },
+    onde: 'É o enquadramento da capa, dos cards e do topo da matéria.',
+  },
+  vertical: {
+    rotulo: 'Vertical (4:5)',
+    razao: '4:5',
+    proporcao: 4 / 5,
+    ideal: { largura: 1080, altura: 1350 },
+    minima: { largura: 800, altura: 1000 },
+    onde: 'Boa no meio do texto. Como capa, o portal corta o topo e a base para chegar em 16:9.',
+  },
+} as const
+
 const PESO_MAXIMO_MB = 5
 const TIPOS_ACEITOS = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
 
 interface Medida { largura: number, altura: number }
 
-/** Foto escolhida antes de a matéria existir: espera aqui até haver um id. */
+/** Foto escolhida antes de a matéria existir: espera aqui até haver um id. */ 
 interface Pendente {
   chave: string
   arquivo: File
@@ -48,6 +71,7 @@ interface Pendente {
   medida: Medida | null
   legenda: string
   credito: string
+  orientacao: 'horizontal' | 'vertical' | null
 }
 
 const campoArquivo = ref<HTMLInputElement | null>(null)
@@ -57,35 +81,57 @@ const arrastando = ref(false)
 const verInteira = ref(false)
 /** Foto aberta no quadro grande; a capa é a escolha padrão. */
 const emDestaque = ref<string | null>(null)
+/** Orientação selecionada para a nova foto (horizontal ou vertical). */
+const orientacaoFotoSelecionada = ref<'horizontal' | 'vertical' | null>(null)
+
+const formato = computed(() => {
+  const chave = orientacaoFotoSelecionada.value === 'vertical' ? 'vertical' : 'paisagem'
+  return FORMATOS[chave]
+})
 
 /** Medidas reais das fotos já enviadas, lidas do `<img>` quando ele carrega. */
 const medidas = reactive<Record<string, Medida>>({})
+
+/**
+ * Impressão digital do conteúdo de cada foto (SHA-256), por chave da galeria.
+ *
+ * Serve para uma coisa só: reconhecer a mesma imagem chegando de novo. Nome de
+ * arquivo não presta para isso — o navegador entrega `image.jpg` para meio
+ * mundo, e a mesma foto arrastada duas vezes viraria duas fotos idênticas na
+ * matéria sem ninguém perceber.
+ */
+const assinaturas = reactive<Record<string, string>>({})
 
 onBeforeUnmount(() => {
   pendentes.value.forEach(item => URL.revokeObjectURL(item.previa))
 })
 
 /**
- * O que acontece com a imagem no corte 16:9 do portal.
+ * O que acontece com a imagem no corte do enquadramento escolhido.
  *
  * `cortado` é a fração que some — nas laterais quando a foto é mais larga que
- * 16:9, no topo e na base quando é mais alta. É esse número que vira o aviso
- * embaixo da miniatura.
+ * o alvo, no topo e na base quando é mais alta. É esse número que vira o aviso
+ * embaixo da prévia.
  */
-function analisar(medida: Medida | null) {
+function analisar(medida: Medida | null, orientacaoFoto?: 'horizontal' | 'vertical' | null) {
   if (!medida?.largura || !medida.altura) return null
 
+  // Usa a orientação da foto se definida, senão usa o preview selecionado
+  const formatoAlvo = orientacaoFoto === 'vertical' ? FORMATOS.vertical : orientacaoFoto === 'horizontal' ? FORMATOS.paisagem : formato.value
+  const alvo = formatoAlvo
   const proporcao = medida.largura / medida.altura
-  const larga = proporcao > PROPORCAO
-  const cortado = larga ? 1 - PROPORCAO / proporcao : 1 - proporcao / PROPORCAO
+  const larga = proporcao > alvo.proporcao
+  const cortado = larga ? 1 - alvo.proporcao / proporcao : 1 - proporcao / alvo.proporcao
 
   return {
     cortado,
     percentual: Math.round(cortado * 100),
     eixo: larga ? 'das laterais' : 'do topo e da base',
-    pequena: medida.largura < MINIMA.largura || medida.altura < MINIMA.altura,
+    pequena: medida.largura < alvo.minima.largura || medida.altura < alvo.minima.altura,
     /** Diferença de até 2% não vale aviso: ninguém vê e todo mundo cansa de alerta. */
     exata: cortado < 0.02,
+    /** Retrato de verdade: é o que não devia estar na capa do portal. */
+    emPe: proporcao < 1,
   }
 }
 
@@ -100,16 +146,18 @@ function rotuloMedida(medida: Medida | null) {
 }
 
 /**
- * Retângulo do que sobrevive ao corte, em % do quadro 16:9 da miniatura.
+ * Retângulo do que sobrevive ao corte, em % do quadro da prévia.
  *
- * Dentro de um quadro 16:9 com a imagem em `object-contain`, a área que o
- * `object-cover` do portal aproveita é sempre um retângulo centralizado com a
- * mesma fração na largura e na altura — a razão entre a proporção da foto e a
- * do quadro, invertida quando a foto é mais alta que larga.
+ * Dentro de um quadro com a proporção do alvo e a imagem em `object-contain`,
+ * a área que o `object-cover` do portal aproveita é sempre um retângulo
+ * centralizado com a mesma fração na largura e na altura — a razão entre a
+ * proporção da foto e a do quadro, invertida quando a foto é mais alta que
+ * larga.
  */
 function areaSegura(medida: Medida) {
+  const alvo = formato.value.proporcao
   const proporcao = medida.largura / medida.altura
-  const fracao = proporcao > PROPORCAO ? PROPORCAO / proporcao : proporcao / PROPORCAO
+  const fracao = proporcao > alvo ? alvo / proporcao : proporcao / alvo
   const sobra = ((1 - fracao) / 2) * 100
   return {
     width: `${fracao * 100}%`,
@@ -128,7 +176,8 @@ const galeria = computed(() => [
     credito: foto.credito ?? '',
     capa: foto.capa,
     medida: medidas[foto.id] ?? null,
-    analise: analisar(medidas[foto.id] ?? null),
+    analise: analisar(medidas[foto.id] ?? null, foto.orientacao),
+    orientacao: foto.orientacao,
     foto,
     pendente: null as Pendente | null,
   })),
@@ -139,7 +188,8 @@ const galeria = computed(() => [
     credito: item.credito,
     capa: false,
     medida: item.medida,
-    analise: analisar(item.medida),
+    analise: analisar(item.medida, item.orientacao),
+    orientacao: item.orientacao,
     foto: null as PostImagem | null,
     pendente: item,
   })),
@@ -180,8 +230,48 @@ function medirEnviadas() {
   }
 }
 
-onMounted(medirEnviadas)
-watch(fotos, medirEnviadas)
+/** SHA-256 do arquivo, em hexadecimal. Devolve `null` se o navegador recusar. */
+async function assinar(dados: Blob): Promise<string | null> {
+  try {
+    const resumo = await crypto.subtle.digest('SHA-256', await dados.arrayBuffer())
+    return [...new Uint8Array(resumo)].map(byte => byte.toString(16).padStart(2, '0')).join('')
+  }
+  catch {
+    return null
+  }
+}
+
+/**
+ * Assina as fotos que já estão na matéria.
+ *
+ * Baixa cada imagem de novo — o navegador responde do cache, já que a prévia
+ * acabou de exibi-la. Sem isso a checagem de repetida só funcionaria para o
+ * que foi enviado nesta sessão, e reabrir a matéria devolveria a porta aberta
+ * para a foto duplicada. Falhar aqui não quebra nada: sem assinatura, a foto
+ * apenas não participa da comparação.
+ */
+async function assinarEnviadas() {
+  for (const foto of fotos.value) {
+    if (assinaturas[foto.id] || !foto.url) continue
+    try {
+      const resposta = await fetch(foto.url)
+      if (!resposta.ok) continue
+      const assinatura = await assinar(await resposta.blob())
+      if (assinatura) assinaturas[foto.id] = assinatura
+    }
+    catch {
+      // Imagem de outra origem sem CORS, rede fora: segue sem a assinatura.
+    }
+  }
+}
+
+function conferirEnviadas() {
+  medirEnviadas()
+  assinarEnviadas()
+}
+
+onMounted(conferirEnviadas)
+watch(fotos, conferirEnviadas)
 
 /** Lê largura e altura do arquivo local, antes de qualquer upload. */
 function medirArquivo(arquivo: File): Promise<Medida | null> {
@@ -224,17 +314,19 @@ function aceitavel(arquivo: File) {
 }
 
 /** Envia um arquivo e devolve a foto criada. A primeira da matéria vira capa. */
-async function subir(postId: string, arquivo: File, legenda = '', credito = '') {
+async function subir(postId: string, arquivo: File, legenda = '', credito = '', orientacao: 'horizontal' | 'vertical' | null = null, assinatura?: string | null) {
   const corpo = new FormData()
   corpo.append('file', arquivo)
   corpo.append('set_as_cover', String(fotos.value.length === 0))
   if (legenda.trim()) corpo.append('caption', legenda.trim())
   if (credito.trim()) corpo.append('credit', credito.trim())
+  if (orientacao) corpo.append('orientation', orientacao)
 
   const foto = await $fetch<PostImagem>(`/api/posts/${postId}/foto`, { method: 'POST', body: corpo })
 
   fotos.value = [...fotos.value, foto]
   emDestaque.value = foto.id
+  if (assinatura) assinaturas[foto.id] = assinatura
   if (foto.capa) capaUrl.value = foto.url
   return foto
 }
@@ -250,28 +342,55 @@ async function receber(lista: FileList | File[] | null) {
   const escolhidos = [...(lista ?? [])].filter(aceitavel)
   if (!escolhidos.length) return
 
-  const medidos = await Promise.all(escolhidos.map(async arquivo => ({
-    arquivo,
-    medida: await medirArquivo(arquivo),
-  })))
+  const medidos: { arquivo: File, medida: Medida | null, assinatura: string | null }[] = []
+  let repetidas = 0
+  const orientacaoAtual = orientacaoFotoSelecionada.value
+
+  for (const arquivo of escolhidos) {
+    const assinatura = await assinar(arquivo)
+
+    // A mesma imagem já está na matéria (ou veio duas vezes no mesmo arraste).
+    if (assinatura && (
+      Object.values(assinaturas).includes(assinatura)
+      || medidos.some(outro => outro.assinatura === assinatura)
+    )) {
+      repetidas++
+      continue
+    }
+
+    medidos.push({ arquivo, medida: await medirArquivo(arquivo), assinatura })
+  }
+
+  if (repetidas) {
+    avisar.alerta(
+      repetidas === 1 ? 'Essa foto já está na matéria.' : `${repetidas} fotos repetidas foram ignoradas.`,
+      'Cada imagem entra uma vez só — para trocar a capa, use a estrela na foto que já está aqui.',
+    )
+  }
+
+  if (!medidos.length) return
 
   // Sem id não há a quem anexar: a foto espera o rascunho existir.
   if (!props.postId) {
     const primeira = pendentes.value.length === 0
-    pendentes.value = [
-      ...pendentes.value,
-      ...medidos.map(({ arquivo, medida }) => ({
-        chave: `${arquivo.name}-${arquivo.size}-${Math.random().toString(36).slice(2, 8)}`,
+    const novos = medidos.map(({ arquivo, medida, assinatura }) => {
+      const chave = `${arquivo.name}-${arquivo.size}-${Math.random().toString(36).slice(2, 8)}`
+      if (assinatura) assinaturas[chave] = assinatura
+      return {
+        chave,
         arquivo,
         previa: URL.createObjectURL(arquivo),
         medida,
         legenda: '',
         credito: '',
-      })),
-    ]
+        orientacao: orientacaoAtual,
+      }
+    })
+
+    pendentes.value = [...pendentes.value, ...novos]
     if (primeira) emDestaque.value = pendentes.value[0]?.chave ?? null
     avisar.info(
-      escolhidos.length === 1 ? 'Foto na fila.' : `${escolhidos.length} fotos na fila.`,
+      novos.length === 1 ? 'Foto na fila.' : `${novos.length} fotos na fila.`,
       'Sobem sozinhas assim que você criar o conteúdo.',
     )
     return
@@ -281,8 +400,8 @@ async function receber(lista: FileList | File[] | null) {
   let enviadas = 0
   try {
     const primeira = fotos.value.length === 0
-    for (const { arquivo } of medidos) {
-      await subir(props.postId, arquivo)
+    for (const { arquivo, assinatura } of medidos) {
+      await subir(props.postId, arquivo, '', '', orientacaoAtual, assinatura)
       enviadas++
     }
     avisar.sucesso(
@@ -312,8 +431,9 @@ async function enviarPendentes(postId: string) {
   let enviadas = 0
   try {
     for (const item of [...pendentes.value]) {
-      await subir(postId, item.arquivo, item.legenda, item.credito)
+      await subir(postId, item.arquivo, item.legenda, item.credito, item.orientacao, assinaturas[item.chave])
       URL.revokeObjectURL(item.previa)
+      delete assinaturas[item.chave]
       pendentes.value = pendentes.value.filter(p => p.chave !== item.chave)
       enviadas++
     }
@@ -329,12 +449,30 @@ async function enviarPendentes(postId: string) {
 
 function descartarPendente(item: Pendente) {
   URL.revokeObjectURL(item.previa)
+  delete assinaturas[item.chave]
   pendentes.value = pendentes.value.filter(p => p.chave !== item.chave)
 }
 
+/**
+ * Só arquivo entra por aqui.
+ *
+ * Arrastar a foto que já está na tela, um link ou um trecho de texto dispara
+ * o mesmo `drop` sem nenhum arquivo dentro — e o silêncio parecia falha do
+ * botão. Vale o recado dizendo o que fazer.
+ */
 function aoSoltar(evento: DragEvent) {
   arrastando.value = false
-  receber(evento.dataTransfer?.files ?? null)
+
+  const arquivos = evento.dataTransfer?.files
+  if (!arquivos?.length) {
+    avisar.alerta(
+      'Nada de imagem veio no arraste.',
+      'Solte um arquivo do seu computador — arrastar a foto que já está aqui não envia nada.',
+    )
+    return
+  }
+
+  receber(arquivos)
 }
 
 function aoEscolher(evento: Event) {
@@ -373,7 +511,12 @@ function editarTexto(item: ItemGaleria, campo: 'legenda' | 'credito', valor: str
   if (item.pendente) item.pendente[campo] = valor
 }
 
-/** Grava legenda e crédito ao sair do campo, e só quando algo mudou. */
+/** Escreve a orientação no rascunho local ou grava na API. */
+function editarOrientacao(item: ItemGaleria, valor: 'horizontal' | 'vertical' | null) {
+  if (item.pendente) item.pendente.orientacao = valor
+}
+
+/** Grava legenda, crédito e orientação ao sair do campo, e só quando algo mudou. */
 async function confirmarTexto(item: ItemGaleria, campo: 'legenda' | 'credito', valor: string) {
   const foto = item.foto
   const limpo = valor.trim() || null
@@ -389,6 +532,25 @@ async function confirmarTexto(item: ItemGaleria, campo: 'legenda' | 'credito', v
   }
   catch (e: unknown) {
     avisar.erro(e, `Não foi possível salvar ${campo === 'legenda' ? 'a legenda' : 'o crédito'}.`)
+  }
+}
+
+/** Grava a orientação na API quando mudar. */
+async function confirmarOrientacao(item: ItemGaleria, valor: 'horizontal' | 'vertical' | null) {
+  const foto = item.foto
+  if (!foto || !props.postId || valor === foto.orientacao) return
+
+  try {
+    const atualizada = await $fetch<PostImagem>(`/api/posts/${props.postId}/foto`, {
+      method: 'PATCH',
+      params: { imagemId: foto.id },
+      body: { orientacao: valor },
+    })
+    fotos.value = fotos.value.map(outra => (outra.id === atualizada.id ? atualizada : outra))
+    avisar.sucesso('Orientação atualizada.')
+  }
+  catch (e: unknown) {
+    avisar.erro(e, 'Não foi possível salvar a orientação.')
   }
 }
 
@@ -409,6 +571,7 @@ async function remover(item: ItemGaleria) {
     await $fetch(`/api/posts/${props.postId}/foto`, { method: 'DELETE', params: { imagemId: foto.id } })
     fotos.value = fotos.value.filter(outra => outra.id !== foto.id)
     delete medidas[foto.id]
+    delete assinaturas[foto.id]
 
     if (!foto.capa) {
       avisar.sucesso('Foto removida.')
@@ -444,6 +607,23 @@ defineExpose({ enviarPendentes })
     </CardHeader>
 
     <CardContent class="flex flex-col gap-4">
+      <!-- Seleção de orientação da foto -->
+      <div class="flex items-center gap-3">
+        <label for="orientacao-foto" class="text-sm font-medium">Orientação da foto:</label>
+        <Select id="orientacao-foto" v-model="orientacaoFotoSelecionada" class="w-48">
+          <SelectTrigger>
+            <SelectValue placeholder="Selecione..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="horizontal">Horizontal (16:9)</SelectItem>
+            <SelectItem value="vertical">Vertical (4:5)</SelectItem>
+          </SelectContent>
+        </Select>
+        <p class="text-xs text-muted-foreground">
+          Define como a foto será cortada no portal
+        </p>
+      </div>
+
       <!-- O campo fica fora da área clicável de propósito: dentro dela, o
            clique que ele mesmo dispara voltaria para o `@click` do contêiner e
            se chamaria sem fim. -->
@@ -460,7 +640,8 @@ defineExpose({ enviarPendentes })
         <div class="flex flex-col gap-3">
           <!-- Quadro grande: é a foto no tamanho e no corte em que o portal publica -->
           <div
-            class="relative aspect-video w-full overflow-hidden rounded-xl transition-colors"
+            class="relative w-full overflow-hidden rounded-xl transition-colors"
+            :style="{ aspectRatio: formato.razao.replace(':', '/') }"
             :class="destaque
               ? 'border border-border bg-neutral-900'
               : `flex cursor-pointer flex-col items-center justify-center gap-2 border-2 border-dashed p-6 text-center ${arrastando ? 'border-primary bg-primary/5' : 'border-input hover:border-primary/60 hover:bg-muted/40'}`"
@@ -474,6 +655,7 @@ defineExpose({ enviarPendentes })
               <img
                 :src="destaque.url"
                 :alt="destaque.legenda || titulo || 'Foto da matéria'"
+                draggable="false"
                 class="size-full"
                 :class="verInteira ? 'object-contain' : 'object-cover'"
               >
@@ -560,20 +742,31 @@ defineExpose({ enviarPendentes })
               >
                 <TriangleAlertIcon v-if="!destaque.analise.exata" class="mt-px size-3.5 shrink-0" />
                 <span v-if="destaque.analise.exata">
-                  Está em 16:9: entra inteira, sem corte.
+                  Está em {{ formato.razao }}: entra inteira, sem corte.
                 </span>
                 <span v-else>
-                  O portal corta {{ destaque.analise.percentual }}% {{ destaque.analise.eixo }}
-                  para chegar em 16:9 — confira no botão "ver imagem inteira".
+                  No corte {{ formato.razao }}, {{ destaque.analise.percentual }}%
+                  {{ destaque.analise.eixo }} ficam de fora — confira no botão "ver imagem inteira".
                 </span>
               </p>
               <p v-if="destaque.analise.pequena" class="flex items-start gap-1.5 text-amber-600 dark:text-amber-400">
                 <TriangleAlertIcon class="mt-px size-3.5 shrink-0" />
-                <span>Menor que {{ MINIMA.largura }} × {{ MINIMA.altura }} px — pode sair borrada na capa.</span>
+                <span>
+                  Menor que {{ formato.minima.largura }} × {{ formato.minima.altura }} px — pode sair borrada.
+                </span>
+              </p>
+              <!-- Foto em pé na capa é o erro caro: some no card, no topo da
+                   matéria e na prévia que vai para as redes sociais. -->
+              <p v-if="destaque.analise.emPe && destaque.capa" class="flex items-start gap-1.5 text-amber-600 dark:text-amber-400">
+                <TriangleAlertIcon class="mt-px size-3.5 shrink-0" />
+                <span>
+                  Esta é uma foto em pé e está na capa — o card e o topo da matéria são 16:9.
+                  Prefira uma paisagem como capa e deixe a vertical para o meio do texto.
+                </span>
               </p>
             </div>
 
-            <div class="grid gap-2 sm:grid-cols-2">
+            <div class="grid gap-2 sm:grid-cols-[1fr_1fr_auto]">
               <Input
                 :model-value="destaque.legenda"
                 placeholder="Legenda (aparece sob a foto)"
@@ -588,6 +781,20 @@ defineExpose({ enviarPendentes })
                 @update:model-value="editarTexto(destaque, 'credito', String($event))"
                 @change="confirmarTexto(destaque, 'credito', ($event.target as HTMLInputElement).value)"
               />
+              <Select
+                v-if="destaque"
+                :model-value="destaque.orientacao"
+                @update:model-value="(val) => { if (!destaque) return; editarOrientacao(destaque, val as 'horizontal' | 'vertical' | null); confirmarOrientacao(destaque, val as 'horizontal' | 'vertical' | null) }"
+                class="h-9"
+              >
+                <SelectTrigger class="h-9 text-sm">
+                  <SelectValue placeholder="Orientação" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="horizontal">Horizontal (16:9)</SelectItem>
+                  <SelectItem value="vertical">Vertical (4:5)</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -595,19 +802,22 @@ defineExpose({ enviarPendentes })
         <!-- O tamanho certo, ao lado de onde a foto é escolhida -->
         <aside class="flex flex-col gap-3 rounded-xl border border-border bg-muted/40 p-4">
           <div class="flex justify-center rounded-lg border border-dashed border-muted-foreground/40 bg-background p-2">
-            <div class="flex aspect-video w-full flex-col items-center justify-center rounded-md bg-linear-to-br from-primary/25 to-primary/5 text-center">
-              <span class="font-mono text-xs font-semibold">{{ IDEAL.largura }} × {{ IDEAL.altura }}</span>
-              <span class="text-[10px] uppercase tracking-wide text-muted-foreground">16:9 — o corte do portal</span>
+            <div
+              class="flex w-full flex-col items-center justify-center rounded-md bg-linear-to-br from-primary/25 to-primary/5 text-center"
+              :style="{ aspectRatio: formato.razao.replace(':', '/') }"
+            >
+              <span class="font-mono text-xs font-semibold">{{ formato.ideal.largura }} × {{ formato.ideal.altura }}</span>
+              <span class="text-[10px] uppercase tracking-wide text-muted-foreground">{{ formato.razao }} — o corte da prévia</span>
             </div>
           </div>
 
           <dl class="grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 gap-y-1.5 text-xs">
             <dt class="text-muted-foreground">Ideal</dt>
-            <dd class="font-medium">{{ IDEAL.largura }} × {{ IDEAL.altura }} px</dd>
+            <dd class="font-medium">{{ formato.ideal.largura }} × {{ formato.ideal.altura }} px</dd>
             <dt class="text-muted-foreground">Mínimo</dt>
-            <dd class="font-medium">{{ MINIMA.largura }} × {{ MINIMA.altura }} px</dd>
+            <dd class="font-medium">{{ formato.minima.largura }} × {{ formato.minima.altura }} px</dd>
             <dt class="text-muted-foreground">Proporção</dt>
-            <dd class="font-medium">16:9 (paisagem)</dd>
+            <dd class="font-medium">{{ formato.rotulo }}</dd>
             <dt class="text-muted-foreground">Peso</dt>
             <dd class="font-medium">até {{ PESO_MAXIMO_MB }} MB</dd>
             <dt class="text-muted-foreground">Formatos</dt>
@@ -615,8 +825,8 @@ defineExpose({ enviarPendentes })
           </dl>
 
           <p class="text-xs leading-relaxed text-muted-foreground">
-            Fora de 16:9 a foto não é recusada — ela é <strong>cortada pelo centro</strong> nos cards
-            e no topo da matéria. Deixe o assunto no meio do quadro e não cole texto nas bordas.
+            Fora de {{ formato.razao }} a foto não é recusada — ela é <strong>cortada pelo centro</strong>.
+            Deixe o assunto no meio do quadro e não cole texto nas bordas.
           </p>
         </aside>
       </div>
@@ -639,14 +849,15 @@ defineExpose({ enviarPendentes })
             v-for="item in galeria"
             :key="item.chave"
             type="button"
-            class="group relative aspect-video w-28 overflow-hidden rounded-lg border-2 bg-neutral-900 transition"
+            class="group relative w-28 overflow-hidden rounded-lg border-2 bg-neutral-900 transition"
+            :style="{ aspectRatio: formato.razao.replace(':', '/') }"
             :class="item.chave === destaque?.chave
               ? 'border-primary'
               : item.pendente ? 'border-dashed border-amber-400/70 hover:border-amber-400' : 'border-transparent hover:border-input'"
             :title="item.capa ? 'Capa da matéria' : item.pendente ? 'Na fila' : 'Abrir no quadro grande'"
             @click="emDestaque = item.chave"
           >
-            <img :src="item.url" alt="" class="size-full object-cover">
+            <img :src="item.url" alt="" draggable="false" class="size-full object-cover">
             <StarIcon
               v-if="item.capa"
               class="absolute left-1 top-1 size-4 rounded-full bg-primary p-0.5 text-primary-foreground"
@@ -655,7 +866,8 @@ defineExpose({ enviarPendentes })
 
           <button
             type="button"
-            class="flex aspect-video w-28 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-input text-xs text-muted-foreground transition hover:border-primary/60 hover:bg-muted/40"
+            class="flex w-28 flex-col items-center justify-center gap-1 rounded-lg border-2 border-dashed border-input text-xs text-muted-foreground transition hover:border-primary/60 hover:bg-muted/40"
+            :style="{ aspectRatio: formato.razao.replace(':', '/') }"
             :disabled="enviando"
             @click="campoArquivo?.click()"
           >

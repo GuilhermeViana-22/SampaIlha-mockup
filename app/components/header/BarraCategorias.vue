@@ -46,7 +46,7 @@ watch(() => portal.categoriasDoMenu.length, () => nextTick(medir))
 
 <template>
   <div class="cat-nav" :class="{ 'cat-nav--antes': temAntes, 'cat-nav--depois': temDepois }">
-    <nav ref="trilho" class="cat-nav__inner" aria-label="Editorias" @scroll.passive="medir">
+    <nav ref="trilho" class="cat-nav__inner" aria-label="Categorias" @scroll.passive="medir">
       <NuxtLink
         class="cat-link"
         :class="{ active: rota.path === '/noticias' }"

@@ -4,7 +4,7 @@ const portal = usePortalStore()
 
 const categoria = computed(() => portal.categoria(rota.params.slug as string))
 if (!categoria.value) {
-  throw createError({ statusCode: 404, statusMessage: 'Editoria não encontrada.', fatal: true })
+  throw createError({ statusCode: 404, statusMessage: 'Categoria não encontrada.', fatal: true })
 }
 
 const { data, status } = await useListaConteudo('categoria', () => ({
@@ -23,7 +23,7 @@ useSeoMeta({
     <ComumHeroPagina
       :titulo="categoria!.nome"
       :descricao="categoria!.descricao"
-      etiqueta="Editoria"
+      etiqueta="Categoria"
       :etiqueta-icone="categoria!.icone"
     />
 
@@ -35,7 +35,7 @@ useSeoMeta({
           <NoticiasLista v-if="data.itens.length > 6" :posts="data.itens.slice(6)" />
           <ComumEstadoVazio
             v-if="!data.itens.length && status !== 'pending'"
-            titulo="Nada publicado nesta editoria"
+            titulo="Nada publicado nesta categoria"
             :descricao="`Assim que houver conteúdo em ${categoria!.nome}, ele aparece aqui.`"
             :icone="categoria!.icone"
           />

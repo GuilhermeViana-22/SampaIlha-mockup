@@ -33,7 +33,7 @@ const ano = new Date().getFullYear()
       </div>
 
       <div class="footer-col">
-        <h4><i class="fas fa-newspaper" /> Editorias</h4>
+        <h4><i class="fas fa-newspaper" /> Categorias</h4>
         <ul>
           <li v-for="item in RODAPE_EDITORIAS" :key="item.para">
             <NuxtLink :to="item.para"><i class="fas fa-chevron-right" /> {{ item.rotulo }}</NuxtLink>

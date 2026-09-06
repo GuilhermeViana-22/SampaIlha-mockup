@@ -57,10 +57,10 @@ const temFiltro = computed(() => {
 
       <Select v-model="posts.filtros.categoria">
         <SelectTrigger class="w-[180px]">
-          <SelectValue placeholder="Editoria" />
+          <SelectValue placeholder="Categoria" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="todas">Todas as editorias</SelectItem>
+          <SelectItem value="todas">Todas as categorias</SelectItem>
           <SelectItem v-for="categoria in portal.categorias" :key="categoria.slug" :value="categoria.slug">
             {{ categoria.nome }}
           </SelectItem>

@@ -30,7 +30,7 @@ useSeoMeta({ title: () => `Busca por "${termo.value}" — Portal Sampa na Ilha` 
           <ComumEstadoVazio
             v-else-if="status !== 'pending'"
             titulo="Nenhum resultado encontrado"
-            descricao="Tente outro termo, ou navegue pelas editorias na barra azul do topo."
+            descricao="Tente outro termo, ou navegue pelas categorias na barra azul do topo."
             icone="fas fa-search"
           />
         </main>

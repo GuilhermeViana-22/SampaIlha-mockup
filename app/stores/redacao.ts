@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import type { NovoUsuario, PapelUsuario, Usuario } from '#shared/types/content'
+import type { NovoUsuario, PapelUsuario, PedidoSenha, Usuario } from '#shared/types/content'
 
 /**
  * Equipe da redação e perfil de quem está logado.
@@ -20,6 +20,10 @@ function filtrosPadrao(): FiltrosEquipe {
 export const useRedacaoStore = defineStore('redacao', () => {
   const equipe = ref<Usuario[]>([])
   const perfil = ref<Usuario | null>(null)
+  /** Fila de quem espera senha nova — só o editor-chefe carrega. */
+  const pedidosSenha = ref<PedidoSenha[]>([])
+  /** O pedido em aberto de quem está logado, quando existe. */
+  const meuPedidoSenha = ref<PedidoSenha | null>(null)
   const carregando = ref(false)
   const salvando = ref(false)
   const filtros = ref<FiltrosEquipe>(filtrosPadrao())
@@ -45,6 +49,8 @@ export const useRedacaoStore = defineStore('redacao', () => {
   function limparFiltros() {
     filtros.value = filtrosPadrao()
   }
+
+  const totalPedidosSenha = computed(() => pedidosSenha.value.length)
 
   const contagem = computed(() => ({
     total: equipe.value.length,
@@ -78,6 +84,58 @@ export const useRedacaoStore = defineStore('redacao', () => {
     return perfil.value
   }
 
+  /**
+   * Carrega a fila de pedidos de senha.
+   *
+   * Sem `forcar` a chamada é repetida sempre: o contador do menu vive em todas
+   * as telas do painel e um pedido novo tem de aparecer sem recarregar a
+   * página. A lista é curta e a chamada, barata.
+   */
+  async function carregarPedidosSenha() {
+    pedidosSenha.value = await $fetch<PedidoSenha[]>('/api/usuarios/solicitacoes-senha', {
+      headers: import.meta.server ? useRequestHeaders(['cookie']) : undefined,
+    })
+    return pedidosSenha.value
+  }
+
+  async function carregarMeuPedidoSenha() {
+    meuPedidoSenha.value = await $fetch<PedidoSenha | null>('/api/perfil/solicitacao-senha', {
+      headers: import.meta.server ? useRequestHeaders(['cookie']) : undefined,
+    })
+    return meuPedidoSenha.value
+  }
+
+  async function solicitarSenha(recado?: string) {
+    salvando.value = true
+    try {
+      meuPedidoSenha.value = await $fetch<PedidoSenha>('/api/perfil/solicitacao-senha', {
+        method: 'POST',
+        body: { recado },
+      })
+      return meuPedidoSenha.value
+    }
+    catch (e: any) {
+      throw new Error(mensagem(e, 'Não foi possível enviar o pedido.'))
+    }
+    finally {
+      salvando.value = false
+    }
+  }
+
+  async function cancelarPedidoSenha() {
+    salvando.value = true
+    try {
+      await $fetch('/api/perfil/solicitacao-senha', { method: 'DELETE' })
+      meuPedidoSenha.value = null
+    }
+    catch (e: any) {
+      throw new Error(mensagem(e, 'Não foi possível cancelar o pedido.'))
+    }
+    finally {
+      salvando.value = false
+    }
+  }
+
   async function criar(dados: NovoUsuario) {
     salvando.value = true
     try {
@@ -98,6 +156,9 @@ export const useRedacaoStore = defineStore('redacao', () => {
     try {
       const salvo = await $fetch<Usuario>(`/api/usuarios/${id}`, { method: 'PUT', body: dados })
       equipe.value = equipe.value.map(u => (u.id === id ? salvo : u))
+      // Definir a senha de alguém dá baixa no pedido dessa pessoa lá na API;
+      // tirar da fila local aqui evita um contador que insiste em não zerar.
+      if (dados.senha) pedidosSenha.value = pedidosSenha.value.filter(p => p.usuarioId !== id)
       return salvo
     }
     catch (e: any) {
@@ -150,7 +211,9 @@ export const useRedacaoStore = defineStore('redacao', () => {
 
   return {
     equipe, perfil, carregando, salvando,
+    pedidosSenha, meuPedidoSenha, totalPedidosSenha,
     filtros, listaFiltrada, temFiltro, contagem, limparFiltros,
     carregarEquipe, carregarPerfil, criar, atualizar, remover, salvarPerfil, trocarSenha,
+    carregarPedidosSenha, carregarMeuPedidoSenha, solicitarSenha, cancelarPedidoSenha,
   }
 })

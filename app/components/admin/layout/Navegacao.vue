@@ -29,6 +29,27 @@ const SECOES_COM_SUBROTAS = ['/admin/posts', '/admin/workshops']
 const rota = useRoute()
 const posts = usePostsStore()
 const auth = useAuthStore()
+const redacao = useRedacaoStore()
+
+/**
+ * A fila de pedidos de senha alimenta o contador de Equipe.
+ *
+ * Carregada aqui, e não na página, porque o menu acompanha o painel inteiro: um
+ * pedido feito enquanto o chefe está em outra tela precisa aparecer sem ele ter
+ * de passar por Equipe. A API recusa a fila para quem não é chefe, então nem se
+ * pede.
+ */
+onMounted(() => {
+  if (auth.ehChefe) redacao.carregarPedidosSenha().catch(() => {})
+})
+
+function contadorDe(para: string): number | undefined {
+  if (para === '/admin/posts') return posts.total
+  // Zero não vira badge: um "0" aceso ao lado de Equipe diria que há algo a
+  // fazer justamente quando não há.
+  if (para === '/admin/equipe') return redacao.totalPedidosSenha || undefined
+  return undefined
+}
 
 const itens = computed(() => MENU_ADMIN.filter(item => !item.soChefe || auth.ehChefe).map(item => ({
   ...item,
@@ -37,7 +58,7 @@ const itens = computed(() => MENU_ADMIN.filter(item => !item.soChefe || auth.ehC
   ativo: SECOES_COM_SUBROTAS.includes(item.para)
     ? rota.path.startsWith(item.para)
     : rota.path === item.para,
-  contador: item.para === '/admin/posts' ? posts.total : undefined,
+  contador: contadorDe(item.para),
 })))
 
 defineEmits<{ navegou: [] }>()

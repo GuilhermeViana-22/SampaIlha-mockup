@@ -239,7 +239,7 @@ async function restaurar() {
       <TabsContent value="taxonomia" class="mt-4 grid gap-4 lg:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle class="text-base">Editorias</CardTitle>
+            <CardTitle class="text-base">Categorias</CardTitle>
             <CardDescription>
               Definidas em API Python (<code class="font-mono text-xs">/categories</code>) e usadas
               pelo site e pelo painel.

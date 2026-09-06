@@ -40,6 +40,7 @@ export interface ApiPost {
     credit: string | null
     sort_order: number
     is_featured: boolean
+    orientation: string | null
   }[]
 }
 
@@ -58,6 +59,7 @@ export function paraPost(api: ApiPost): Post {
     credito: imagem.credit,
     ordem: imagem.sort_order,
     capa: imagem.is_featured,
+    orientacao: imagem.orientation as 'horizontal' | 'vertical' | null,
   }))
 
   // Toda matéria sai daqui com foto (ou fallback de capa), editoria, título e data.

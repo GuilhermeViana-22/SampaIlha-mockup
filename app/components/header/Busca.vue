@@ -23,7 +23,7 @@ onKeyStroke('Escape', () => {
         ref="campo"
         v-model="portal.termoBusca"
         type="search"
-        placeholder="Buscar por matérias, dicas, editorias ou tags…"
+        placeholder="Buscar por matérias, dicas, categorias ou tags…"
         aria-label="Buscar no portal"
         enterkeyhint="search"
       >

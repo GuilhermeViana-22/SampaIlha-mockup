@@ -26,7 +26,7 @@ const { data: stats, refresh } = await useFetch<EstatisticasDashboard>('/api/est
 const semConteudo = computed(() => !stats.value || stats.value.totalPosts === 0)
 
 const atalhos = [
-  { rotulo: 'Escrever notícia', descricao: 'Nova matéria para a editoria', para: '/admin/posts/novo?tipo=noticia', icone: 'fas fa-newspaper' },
+  { rotulo: 'Escrever notícia', descricao: 'Nova matéria para a categoria', para: '/admin/posts/novo?tipo=noticia', icone: 'fas fa-newspaper' },
   { rotulo: 'Publicar dica', descricao: 'Guia prático ou roteiro', para: '/admin/posts/novo?tipo=dica', icone: 'fas fa-lightbulb' },
   { rotulo: 'Página de informação', descricao: 'Serviço e institucional', para: '/admin/posts/novo?tipo=informacao', icone: 'fas fa-circle-info' },
   { rotulo: 'Ver inscritos', descricao: 'Base da newsletter', para: '/admin/newsletter', icone: 'fas fa-envelope' },
@@ -102,7 +102,7 @@ const atalhos = [
         tom="ambar"
       />
       <AdminDashboardCardEstatistica
-        rotulo="Editorias em uso"
+        rotulo="Categorias em uso"
         :valor="stats.porCategoria.length"
         :descricao="`de ${portal.categorias.length} cadastradas`"
         :icone="FileTextIcon"

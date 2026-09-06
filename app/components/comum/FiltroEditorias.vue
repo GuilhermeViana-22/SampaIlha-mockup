@@ -124,7 +124,7 @@ watch(() => props.opcoes.length, () => nextTick(medir))
       ref="trilho"
       class="filtro__trilho tags"
       role="group"
-      :aria-label="legenda ?? 'Filtrar por editoria'"
+      :aria-label="legenda ?? 'Filtrar por categoria'"
       @scroll.passive="medir"
     >
       <button

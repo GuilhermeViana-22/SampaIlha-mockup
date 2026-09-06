@@ -164,15 +164,6 @@ const previa = computed<Post>(() => ({
   <form class="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]" @submit.prevent="salvar()">
     <!-- Coluna principal -->
     <div class="flex flex-col gap-6">
-      <!-- Fotos primeiro: a capa é decisão de pauta, não acabamento do fim. -->
-      <AdminPostsFotos
-        ref="blocoFotos"
-        v-model:fotos="fotos"
-        v-model:capa-url="form.imagemUrl"
-        :post-id="post?.id"
-        :titulo="form.titulo"
-      />
-
       <Card>
         <CardHeader>
           <CardTitle class="text-base">Conteúdo</CardTitle>
@@ -239,6 +230,15 @@ const previa = computed<Post>(() => ({
         </CardContent>
       </Card>
 
+      <!-- Fotos: a capa é decisão de pauta, não acabamento do fim. -->
+      <AdminPostsFotos
+        ref="blocoFotos"
+        v-model:fotos="fotos"
+        v-model:capa-url="form.imagemUrl"
+        :post-id="post?.id"
+        :titulo="form.titulo"
+      />
+
       <Card>
         <CardHeader>
           <CardTitle class="text-base">Classificação</CardTitle>
@@ -258,7 +258,7 @@ const previa = computed<Post>(() => ({
           </div>
 
           <div class="grid gap-2">
-            <Label>Editoria</Label>
+            <Label>Categoria</Label>
             <Select v-model="form.categoria">
               <SelectTrigger class="w-full"><SelectValue /></SelectTrigger>
               <SelectContent>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { PencilIcon, ShieldCheckIcon, Trash2Icon, UserPlusIcon, UsersIcon } from '@lucide/vue'
+import { KeyRoundIcon, PencilIcon, ShieldCheckIcon, Trash2Icon, UserPlusIcon, UsersIcon } from '@lucide/vue'
 import type { Usuario } from '#shared/types/content'
 
 const emit = defineEmits<{ editar: [Usuario], adicionar: [] }>()
@@ -34,7 +34,7 @@ async function alternarPapel(pessoa: Usuario) {
     avisar.sucesso(
       `${pessoa.nome} agora é ${papel}.`,
       virandoChefe
-        ? 'Passa a publicar, validar a fila e mexer em editorias e acessos.'
+        ? 'Passa a publicar, validar a fila e mexer em categorias e acessos.'
         : 'Deixa de publicar e de mexer nos acessos; segue escrevendo normalmente.',
     )
   }
@@ -105,6 +105,14 @@ async function confirmarRemocao() {
                   </div>
                   <div class="truncate text-xs text-muted-foreground">{{ pessoa.email }}</div>
                   <div v-if="pessoa.bio" class="truncate text-xs text-muted-foreground/80">{{ pessoa.bio }}</div>
+                  <!-- O pedido some sozinho: definir a senha da pessoa é o que o atende. -->
+                  <div
+                    v-if="pessoa.pedidoSenhaEm"
+                    class="mt-1 inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-medium text-amber-700 dark:text-amber-400"
+                    :title="`Pediu em ${entrouEm(pessoa.pedidoSenhaEm)}. Abra o cadastro e defina a senha nova.`"
+                  >
+                    <KeyRoundIcon class="size-3" /> Pediu troca de senha
+                  </div>
                 </div>
               </div>
             </TableCell>

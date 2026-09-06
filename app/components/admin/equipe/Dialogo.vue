@@ -13,6 +13,7 @@ const emit = defineEmits<{ salvo: [] }>()
 
 const redacao = useRedacaoStore()
 const editando = computed(() => !!props.pessoa)
+const pedidoSenha = computed(() => !!props.pessoa?.pedidoSenhaEm)
 
 const form = reactive({
   nome: '',
@@ -51,7 +52,7 @@ const PAPEIS: { valor: PapelUsuario, rotulo: string, texto: string }[] = [
   {
     valor: 'editor-chefe',
     rotulo: 'Editor-chefe',
-    texto: 'Publica, valida o que a equipe escreve e cuida das editorias e dos acessos.',
+    texto: 'Publica, valida o que a equipe escreve e cuida das categorias e dos acessos.',
   },
 ]
 
@@ -92,7 +93,9 @@ async function salvar() {
 
       avisar.sucesso(
         `Cadastro de ${form.nome} atualizado.`,
-        form.senha ? 'A senha também foi trocada.' : undefined,
+        form.senha
+          ? 'A senha foi trocada e as sessões dessa pessoa caíram.'
+          : undefined,
       )
     }
     else {
@@ -145,6 +148,18 @@ async function salvar() {
         </div>
 
         <div class="grid gap-2">
+          <!-- Definir a senha aqui é o que atende o pedido: não há botão separado. -->
+          <div
+            v-if="pedidoSenha"
+            class="flex items-start gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 p-3 text-xs"
+          >
+            <KeyRoundIcon class="mt-0.5 size-3.5 shrink-0 text-amber-600 dark:text-amber-400" />
+            <p>
+              {{ props.pessoa?.nome }} pediu uma senha nova. Defina-a abaixo: o pedido é encerrado
+              junto e as sessões abertas dessa pessoa caem.
+            </p>
+          </div>
+
           <div class="flex items-center justify-between">
             <Label for="f-senha">{{ editando ? 'Nova senha (opcional)' : 'Senha inicial' }}</Label>
             <Button variant="ghost" size="sm" class="h-7 text-xs" @click="sortearSenha()">
@@ -162,7 +177,8 @@ async function salvar() {
             A senha precisa de pelo menos 8 caracteres.
           </p>
           <p v-else-if="!editando" class="text-xs text-muted-foreground">
-            Passe esta senha à pessoa por um canal seguro. Ela pode trocá-la depois em “Meu perfil”.
+            Passe esta senha à pessoa por um canal seguro. Quem edita não troca a própria senha:
+            para mudá-la de novo, a pessoa pede e você define aqui.
           </p>
         </div>
 

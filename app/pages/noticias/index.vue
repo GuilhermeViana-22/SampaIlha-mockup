@@ -42,7 +42,7 @@ const titulo = computed(() => {
     <ComumHeroPagina
       titulo="Notícias"
       descricao="A cobertura completa do portal de São Paulo às cinco regiões do Brasil."
-      etiqueta="Editorias"
+      etiqueta="Categorias"
       etiqueta-icone="fas fa-newspaper"
     />
 
@@ -52,13 +52,13 @@ const titulo = computed(() => {
           <ComumFiltroEditorias
             v-model="categoriaAtiva"
             :opcoes="portal.categorias"
-            legenda="Filtrar notícias por editoria"
+            legenda="Filtrar notícias por categoria"
           />
 
           <ComumCabecalhoSecao :titulo="titulo" />
 
           <!-- A lista anterior continua visível enquanto a nova chega: trocar de
-               editoria não pisca a tela em branco. -->
+               categoria não pisca a tela em branco. -->
           <div class="lista-filtrada" :class="{ 'lista-filtrada--carregando': carregando }" :aria-busy="carregando">
             <NoticiasGrade v-if="data.itens.length" :posts="data.itens.slice(0, 6)" />
             <NoticiasLista v-if="data.itens.length > 6" :posts="data.itens.slice(6)" />
@@ -66,13 +66,13 @@ const titulo = computed(() => {
 
           <ComumEstadoVazio
             v-if="!data.itens.length && !carregando"
-            titulo="Nenhuma matéria nesta editoria ainda"
-            descricao="Assim que uma matéria for publicada nesta editoria, ela aparece aqui."
+            titulo="Nenhuma matéria nesta categoria ainda"
+            descricao="Assim que uma matéria for publicada nesta categoria, ela aparece aqui."
             icone="fas fa-newspaper"
           >
             <div v-if="categoriaAtiva" class="estado-vazio__acao">
               <button class="btn-subscribe" type="button" @click="categoriaAtiva = ''">
-                <i class="fas fa-th-large" /> Ver todas as editorias
+                <i class="fas fa-th-large" /> Ver todas as categorias
               </button>
             </div>
           </ComumEstadoVazio>
