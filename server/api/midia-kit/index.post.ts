@@ -2,7 +2,7 @@ import { $fetch } from 'ofetch'
 import type { MidiaKit } from '../../../shared/types/content'
 import type { ApiMidiaKit } from '../../utils/midiaKit'
 import { paraMidiaKit } from '../../utils/midiaKit'
-import { COOKIE_ACESSO, chamarApi } from '../../utils/api'
+import { tokenDaSessao } from '../../utils/api'
 
 /**
  * Sobe uma peça para o mídia kit.
@@ -33,16 +33,13 @@ export default defineEventHandler(async (event): Promise<MidiaKit> => {
 
   // FormData precisa ir direto no $fetch para o boundary ser montado corretamente.
   const config = useRuntimeConfig()
-  if (!getCookie(event, COOKIE_ACESSO)) {
-    // Garante um token válido (renovando se preciso) antes do upload.
-    await chamarApi(event, '/auth/me', { requerSessao: true })
-  }
+  const token = await tokenDaSessao(event)
 
   try {
     const criada = await $fetch<ApiMidiaKit>(`${config.apiBase}/media-kit`, {
       method: 'POST',
       body: formulario,
-      headers: { Authorization: `Bearer ${getCookie(event, COOKIE_ACESSO)}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
 
     setResponseStatus(event, 201)

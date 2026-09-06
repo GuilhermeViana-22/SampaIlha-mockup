@@ -2,7 +2,7 @@ import { $fetch } from 'ofetch'
 import type { Workshop } from '../../../../shared/types/workshop'
 import type { ApiWorkshop } from '../../../utils/workshops'
 import { paraWorkshop } from '../../../utils/workshops'
-import { COOKIE_ACESSO, chamarApi } from '../../../utils/api'
+import { tokenDaSessao } from '../../../utils/api'
 
 /**
  * Envia o cartaz da oficina.
@@ -24,16 +24,13 @@ export default defineEventHandler(async (event): Promise<Workshop> => {
 
   // FormData precisa ir direto no $fetch para o boundary ser montado corretamente.
   const config = useRuntimeConfig()
-  if (!getCookie(event, COOKIE_ACESSO)) {
-    // Garante um token válido (renovando se preciso) antes do upload.
-    await chamarApi(event, '/auth/me', { requerSessao: true })
-  }
+  const token = await tokenDaSessao(event)
 
   try {
     const atualizada = await $fetch<ApiWorkshop>(`${config.apiBase}/workshops/${id}/imagem`, {
       method: 'PUT',
       body: formulario,
-      headers: { Authorization: `Bearer ${getCookie(event, COOKIE_ACESSO)}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
 
     return paraWorkshop(atualizada)

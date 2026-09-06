@@ -105,6 +105,36 @@ export async function chamarApi<T>(event: H3Event, caminho: string, opcoes: Opco
   }
 }
 
+/**
+ * Token de acesso válido para as chamadas que não passam pelo `chamarApi`.
+ *
+ * Os uploads montam o `FormData` na mão e vão direto no `$fetch` — o boundary
+ * do multipart tem de ser montado pelo próprio fetch —, então não herdam daqui
+ * o refresh automático. O jeito antigo de resolver isso era:
+ *
+ *     if (!getCookie(event, COOKIE_ACESSO))
+ *       await chamarApi(event, '/auth/me', { requerSessao: true })
+ *     ...
+ *     headers: { Authorization: `Bearer ${getCookie(event, COOKIE_ACESSO)}` }
+ *
+ * e o segundo `getCookie` voltava vazio mesmo depois de a sessão ter sido
+ * renovada com sucesso: `setCookie` escreve na *resposta*, enquanto `getCookie`
+ * lê a *requisição*, que continua sendo a mesma de antes — sem o cookie novo.
+ * O cabeçalho saía literalmente `Bearer undefined` e a API recusava com 401.
+ *
+ * Devolver o token em vez de confiar no cookie fecha essa janela: quem envia a
+ * foto logo depois de o access token expirar não é mais deslogado no meio.
+ */
+export async function tokenDaSessao(event: H3Event): Promise<string> {
+  const token = getCookie(event, COOKIE_ACESSO) ?? (await renovarAcesso(event))
+
+  if (!token) {
+    throw createError({ statusCode: 401, statusMessage: 'Sessão expirada. Faça login novamente.' })
+  }
+
+  return token
+}
+
 export function gravarAcesso(event: H3Event, token: string, expiraEmSegundos: number): void {
   setCookie(event, COOKIE_ACESSO, token, {
     httpOnly: true,

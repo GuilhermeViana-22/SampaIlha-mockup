@@ -1,7 +1,7 @@
 import { $fetch } from 'ofetch'
 import type { PostImagem } from '../../../../shared/types/content'
 import { urlAbsoluta } from '../../../utils/adaptadores'
-import { COOKIE_ACESSO, chamarApi } from '../../../utils/api'
+import { tokenDaSessao } from '../../../utils/api'
 
 interface ApiImagem {
   id: string
@@ -37,17 +37,13 @@ export default defineEventHandler(async (event): Promise<PostImagem> => {
 
   // FormData precisa ir direto no $fetch para o boundary ser montado corretamente.
   const config = useRuntimeConfig()
-  const token = getCookie(event, COOKIE_ACESSO)
-  if (!token) {
-    // Garante um token válido (renovando se preciso) antes do upload.
-    await chamarApi(event, '/auth/me', { requerSessao: true })
-  }
+  const token = await tokenDaSessao(event)
 
   try {
     const imagem = await $fetch<ApiImagem>(`${config.apiBase}/posts/${id}/images`, {
       method: 'POST',
       body: formulario,
-      headers: { Authorization: `Bearer ${getCookie(event, COOKIE_ACESSO)}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
 
     setResponseStatus(event, 201)

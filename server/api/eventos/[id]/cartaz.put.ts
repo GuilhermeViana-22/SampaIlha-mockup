@@ -2,7 +2,7 @@ import { $fetch } from 'ofetch'
 import type { Evento } from '../../../../shared/types/evento'
 import type { ApiEvento } from '../../../utils/eventos'
 import { paraEvento } from '../../../utils/eventos'
-import { COOKIE_ACESSO, chamarApi } from '../../../utils/api'
+import { tokenDaSessao } from '../../../utils/api'
 
 /**
  * Envia o cartaz do evento.
@@ -28,16 +28,13 @@ export default defineEventHandler(async (event): Promise<Evento> => {
 
   // FormData precisa ir direto no $fetch para o boundary ser montado corretamente.
   const config = useRuntimeConfig()
-  if (!getCookie(event, COOKIE_ACESSO)) {
-    // Garante um token válido (renovando se preciso) antes do upload.
-    await chamarApi(event, '/auth/me', { requerSessao: true })
-  }
+  const token = await tokenDaSessao(event)
 
   try {
     const atualizado = await $fetch<ApiEvento>(`${config.apiBase}/events/${id}/imagem`, {
       method: 'PUT',
       body: formulario,
-      headers: { Authorization: `Bearer ${getCookie(event, COOKIE_ACESSO)}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
 
     return paraEvento(atualizado)

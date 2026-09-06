@@ -1,5 +1,5 @@
 import { $fetch } from 'ofetch'
-import { COOKIE_ACESSO, chamarApi } from '../../utils/api'
+import { tokenDaSessao } from '../../utils/api'
 import { urlAbsoluta } from '../../utils/adaptadores'
 
 /**
@@ -18,17 +18,14 @@ export default defineEventHandler(async (event): Promise<{ logoUrl: string | nul
   formulario.append('file', new Blob([new Uint8Array(arquivo.data)], { type: arquivo.type }), arquivo.filename)
 
   const config = useRuntimeConfig()
-  if (!getCookie(event, COOKIE_ACESSO)) {
-    // Garante um token válido (renovando se preciso) antes do upload.
-    await chamarApi(event, '/auth/me', { requerSessao: true })
-  }
+  const token = await tokenDaSessao(event)
 
   try {
     // FormData precisa ir direto no $fetch para o boundary ser montado certo.
     const marca = await $fetch<{ logo_url: string | null }>(`${config.apiBase}/settings/branding/logo`, {
       method: 'PUT',
       body: formulario,
-      headers: { Authorization: `Bearer ${getCookie(event, COOKIE_ACESSO)}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
 
     return { logoUrl: urlAbsoluta(marca.logo_url) ?? null }
