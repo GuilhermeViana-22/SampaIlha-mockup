@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { DownloadIcon, LoaderCircleIcon, MailIcon, SendIcon, Trash2Icon, TriangleAlertIcon } from '@lucide/vue'
-import type { FilaNewsletter } from '#shared/types/content'
+import {
+  DownloadIcon, EyeIcon, LoaderCircleIcon, MailIcon, SendIcon, SparklesIcon, Trash2Icon, TriangleAlertIcon,
+} from '@lucide/vue'
+import type { FilaNewsletter, InscricaoNewsletter } from '#shared/types/content'
 
 definePageMeta({
   layout: 'admin',
@@ -18,6 +20,44 @@ const busca = ref('')
 const removendo = ref<string | null>(null)
 
 await newsletter.carregar()
+
+/**
+ * Quem entrou desde a última passada por aqui.
+ *
+ * O conjunto é tirado uma vez, na abertura, e a base é dada por vista logo em
+ * seguida: o badge do menu zera no mesmo instante em que a lista aparece, e
+ * mesmo assim quem é novidade continua marcado na tela enquanto ela estiver
+ * aberta — apagar o aviso não pode apagar também a informação de quem chegou.
+ */
+const destacados = ref(new Set<string>())
+
+onMounted(() => {
+  newsletter.lerMarca()
+  for (const i of newsletter.novos) destacados.value.add(i.id)
+  newsletter.marcarVistos()
+})
+
+// Chegou gente com a tela aberta (o menu recarrega a base de tempos em tempos):
+// já está à vista, então entra no destaque e não volta a acender o badge.
+watch(() => newsletter.inscricoes, () => {
+  if (!destacados.value.size && !newsletter.totalNovos) return
+  for (const i of newsletter.novos) destacados.value.add(i.id)
+  newsletter.marcarVistos()
+})
+
+/** Inscrito aberto no diálogo de visualização. */
+const emDetalhe = ref<InscricaoNewsletter | null>(null)
+const detalheAberto = ref(false)
+
+function visualizar(inscricao: InscricaoNewsletter) {
+  emDetalhe.value = inscricao
+  detalheAberto.value = true
+}
+
+function removerDoDetalhe(inscricao: InscricaoNewsletter) {
+  detalheAberto.value = false
+  remover(inscricao.id, inscricao.email)
+}
 
 const filtrados = computed(() => {
   const termo = busca.value.trim().toLowerCase()
@@ -127,13 +167,20 @@ function exportarCsv() {
       </CardContent>
     </Card>
 
-    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
       <AdminDashboardCardEstatistica
         rotulo="Inscritos"
         :valor="newsletter.inscricoes.length"
         descricao="Total na base do portal"
         :icone="MailIcon"
         tom="destaque"
+      />
+      <AdminDashboardCardEstatistica
+        rotulo="Novos"
+        :valor="destacados.size"
+        descricao="Cadastros desde a sua última visita"
+        :icone="SparklesIcon"
+        tom="verde"
       />
       <AdminDashboardCardEstatistica
         rotulo="Na fila"
@@ -190,15 +237,39 @@ function exportarCsv() {
               <TableHead>Nome</TableHead>
               <TableHead>E-mail</TableHead>
               <TableHead class="w-[200px]">Inscrição</TableHead>
-              <TableHead class="w-[80px] text-right">Ações</TableHead>
+              <TableHead class="w-[120px] text-right">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow v-for="inscricao in filtrados" :key="inscricao.id">
-              <TableCell class="font-medium">{{ inscricao.nome }}</TableCell>
+            <TableRow
+              v-for="inscricao in filtrados"
+              :key="inscricao.id"
+              :class="destacados.has(inscricao.id) ? 'bg-emerald-500/5' : ''"
+            >
+              <TableCell class="font-medium">
+                <div class="flex items-center gap-2">
+                  <!-- Barrinha verde: diz de relance onde a lista era nova, sem
+                       depender de ler a data em cada linha. -->
+                  <span
+                    v-if="destacados.has(inscricao.id)"
+                    class="h-4 w-1 shrink-0 rounded-full bg-emerald-500"
+                    aria-hidden="true"
+                  />
+                  {{ inscricao.nome }}
+                  <Badge
+                    v-if="destacados.has(inscricao.id)"
+                    class="gap-1 bg-emerald-500 text-[10px] text-white"
+                  >
+                    <SparklesIcon class="size-3" /> Novo
+                  </Badge>
+                </div>
+              </TableCell>
               <TableCell class="text-muted-foreground">{{ inscricao.email }}</TableCell>
               <TableCell class="text-sm text-muted-foreground">{{ formatarDataHora(inscricao.criadoEm) }}</TableCell>
               <TableCell class="text-right">
+                <Button variant="ghost" size="icon-sm" title="Visualizar" @click="visualizar(inscricao)">
+                  <EyeIcon class="size-4" />
+                </Button>
                 <Button
                   variant="ghost"
                   size="icon-sm"
@@ -219,5 +290,12 @@ function exportarCsv() {
         </Table>
       </div>
     </Card>
+
+    <AdminNewsletterDetalhe
+      v-model="detalheAberto"
+      :inscricao="emDetalhe"
+      :novo="!!emDetalhe && destacados.has(emDetalhe.id)"
+      @remover="removerDoDetalhe"
+    />
   </div>
 </template>

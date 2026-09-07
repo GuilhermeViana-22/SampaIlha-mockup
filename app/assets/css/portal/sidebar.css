@@ -63,6 +63,89 @@
     display: flex; align-items: center; justify-content: center; gap: 8px;
   }
   .nl-btn:hover { background: var(--azul-mid); }
+  .newsletter-widget .nl-btn { width: 100%; }
+
+  /* ── Modal de assinatura ── */
+  .nl-modal {
+    position: fixed; inset: 0; z-index: 210;
+    background: rgba(6, 16, 30, .72);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .nl-modal__caixa {
+    position: relative;
+    width: 100%; max-width: 440px;
+    max-height: 90vh; overflow-y: auto;
+    padding: 34px 32px 28px;
+    background: var(--branco);
+    border-radius: 14px;
+    box-shadow: var(--sombra-lg);
+    text-align: center;
+  }
+  /* A faixa da marca no topo da caixa, para o modal não chegar branco de todo. */
+  .nl-modal__caixa::before {
+    content: ''; position: absolute; inset: 0 0 auto; height: 5px;
+    background: linear-gradient(90deg, var(--azul), var(--ciano));
+    border-radius: 14px 14px 0 0;
+  }
+  .nl-modal__fechar {
+    position: absolute; top: 14px; right: 14px;
+    width: 32px; height: 32px; border: 0; border-radius: 8px;
+    background: var(--cinza-1); color: var(--cinza-4);
+    cursor: pointer; transition: background .2s, color .2s;
+  }
+  .nl-modal__fechar:hover { background: var(--cinza-2); color: var(--escuro); }
+  .nl-modal__selo {
+    width: 56px; height: 56px; margin: 0 auto 16px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: var(--azul-leve); color: var(--azul);
+    font-size: 1.5rem;
+  }
+  .nl-modal__titulo { font-family: var(--fonte-serif); font-size: 1.45rem; line-height: 1.2; }
+  .nl-modal__slogan {
+    margin: 10px auto 22px; max-width: 34ch;
+    font-size: .9rem; line-height: 1.6; color: var(--cinza-4);
+  }
+  .nl-modal__form { display: flex; flex-direction: column; gap: 14px; text-align: left; }
+  .nl-modal__campo { display: flex; flex-direction: column; gap: 6px; }
+  .nl-modal__campo span { font-size: .78rem; font-weight: 700; color: var(--cinza-4); letter-spacing: .3px; text-transform: uppercase; }
+  .nl-modal__campo input {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--cinza-2); border-radius: 8px;
+    font-size: .92rem; font-family: var(--fonte-sans);
+    outline: none; background: #fff;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .nl-modal__campo input:focus {
+    border-color: var(--azul);
+    box-shadow: 0 0 0 3px var(--azul-leve);
+  }
+  .nl-modal__btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; padding: 13px;
+    border: 0; border-radius: 8px;
+    background: var(--azul); color: #fff;
+    font-size: .95rem; font-weight: 700; font-family: var(--fonte-sans);
+    cursor: pointer; transition: background .2s;
+  }
+  .nl-modal__btn:hover { background: var(--azul-mid); }
+  .nl-modal__btn:disabled { opacity: .7; cursor: default; }
+  .nl-modal__erro { font-size: .82rem; font-weight: 600; color: var(--vermelho); }
+  .nl-modal__nota { font-size: .74rem; color: var(--cinza-3); text-align: center; }
+  .nl-modal__pronto { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .nl-modal__pronto > i { font-size: 2rem; color: var(--verde); }
+  .nl-modal__pronto p { font-size: .92rem; line-height: 1.6; color: var(--cinza-4); }
+
+  .nl-modal-enter-active, .nl-modal-leave-active { transition: opacity .2s ease; }
+  .nl-modal-enter-from, .nl-modal-leave-to { opacity: 0; }
+  .nl-modal-enter-active .nl-modal__caixa { transition: transform .22s ease; }
+  .nl-modal-enter-from .nl-modal__caixa { transform: translateY(12px) scale(.97); }
+
+  @media (max-width: 480px) {
+    .nl-modal__caixa { padding: 30px 22px 24px; }
+  }
 
   /* Tags */
   .tags { display: flex; flex-wrap: wrap; gap: 8px; }

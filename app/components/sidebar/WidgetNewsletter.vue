@@ -1,16 +1,13 @@
 <script setup lang="ts">
-const newsletter = useNewsletterStore()
-
-const nome = ref('')
-const email = ref('')
-
-async function enviar() {
-  const ok = await newsletter.inscrever(nome.value, email.value)
-  if (ok) {
-    nome.value = ''
-    email.value = ''
-  }
-}
+/**
+ * Chamada da newsletter na coluna lateral.
+ *
+ * O formulário saiu daqui e virou modal (`NewsletterModal`). Três campos
+ * espremidos numa coluna de 300px, no meio de uma página de leitura, é o
+ * formato que a pessoa passa direto: o widget agora faz o convite, e quem
+ * aceita preenche numa caixa centralizada, sem o resto da página competindo.
+ */
+const aberto = ref(false)
 </script>
 
 <template>
@@ -20,20 +17,10 @@ async function enviar() {
     </div>
     <p>Receba os principais destaques, cultura e notícias de todo o Brasil diretamente no seu e-mail.</p>
 
-    <form class="nl-form" @submit.prevent="enviar">
-      <input v-model="nome" type="text" class="nl-input" placeholder="Seu nome">
-      <input v-model="email" type="email" class="nl-input" placeholder="Seu e-mail" required>
-      <button class="nl-btn" type="submit" :disabled="newsletter.enviando">
-        <i class="fas" :class="newsletter.enviando ? 'fa-spinner fa-spin' : 'fa-paper-plane'" />
-        {{ newsletter.enviando ? 'Enviando…' : 'Quero receber' }}
-      </button>
-    </form>
+    <button class="nl-btn" type="button" @click="aberto = true">
+      <i class="fas fa-paper-plane" /> Quero receber
+    </button>
 
-    <p v-if="newsletter.mensagem" style="margin-top:10px;color:var(--verde);font-weight:600;font-size:.82rem;">
-      <i class="fas fa-circle-check" /> {{ newsletter.mensagem }}
-    </p>
-    <p v-if="newsletter.erro" style="margin-top:10px;color:var(--vermelho);font-weight:600;font-size:.82rem;">
-      <i class="fas fa-circle-exclamation" /> {{ newsletter.erro }}
-    </p>
+    <NewsletterModal :aberto="aberto" @fechar="aberto = false" />
   </div>
 </template>
