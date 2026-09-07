@@ -314,3 +314,22 @@ export interface Previsao {
   agora: TempoAgora
   dias: TempoDia[]
 }
+
+/** Estado da fila de disparo da newsletter, como o painel mostra. */
+export interface FilaNewsletter {
+  /** Falso quando a API está sem SMTP: a fila acumula e nada sai. */
+  habilitada: boolean
+  pendentes: number
+  enviados: number
+  falhas: number
+  campanhasEnviadas: number
+  ultimaCampanha: { assunto: string, destinatarios: number, em: string | null } | null
+}
+
+export interface ResultadoDisparo {
+  enviados: number
+  falhas: number
+  /** Entregas abandonadas porque a matéria saiu do ar antes do envio. */
+  descartados: number
+  restantes: number
+}

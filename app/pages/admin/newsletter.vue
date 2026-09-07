@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { DownloadIcon, MailIcon, Trash2Icon } from '@lucide/vue'
+import { DownloadIcon, LoaderCircleIcon, MailIcon, SendIcon, Trash2Icon, TriangleAlertIcon } from '@lucide/vue'
+import type { FilaNewsletter } from '#shared/types/content'
 
 definePageMeta({
   layout: 'admin',
@@ -48,6 +49,51 @@ async function remover(id: string, email: string) {
   }
 }
 
+/**
+ * Estado da fila de disparo.
+ *
+ * O envio é feito pelo agendador do Dokploy, de cinco em cinco minutos, e não
+ * por esta tela — quem publica uma matéria não fica esperando os e-mails
+ * saírem. Aqui só se vê o que está acontecendo, e se force uma passada quando
+ * não se quer esperar.
+ */
+// Sem `default`: até a primeira resposta chegar, `fila` é null — e os cartões
+// já sabem lidar com isso (`fila?.pendentes ?? 0`).
+const { data: fila, refresh: recarregarFila } = await useFetch<FilaNewsletter>('/api/newsletter/fila', {
+  key: 'newsletter-fila',
+})
+
+const disparando = ref(false)
+
+async function dispararAgora() {
+  if (disparando.value) return
+  disparando.value = true
+
+  try {
+    const r = await $fetch<{ enviados: number, falhas: number, restantes: number }>(
+      '/api/newsletter/fila/disparar',
+      { method: 'POST' },
+    )
+    await recarregarFila()
+
+    if (r.enviados === 0 && r.restantes === 0) {
+      avisar.sucesso('Nada na fila.', 'Todo mundo já recebeu o que havia para receber.')
+    }
+    else {
+      avisar.sucesso(
+        `${r.enviados} e-mail(s) enviado(s).`,
+        r.restantes ? `Ainda faltam ${r.restantes} — o agendador continua daqui.` : 'A fila ficou vazia.',
+      )
+    }
+  }
+  catch (e: unknown) {
+    avisar.erro(e, 'Não foi possível disparar a newsletter agora.')
+  }
+  finally {
+    disparando.value = false
+  }
+}
+
 /** Exporta a base em CSV para uso na ferramenta de disparo. */
 function exportarCsv() {
   const linhas = [
@@ -66,7 +112,22 @@ function exportarCsv() {
 
 <template>
   <div class="flex flex-col gap-5">
-    <div class="grid gap-3 sm:grid-cols-3">
+    <!-- Sem SMTP na API a fila só acumula. Dizer isso aqui evita a pergunta
+         "cadastrei a matéria e ninguém recebeu". -->
+    <Card v-if="fila && !fila.habilitada" class="border-amber-300 bg-amber-50 py-3 dark:bg-amber-950/30">
+      <CardContent class="flex items-start gap-3 px-4">
+        <TriangleAlertIcon class="mt-0.5 size-4 shrink-0 text-amber-600" />
+        <div class="text-sm">
+          <p class="font-medium">O envio está desligado.</p>
+          <p class="text-muted-foreground">
+            A API está sem servidor de e-mail configurado, então a fila acumula e nada sai.
+            Defina <code>SMTP_HOST</code> no ambiente da API para ligar o disparo.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+
+    <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <AdminDashboardCardEstatistica
         rotulo="Inscritos"
         :valor="newsletter.inscricoes.length"
@@ -74,7 +135,43 @@ function exportarCsv() {
         :icone="MailIcon"
         tom="destaque"
       />
+      <AdminDashboardCardEstatistica
+        rotulo="Na fila"
+        :valor="fila?.pendentes ?? 0"
+        descricao="E-mails aguardando o próximo disparo"
+        :icone="SendIcon"
+      />
+      <AdminDashboardCardEstatistica
+        rotulo="Enviados"
+        :valor="fila?.enviados ?? 0"
+        :descricao="`${fila?.campanhasEnviadas ?? 0} matéria(s) já viraram newsletter`"
+        :icone="MailIcon"
+      />
+      <AdminDashboardCardEstatistica
+        rotulo="Falhas"
+        :valor="fila?.falhas ?? 0"
+        descricao="Endereços que recusaram após as tentativas"
+        :icone="TriangleAlertIcon"
+      />
     </div>
+
+    <Card v-if="fila?.ultimaCampanha" class="py-4">
+      <CardContent class="flex flex-wrap items-center justify-between gap-3 px-4">
+        <div class="min-w-0">
+          <p class="text-xs text-muted-foreground">Última newsletter montada</p>
+          <p class="truncate text-sm font-medium">{{ fila.ultimaCampanha.assunto }}</p>
+          <p class="text-xs text-muted-foreground">
+            {{ fila.ultimaCampanha.destinatarios }} destinatário(s)
+            <template v-if="fila.ultimaCampanha.em"> · {{ formatarDataHora(fila.ultimaCampanha.em) }}</template>
+          </p>
+        </div>
+        <Button variant="outline" size="sm" :disabled="disparando" @click="dispararAgora()">
+          <LoaderCircleIcon v-if="disparando" class="size-4 animate-spin" />
+          <SendIcon v-else class="size-4" />
+          Disparar agora
+        </Button>
+      </CardContent>
+    </Card>
 
     <Card class="py-4">
       <CardContent class="flex flex-wrap items-center gap-3 px-4">
