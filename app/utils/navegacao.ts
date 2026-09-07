@@ -7,17 +7,62 @@ export interface ItemMenu {
   filhos?: ItemMenu[]
 }
 
-export const MENU_PRINCIPAL: ItemMenu[] = [
+/**
+ * Destino de uma editoria — um lugar só, para o site inteiro.
+ *
+ * Clicar numa editoria filtra os conteúdos por ela, em qualquer menu: é o que
+ * `/categoria/[slug]` faz. Antes o mesmo rótulo levava a dois lugares — o menu
+ * principal mandava "Turismo" para `/turismo` e a barra mandava para
+ * `/categoria/turismo` —, e as duas páginas nem mostravam a mesma quantidade de
+ * matéria. Quem navegava não tinha como saber que eram a mesma editoria.
+ */
+export function rotaDaCategoria(slug: string): string {
+  return `/categoria/${slug}`
+}
+
+/**
+ * Item do menu principal.
+ *
+ * Vem em duas formas. A fixa (`rotulo` + `para`) é para o que não é editoria:
+ * Início, Notícias, Dicas. A outra traz só `categoria`, o slug no banco — e aí
+ * rótulo, ícone e destino são lidos da API pelo `useMenuPrincipal`.
+ *
+ * A diferença importa: com o slug, renomear "Meio Ambiente" no painel renomeia
+ * o menu, e uma editoria tirada do ar some da navegação sozinha. Com o rótulo
+ * escrito aqui, o menu ia envelhecendo em silêncio até discordar da barra de
+ * categorias — que sempre leu do banco.
+ */
+export interface ItemPrincipal {
+  /** Slug da editoria no banco. Quando presente, manda no rótulo e no destino. */
+  categoria?: string
+  /** Só para os itens fixos, que não são editoria. */
+  rotulo?: string
+  para?: string
+  icone?: string
+  /** Páginas curadas que vivem sob este item, no submenu. */
+  filhos?: ItemMenu[]
+}
+
+export const MENU_PRINCIPAL: ItemPrincipal[] = [
   { rotulo: 'Início', para: '/', icone: 'fas fa-house' },
   { rotulo: 'Notícias', para: '/noticias', icone: 'fas fa-newspaper' },
-  { rotulo: 'Turismo', para: '/turismo', icone: 'fas fa-suitcase-rolling' },
+  {
+    categoria: 'turismo',
+    filhos: [
+      { rotulo: 'Todas as matérias', para: '/categoria/turismo', icone: 'fas fa-suitcase-rolling' },
+      // A página curada do Parintins continua no ar e no menu: ela tem
+      // cronograma e histórico que a listagem por editoria não mostra.
+      { rotulo: 'Festival de Parintins', para: '/turismo', icone: 'fas fa-drum' },
+    ],
+  },
+  // "Dicas" é tipo de conteúdo, não editoria — não existe no banco de
+  // categorias, então continua fixa aqui.
   { rotulo: 'Dicas', para: '/dicas', icone: 'fas fa-lightbulb' },
   {
-    rotulo: 'Cultura',
-    para: '/cultura',
-    icone: 'fas fa-theater-masks',
+    categoria: 'cultura',
     filhos: [
-      { rotulo: 'Cultura & Arte', para: '/cultura', icone: 'fas fa-newspaper' },
+      { rotulo: 'Todas as matérias', para: '/categoria/cultura', icone: 'fas fa-newspaper' },
+      { rotulo: 'Cultura & Arte', para: '/cultura', icone: 'fas fa-palette' },
       { rotulo: 'Quem Somos', para: '/quem-somos', icone: 'fas fa-users' },
       { rotulo: 'O Projeto Sampa na Ilha', para: '/cultura/o-projeto', icone: 'fas fa-seedling' },
       { rotulo: 'Grupo de Dança', para: '/cultura/grupo-danca', icone: 'fas fa-music' },
@@ -25,7 +70,7 @@ export const MENU_PRINCIPAL: ItemMenu[] = [
       { rotulo: 'Eventos & Atrações', para: '/cultura/eventos', icone: 'fas fa-calendar-day' },
     ],
   },
-  { rotulo: 'Vagas', para: '/vagas', icone: 'fas fa-briefcase' },
+  { categoria: 'vagas' },
 ]
 
 /**

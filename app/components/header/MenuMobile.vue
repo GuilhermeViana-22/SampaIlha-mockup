@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onKeyStroke, useScrollLock } from '@vueuse/core'
-import { MENU_PRINCIPAL } from '~/utils/navegacao'
 
 const portal = usePortalStore()
 const rota = useRoute()
@@ -17,9 +16,10 @@ onKeyStroke('Escape', () => {
   if (portal.menuAberto) portal.fecharMenu()
 })
 
-function ativo(para: string) {
-  return para === '/' ? rota.path === '/' : rota.path.startsWith(para)
-}
+// Mesma resolução do menu de cima: editorias vindas do banco, um destino só
+// por editoria e o mesmo estado ativo. A gaveta do celular não pode discordar
+// do cabeçalho do desktop.
+const { itens, categoriaAtiva, rotaDaCategoria } = useMenuPrincipal()
 </script>
 
 <template>
@@ -41,11 +41,11 @@ function ativo(para: string) {
       :class="{ 'is-open': portal.menuAberto }"
       aria-label="Menu principal"
     >
-      <template v-for="item in MENU_PRINCIPAL" :key="item.para">
+      <template v-for="item in itens" :key="item.chave">
         <NuxtLink
           :to="item.para"
-          :class="{ active: ativo(item.para) }"
-          :aria-current="ativo(item.para) ? 'page' : undefined"
+          :class="{ active: item.ativo }"
+          :aria-current="item.ativo ? 'page' : undefined"
         >
           <i :class="item.icone" /> {{ item.rotulo }}
         </NuxtLink>
@@ -68,9 +68,9 @@ function ativo(para: string) {
         <NuxtLink
           v-for="categoria in portal.categoriasDoMenu"
           :key="categoria.slug"
-          :to="`/categoria/${categoria.slug}`"
-          :class="{ active: rota.params.slug === categoria.slug }"
-          :aria-current="rota.params.slug === categoria.slug ? 'page' : undefined"
+          :to="rotaDaCategoria(categoria.slug)"
+          :class="{ active: categoriaAtiva(categoria.slug) }"
+          :aria-current="categoriaAtiva(categoria.slug) ? 'page' : undefined"
         >
           <i :class="categoria.icone" /> {{ categoria.nome }}
         </NuxtLink>

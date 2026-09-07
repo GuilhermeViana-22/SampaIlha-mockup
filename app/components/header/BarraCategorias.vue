@@ -29,9 +29,11 @@ function mostrarAtiva() {
   })
 }
 
-function ehAtiva(slug: string) {
-  return rota.params.slug === slug
-}
+// A checagem vem do `useMenuPrincipal`, o mesmo lugar que o menu de cima usa —
+// é o que garante que os dois acendam a mesma editoria ao mesmo tempo. Ela
+// compara o caminho inteiro: `rota.params.slug` se chama igual em
+// `/regioes/[slug]`, então a região "norte" acendia a editoria "norte".
+const { categoriaAtiva, rotaDaCategoria } = useMenuPrincipal()
 
 onMounted(() => {
   medir()
@@ -59,9 +61,9 @@ watch(() => portal.categoriasDoMenu.length, () => nextTick(medir))
         v-for="categoria in portal.categoriasDoMenu"
         :key="categoria.slug"
         class="cat-link"
-        :class="{ active: ehAtiva(categoria.slug) }"
-        :aria-current="ehAtiva(categoria.slug) ? 'page' : undefined"
-        :to="`/categoria/${categoria.slug}`"
+        :class="{ active: categoriaAtiva(categoria.slug) }"
+        :aria-current="categoriaAtiva(categoria.slug) ? 'page' : undefined"
+        :to="rotaDaCategoria(categoria.slug)"
       >
         <i :class="categoria.icone" /> {{ categoria.nome }}
       </NuxtLink>

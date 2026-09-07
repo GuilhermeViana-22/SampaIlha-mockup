@@ -26,7 +26,7 @@
   /* Classe própria em vez de `.site-header nav`: o seletor por elemento
      vazava para o menu do painel, para as trilhas das matérias e — depois que
      a gaveta virou um `<nav>` — para o próprio menu do celular. */
-  .nav-principal { display: flex; align-items: center; gap: 2px; }
+  .nav-principal { display: flex; align-items: center; gap: 2px; position: relative; }
   .nav-item { position: relative; }
   .nav-link {
     padding: 6px 14px;
@@ -40,6 +40,28 @@
   }
   .nav-link:hover, .nav-link.active { background: var(--azul-leve); color: var(--azul); }
   .nav-link .fa-chevron-down { font-size: .6rem; transition: transform .2s; }
+
+  /* Sublinhado do item aberto.
+     
+     E um elemento so para a barra inteira: em vez de sumir de um item e
+     aparecer no outro, ela desliza entre os dois, e o olho acompanha para onde
+     a navegacao foi. Posicao e largura vem medidas do DOM (ver Navegacao.vue),
+     porque os rotulos sao os nomes das editorias no banco — nao da para
+     saber a largura de "Meio Ambiente" antes de a fonte carregar.
+     
+     `left: 0` com `translateX`: animar transform nao provoca layout, entao o
+     deslize roda no compositor e nao engasga junto com a troca de pagina. */
+  .nav-marcador {
+    position: absolute;
+    left: 0; bottom: -6px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--azul);
+    pointer-events: none;
+    transition: transform .32s cubic-bezier(.22, .61, .36, 1),
+                width .32s cubic-bezier(.22, .61, .36, 1),
+                opacity .2s ease;
+  }
   .nav-item:hover .nav-link .fa-chevron-down,
   .nav-item:focus-within .nav-link .fa-chevron-down { transform: rotate(180deg); }
 
