@@ -183,21 +183,6 @@ export interface Regiao {
   totalPosts?: number
 }
 
-/** Vaga divulgada pelo portal (vem da API). */
-export interface Vaga {
-  id: string
-  titulo: string
-  slug: string
-  empresa: string
-  local: string
-  regime: string
-  modelo: string
-  descricao: string
-  emailCandidatura: string | null
-  status: string
-  publicadoEm: string
-}
-
 /** Assunto em alta (tag com contagem). */
 /** Recado da redação na faixa do topo — vale só pelo dia em que foi cadastrado. */
 export type TipoAviso = 'urgente' | 'informacao' | 'acontecendo'

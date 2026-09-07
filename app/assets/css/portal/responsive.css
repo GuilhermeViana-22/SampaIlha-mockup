@@ -22,6 +22,8 @@
     .footer-top { grid-template-columns: 1fr; }
     .footer-bottom { flex-direction: column; gap: 12px; }
     .job-card { flex-direction: column; align-items: flex-start; }
+    /* Empilhado, a foto passa a valer como abertura do card. */
+    .job-card__foto { width: 100%; height: 160px; }
   }
 
   @media (max-width: 1024px) {

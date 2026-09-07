@@ -120,7 +120,8 @@ server/                         # proxy para a API Python — nada de regra de n
     └── adaptadores.ts          # tradução de campos (title↔titulo, views↔leituras…)
 │
 shared/
-├── types/content.ts            # Post, Categoria, Regiao, Vaga, EventoAgenda…
+├── types/content.ts            # Post, Categoria, Regiao, EventoAgenda…
+├── types/vaga.ts               # Vaga, status e listas de regime/modelo
 └── utils/taxonomia.ts          # tipos, status, capas e gerarSlug (editorias vêm da API)
 │
 legacy/                         # o mockup HTML original, preservado para consulta
@@ -152,6 +153,7 @@ legacy/                         # o mockup HTML original, preservado para consul
 | `/admin/posts/novo` · `/admin/posts/[id]` | Formulário de criação/edição com prévia |
 | `/admin/midia-kit` | Acervo para patrocinadores: logos, PDFs e documentos (só no painel) |
 | `/admin/publicidade` | Banners da coluna lateral: arte, link e período contratado |
+| `/admin/vagas` · `/admin/vagas/nova` · `/admin/vagas/[id]` | Vagas de emprego: foto, descrição, link e data de publicação |
 | `/admin/newsletter` | Inscritos + exportação CSV |
 | `/admin/configuracoes` | Taxonomia, sessão e restauração do conteúdo original |
 

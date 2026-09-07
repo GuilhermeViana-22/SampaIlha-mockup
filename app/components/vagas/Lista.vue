@@ -1,19 +1,21 @@
 <script setup lang="ts">
-import type { Vaga } from '#shared/types/content'
+/**
+ * Mural de vagas de /vagas — só o que está aberto.
+ *
+ * A store é a mesma do painel: quem acabou de publicar uma vaga vê aqui
+ * exatamente o que gravou, sem um segundo contrato de leitura para manter.
+ */
+const vagas = useVagasStore()
 
-/** Vagas divulgadas pelo portal — vêm da API. */
-const { data, status } = await useFetch<{ itens: Vaga[], total: number }>('/api/vagas', {
-  key: 'vagas',
-  default: () => ({ itens: [], total: 0 }),
-})
+await vagas.carregar()
 </script>
 
 <template>
   <div>
-    <VagasCard v-for="vaga in data.itens" :key="vaga.id" :vaga="vaga" />
+    <VagasCard v-for="vaga in vagas.noAr" :key="vaga.id" :vaga="vaga" />
 
     <ComumEstadoVazio
-      v-if="!data.itens.length && status !== 'pending'"
+      v-if="!vagas.noAr.length && !vagas.carregando"
       titulo="Nenhuma vaga aberta no momento"
       descricao="Assim que uma nova oportunidade for recebida pela redação, ela aparece aqui."
       icone="fas fa-briefcase"

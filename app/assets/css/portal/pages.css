@@ -98,15 +98,29 @@
     padding: 20px 24px; display: flex; justify-content: space-between; align-items: center;
     gap: 16px; margin-bottom: 14px; flex-wrap: wrap;
   }
+  /*
+     A foto entra na altura do card, não no topo: a vaga é uma linha de mural,
+     e uma imagem de largura inteira empurraria o título e a data — o que o
+     candidato precisa ler primeiro — para baixo da dobra em telas pequenas.
+  */
+  .job-card__foto {
+    width: 120px; height: 90px; border-radius: 8px; object-fit: cover;
+    flex-shrink: 0; background: var(--cinza-1);
+  }
+  .job-card__corpo { flex: 1 1 260px; min-width: 0; }
   .job-card__title { font-family: var(--fonte-serif); font-size: 1.05rem; margin-bottom: 6px; }
   .job-card__meta { font-size: .8rem; color: var(--cinza-4); display: flex; gap: 14px; flex-wrap: wrap; }
   .job-card__meta i { margin-right: 4px; color: var(--azul); }
+  .job-card__descricao {
+    font-size: .85rem; color: var(--cinza-4); margin-top: 8px; white-space: pre-line;
+  }
   .job-card__cta {
     background: var(--azul); color: #fff; border: none; padding: 10px 20px;
     border-radius: 6px; font-size: .85rem; font-weight: 600; cursor: pointer;
     white-space: nowrap; transition: background .2s;
   }
   .job-card__cta:hover { background: var(--azul-mid); }
+  .job-card__cta i { margin-left: 6px; font-size: .75rem; }
 
   /* ── CRONOGRAMA (Festival) ── */
   .schedule { display: flex; flex-direction: column; gap: 12px; margin: 20px 0; }

@@ -5,10 +5,25 @@
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: production-stage
+    # Imagem pronta, construida fora da VPS. A VPS so faz `pull`.
+    #
+    # Antes aqui havia um `build:`, e o Dokploy compilava o Nuxt no servidor.
+    # Nao cabia: a maquina tem 1 nucleo e 4 GB, o build pede ~1,7 GB de RAM e
+    # ocupa o nucleo inteiro por minutos. Nesse intervalo Traefik, MySQL e o
+    # proprio SSH ficam sem CPU — a VPS travava a cada deploy do front, com o
+    # site no ar.
+    #
+    # Para publicar uma versao nova, na maquina de quem desenvolve:
+    #
+    #     ./scripts/publicar-imagem.sh
+    #
+    # e depois um deploy no painel do Dokploy, que so puxa a imagem.
+    #
+    # Para voltar a compilar na VPS (nao recomendado), troque esta linha por:
+    #
+    #     build: { context: ., dockerfile: Dockerfile, target: production-stage }
+    image: ${IMAGEM_WEB:-ghcr.io/guilhermeviana-22/sampailha-web:latest}
+    pull_policy: always
     expose:
       - "9042"
     environment:

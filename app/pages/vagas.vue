@@ -19,13 +19,7 @@ const { data } = await useListaConteudo('vagas-conteudo', { categoria: 'vagas', 
     <div class="container">
       <div class="layout">
         <main class="page-content">
-          <ComumAviso>
-            <strong>Seção nova,</strong> sugerida como diferencial do portal: aqui entrarão as vagas
-            recebidas diariamente. As vagas abaixo são exemplos de diagramação e serão substituídas
-            por oportunidades reais.
-          </ComumAviso>
-
-          <ComumCabecalhoSecao titulo="Vagas em Destaque" />
+          <ComumCabecalhoSecao titulo="Vagas abertas" />
           <VagasLista />
 
           <template v-if="data.itens.length">
