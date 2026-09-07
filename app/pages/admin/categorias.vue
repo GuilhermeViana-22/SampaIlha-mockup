@@ -73,6 +73,59 @@ async function criar() {
   }
 }
 
+/** Categorias com o interruptor em movimento — trava só a linha, não a tabela. */
+const alternando = ref<string[]>([])
+
+/**
+ * Liga ou desliga o destaque de uma categoria na barra do topo.
+ *
+ * A troca é escrita na API e a taxonomia é recarregada: a mesma store alimenta
+ * a barra do site e esta tabela, então o menu do portal muda junto, sem
+ * recarregar a página.
+ *
+ * A última editoria em destaque não pode sair — a barra de categorias ficaria
+ * só com "Todos", e o site perderia a navegação por editoria inteira.
+ */
+async function alternarDestaque(categoria: Categoria) {
+  const id = categoria.id
+  if (!id || alternando.value.includes(id)) return
+
+  const passaASerDestaque = !categoria.destaqueNoMenu
+
+  if (!passaASerDestaque && portal.categoriasDoMenu.length <= 1) {
+    avisar.alerta(
+      'Esta é a única categoria no topo.',
+      'Coloque outra em destaque antes de tirar esta — senão a barra do site fica vazia.',
+    )
+    return
+  }
+
+  alternando.value.push(id)
+
+  try {
+    await $fetch(`/api/taxonomia/categorias/${id}`, {
+      method: 'PUT',
+      body: { destaqueNoMenu: passaASerDestaque },
+    })
+    await portal.carregarTaxonomia(true)
+
+    avisar.sucesso(
+      passaASerDestaque
+        ? `“${categoria.nome}” agora aparece no topo do site.`
+        : `“${categoria.nome}” saiu do topo do site.`,
+      passaASerDestaque
+        ? 'Ela entra na barra de categorias e no menu principal.'
+        : `A seção /categoria/${categoria.slug} continua no ar, só não fica mais na barra.`,
+    )
+  }
+  catch (e: unknown) {
+    avisar.erro(e, `Não foi possível mudar o destaque de “${categoria.nome}”.`)
+  }
+  finally {
+    alternando.value = alternando.value.filter(x => x !== id)
+  }
+}
+
 /**
  * Remove a categoria.
  *
@@ -224,9 +277,17 @@ async function remover(categoria: Categoria) {
               </TableCell>
               <TableCell class="text-xs text-muted-foreground">/categoria/{{ categoria.slug }}</TableCell>
               <TableCell>
-                <Badge :variant="categoria.destaqueNoMenu ? 'secondary' : 'outline'">
-                  {{ categoria.destaqueNoMenu ? 'Sim' : 'Não' }}
-                </Badge>
+                <div class="flex items-center gap-2">
+                  <Switch
+                    :model-value="categoria.destaqueNoMenu"
+                    :disabled="alternando.includes(categoria.id ?? '')"
+                    :aria-label="`Mostrar ${categoria.nome} no topo do site`"
+                    @update:model-value="alternarDestaque(categoria)"
+                  />
+                  <span class="text-xs text-muted-foreground">
+                    {{ categoria.destaqueNoMenu ? 'No topo' : 'Fora do topo' }}
+                  </span>
+                </div>
               </TableCell>
               <TableCell class="text-right tabular-nums">{{ categoria.totalPosts ?? 0 }}</TableCell>
               <TableCell class="text-right">
