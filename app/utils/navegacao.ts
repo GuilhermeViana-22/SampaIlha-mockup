@@ -85,6 +85,7 @@ export interface ItemMenuAdmin extends ItemMenu {
 export const MENU_ADMIN: ItemMenuAdmin[] = [
   { rotulo: 'Dashboard', para: '/admin/dashboard', icone: 'LayoutDashboard' },
   { rotulo: 'Conteúdos', para: '/admin/posts', icone: 'FileText' },
+  { rotulo: 'Dicas & Guias', para: '/admin/guias', icone: 'Lightbulb' },
   { rotulo: 'Mídia Kit', para: '/admin/midia-kit', icone: 'File' },
   { rotulo: 'Avisos', para: '/admin/avisos', icone: 'Megaphone', soChefe: true },
   // Cadastrar e tirar banner do ar é decisão comercial: a API só aceita de

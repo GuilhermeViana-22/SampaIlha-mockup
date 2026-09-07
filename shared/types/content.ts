@@ -6,6 +6,9 @@
 /** Cada conteúdo do portal é uma dessas três coisas. */
 export type PostTipo = 'noticia' | 'dica' | 'informacao'
 
+/** Status de um guia. */
+export type GuiaStatus = 'publicado' | 'rascunho'
+
 /**
  * O que a peça do mídia kit é.
  *
@@ -174,6 +177,33 @@ export interface Categoria {
 }
 
 export type BadgeCor = 'blue' | 'cyan' | 'red' | 'green' | 'purple' | 'gold' | 'gray'
+
+export interface Guia {
+  id: string
+  titulo: string
+  slug: string
+  resumo: string
+  /** Corpo em texto simples; parágrafos separados por linha em branco. */
+  conteudo: string
+  categoria: string
+  categoriaNome: string
+  autor: string
+  icone: string
+  capa: CapaGradiente
+  imagemUrl: string | null
+  destaque: boolean
+  tags: string[]
+  status: GuiaStatus
+  leituras: number
+  tempoLeitura: number
+  publicadoEm: string
+  atualizadoEm: string
+  caminho: string
+}
+
+/** Campos aceitos ao criar/editar um guia pelo dashboard. */
+export type GuiaInput = Omit<Guia, 'id' | 'atualizadoEm' | 'leituras' | 'caminho' | 'categoriaNome'> &
+  Partial<Pick<Guia, 'leituras'>>
 
 export interface Regiao {
   slug: string

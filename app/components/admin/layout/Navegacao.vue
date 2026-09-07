@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
   BriefcaseIcon, CalendarDaysIcon, FileIcon, FileTextIcon, GraduationCapIcon, ImageIcon, LayoutDashboardIcon,
-  MailIcon, MegaphoneIcon, SettingsIcon, TagsIcon, UserCircleIcon, UsersIcon,
+  LightbulbIcon, MailIcon, MegaphoneIcon, SettingsIcon, TagsIcon, UserCircleIcon, UsersIcon,
 } from '@lucide/vue'
 
 /**
@@ -13,6 +13,7 @@ const icones: Record<string, unknown> = {
   LayoutDashboard: LayoutDashboardIcon,
   FileText: FileTextIcon,
   File: FileIcon,
+  Lightbulb: LightbulbIcon,
   Mail: MailIcon,
   Settings: SettingsIcon,
   Megaphone: MegaphoneIcon,
@@ -26,7 +27,7 @@ const icones: Record<string, unknown> = {
 }
 
 /** Onde o menu deve continuar aceso ao entrar em uma página filha. */
-const SECOES_COM_SUBROTAS = ['/admin/posts', '/admin/workshops', '/admin/eventos', '/admin/vagas']
+const SECOES_COM_SUBROTAS = ['/admin/posts', '/admin/guias', '/admin/workshops', '/admin/eventos', '/admin/vagas']
 
 const rota = useRoute()
 const posts = usePostsStore()
