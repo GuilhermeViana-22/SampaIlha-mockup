@@ -6,8 +6,14 @@
 /** Cada conteúdo do portal é uma dessas três coisas. */
 export type PostTipo = 'noticia' | 'dica' | 'informacao'
 
-/** Status de um guia. */
-export type GuiaStatus = 'publicado' | 'rascunho'
+/**
+ * Status de um guia.
+ *
+ * O guia é um post de `type=dica`, então herda os quatro status do post: um
+ * guia salvo por editor volta da API como `em_revisao`, e a etiqueta do painel
+ * precisa saber desenhá-lo.
+ */
+export type GuiaStatus = PostStatus
 
 /**
  * O que a peça do mídia kit é.

@@ -37,11 +37,11 @@
     "vue-sonner": "^2.0.9"
   },
   "devDependencies": {
-    "@nuxt/test-utils": "^3.14.4",
-    "@vue/test-utils": "^2.4.6",
-    "happy-dom": "^15.11.6",
+    "@vitejs/plugin-vue": "^6.0.8",
+    "@vue/test-utils": "^2.5.0",
+    "happy-dom": "^20.14.0",
     "typescript": "~5.9",
-    "vitest": "^2.1.8",
+    "vitest": "^4.1.11",
     "vue-tsc": "^3.3.10"
   }
 }

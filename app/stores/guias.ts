@@ -53,6 +53,8 @@ export const useGuiasStore = defineStore('guias', () => {
     baixados: itens.value.length,
     publicados: itens.value.filter(g => g.status === 'publicado').length,
     rascunhos: itens.value.filter(g => g.status === 'rascunho').length,
+    emRevisao: itens.value.filter(g => g.status === 'em_revisao').length,
+    agendados: itens.value.filter(g => g.status === 'agendado').length,
     leituras: itens.value.reduce((soma, g) => soma + g.leituras, 0),
   }))
 
@@ -151,11 +153,19 @@ export const useGuiasStore = defineStore('guias', () => {
     }
   }
 
+  /**
+   * Muda o status direto da tabela (PATCH dedicado na API).
+   *
+   * Reenviar o guia inteiro num PUT — como se fazia aqui — grava de volta o
+   * item da listagem, que vem sem o corpo do texto: publicar pela tabela
+   * apagava o conteúdo do guia. A API tem a palavra final sobre o status: um
+   * editor pedindo `publicado` recebe de volta `em_revisao`.
+   */
   async function mudarStatus(guia: Guia, novo: GuiaStatus): Promise<Guia | null> {
     try {
-      const atualizado = await $fetch<Guia>(`/api/guias/${guia.id}`, {
-        method: 'PUT',
-        body: { ...guia, status: novo },
+      const atualizado = await $fetch<Guia>(`/api/guias/${guia.id}/status`, {
+        method: 'PATCH',
+        params: { status: novo },
       })
       itens.value = itens.value.map(g => (g.id === guia.id ? atualizado : g))
       return atualizado
@@ -173,10 +183,7 @@ export const useGuiasStore = defineStore('guias', () => {
 
   async function alternarDestaque(guia: Guia): Promise<Guia | null> {
     try {
-      const atualizado = await $fetch<Guia>(`/api/guias/${guia.id}`, {
-        method: 'PUT',
-        body: { ...guia, destaque: !guia.destaque },
-      })
+      const atualizado = await $fetch<Guia>(`/api/guias/${guia.id}/destaque`, { method: 'PATCH' })
       itens.value = itens.value.map(g => (g.id === guia.id ? atualizado : g))
       return atualizado
     }
@@ -188,6 +195,10 @@ export const useGuiasStore = defineStore('guias', () => {
 
   /**
    * Busca o guia completo para edição.
+   *
+   * Sempre vai à API: o item da lista vem do endpoint de listagem, que não
+   * carrega o corpo do texto — abrir o formulário a partir dele apagaria o
+   * guia ao salvar.
    */
   async function buscarPorId(id: string): Promise<Guia | null> {
     try {

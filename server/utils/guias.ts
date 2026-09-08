@@ -1,83 +1,75 @@
-import type { BadgeCor, CapaGradiente, Guia } from '../../shared/types/content'
-import { urlAbsoluta, urlRelativa } from './adaptadores'
+import type { Guia } from '../../shared/types/content'
+import type { ApiPost } from './adaptadores'
+import { paraPayloadApi, paraPost } from './adaptadores'
 
 /**
- * Tradução entre o contrato da API Python (inglês, snake_case) e o modelo
- * usado no front (português) para guias.
+ * Guia é a dica vista pelo painel.
+ *
+ * Não existe tabela de guias na API: o que o painel chama de guia é um post de
+ * `type=dica` — o mesmo registro que o site público lê em `/dicas`. Antes estas
+ * rotas guardavam os guias num array em memória do Nitro, o que dava a
+ * impressão de funcionar dentro de uma sessão e perdia tudo no primeiro
+ * restart do contêiner; nada do que era criado no painel chegava ao site.
+ *
+ * Aqui fica só a tradução entre o vocabulário do painel (português) e o
+ * contrato da API (inglês, snake_case) — a mesma divisão de
+ * `utils/adaptadores.ts`, de onde vêm as funções de post reaproveitadas.
  */
 
-export interface ApiGuia {
-  id: string
-  status: 'publicado' | 'rascunho'
-  title: string
-  slug: string
-  excerpt: string | null
-  content?: string
-  category: { slug: string, name: string, icon?: string | null, color?: string | null }
-  author_name: string
-  icon: string
-  cover: string
-  image_url: string | null
-  featured: boolean
-  tags: string[]
-  reading_time: number
-  views: number
-  published_at: string
-  updated_at: string
-  path: string
-}
+/** Tipo do post que representa um guia na API. */
+export const TIPO_GUIA = 'dica' as const
 
-export function paraGuia(api: ApiGuia): Guia {
+export function paraGuia(api: ApiPost): Guia {
+  const post = paraPost(api)
+
   return {
-    id: api.id,
-    status: api.status,
-    titulo: api.title,
-    slug: api.slug,
-    resumo: api.excerpt ?? '',
-    conteudo: api.content ?? '',
-    categoria: api.category.slug,
-    categoriaNome: api.category.name,
-    autor: api.author_name,
-    icone: api.icon,
-    capa: api.cover as CapaGradiente,
-    imagemUrl: urlAbsoluta(api.image_url),
-    destaque: api.featured,
-    tags: api.tags,
-    leituras: api.views,
-    tempoLeitura: api.reading_time,
-    publicadoEm: api.published_at,
-    atualizadoEm: api.updated_at,
-    caminho: api.path,
+    id: post.id,
+    status: post.status,
+    titulo: post.titulo,
+    slug: post.slug,
+    resumo: post.resumo,
+    conteudo: post.conteudo,
+    categoria: post.categoria,
+    categoriaNome: post.categoriaNome,
+    autor: post.autor,
+    icone: post.icone,
+    capa: post.capa,
+    imagemUrl: post.imagemUrl,
+    destaque: post.destaque,
+    tags: post.tags,
+    leituras: post.leituras,
+    tempoLeitura: post.tempoLeitura,
+    publicadoEm: post.publicadoEm,
+    atualizadoEm: post.atualizadoEm,
+    caminho: post.caminho,
   }
 }
 
-/** Corpo de criação/edição de guia, no formato que a API espera. */
+/**
+ * Corpo de criação/edição de guia, no formato que a API espera.
+ *
+ * O `type` vai fixo: quem edita pelo painel de guias não escolhe — e sem ele
+ * um PUT vindo do formulário transformaria a dica em notícia.
+ */
 export function paraPayloadGuia(dados: Record<string, any>): Record<string, unknown> {
-  const mapa: Record<string, string> = {
-    status: 'status',
-    titulo: 'title',
-    slug: 'slug',
-    resumo: 'excerpt',
-    conteudo: 'content',
-    categoria: 'category',
-    autor: 'author_name',
-    icone: 'icon',
-    capa: 'cover',
-    imagemUrl: 'image_url',
-    destaque: 'featured',
-    tags: 'tags',
-    tempoLeitura: 'reading_time',
-    publicadoEm: 'published_at',
+  return { ...paraPayloadApi(dados), type: TIPO_GUIA }
+}
+
+/** Filtros da listagem do painel → query string da API. */
+export function paramsListagemGuias(
+  query: Record<string, any>,
+  autenticado: boolean,
+): Record<string, unknown> {
+  return {
+    page: query.pagina ?? 1,
+    limit: query.limite ?? 20,
+    type: TIPO_GUIA,
+    status: autenticado && query.status && query.status !== 'todos' ? query.status : undefined,
+    category: query.categoria && query.categoria !== 'todas' ? query.categoria : undefined,
+    tag: query.tag || undefined,
+    author: query.autor || undefined,
+    featured: query.destaque === undefined ? undefined : query.destaque === 'true',
+    search: query.busca || undefined,
+    order: query.ordenar ?? 'recentes',
   }
-
-  const payload: Record<string, unknown> = {}
-  for (const [chave, valor] of Object.entries(dados)) {
-    const destino = mapa[chave]
-    if (destino !== undefined && valor !== undefined) payload[destino] = valor
-  }
-
-  // A capa volta do formulário como URL absoluta; a API guarda caminho relativo.
-  if (typeof payload.image_url === 'string') payload.image_url = urlRelativa(payload.image_url)
-
-  return payload
 }

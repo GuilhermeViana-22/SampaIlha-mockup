@@ -1,31 +1,17 @@
-import type { Guia, GuiaInput } from '#shared/types/content'
-
-/**
- * Criação de guias.
- * 
- * NOTA: Implementação temporária em memória até que a API Python
- * tenha o endpoint /guides implementado.
- */
-declare global {
-  var guiasMemoria: Guia[]
-}
+import type { Guia } from '../../../shared/types/content'
+import type { ApiPost } from '../../utils/adaptadores'
+import { paraGuia, paraPayloadGuia } from '../../utils/guias'
+import { chamarApi } from '../../utils/api'
 
 export default defineEventHandler(async (event): Promise<Guia> => {
-  const corpo = await readBody<GuiaInput>(event)
+  const corpo = await readBody<Record<string, unknown>>(event)
 
-  const novoGuia: Guia = {
-    id: crypto.randomUUID(),
-    ...corpo,
-    categoriaNome: 'Categoria', // Será calculado pela API real
-    leituras: 0,
-    tempoLeitura: corpo.tempoLeitura || 3,
-    publicadoEm: corpo.publicadoEm || new Date().toISOString(),
-    atualizadoEm: new Date().toISOString(),
-    caminho: `/guias/${corpo.slug}`,
-  }
-
-  globalThis.guiasMemoria.push(novoGuia)
+  const criado = await chamarApi<ApiPost>(event, '/posts', {
+    method: 'POST',
+    body: paraPayloadGuia(corpo ?? {}),
+    requerSessao: true,
+  })
 
   setResponseStatus(event, 201)
-  return novoGuia
+  return paraGuia(criado)
 })

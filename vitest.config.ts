@@ -6,8 +6,12 @@ export default defineConfig({
   plugins: [vue()],
   test: {
     environment: 'happy-dom',
+    setupFiles: ['./test/setup.ts'],
     include: ['**/*.test.{ts,js}', '**/*.spec.{ts,js}'],
-    exclude: ['node_modules', '.nuxt', '.output', 'dist'],
+    // Os padrões precisam ser globos completos: `'node_modules'` sozinho não
+    // exclui `node_modules/**`, e o vitest sairia varrendo os testes de todas
+    // as dependências.
+    exclude: ['**/node_modules/**', '**/.nuxt/**', '**/.output/**', '**/dist/**'],
     root: fileURLToPath(new URL('./', import.meta.url)),
     coverage: {
       provider: 'v8',

@@ -108,8 +108,9 @@ async function salvar(publicar = false) {
   if (publicar && salvo.status === 'publicado') {
     avisar.sucesso('Guia publicado!', `"${salvo.titulo}" já está no ar.`)
   }
-  else if (publicar && salvo.status === 'rascunho') {
-    avisar.alerta('Guia salvo como rascunho.', 'A publicação requer aprovação do editor-chefe.')
+  else if (publicar) {
+    // Editor não publica sozinho: a API devolve o guia em revisão.
+    avisar.alerta('Guia enviado para revisão.', 'A publicação requer aprovação do editor-chefe.')
   }
   else {
     avisar.sucesso('Guia salvo.', 'As alterações foram guardadas no painel.')
@@ -181,7 +182,7 @@ function cancelar() {
             <div>
               <Label for="slug">Slug (URL)</Label>
               <div class="mt-2 flex gap-2">
-                <span class="flex items-center text-sm text-muted-foreground">/guias/</span>
+                <span class="flex items-center text-sm text-muted-foreground">/dicas/</span>
                 <Input
                   id="slug"
                   v-model="form.slug"

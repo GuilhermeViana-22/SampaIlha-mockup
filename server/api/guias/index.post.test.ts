@@ -1,128 +1,101 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import type { Guia, GuiaInput } from '#shared/types/content'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { criarEvento } from '../../../test/setup'
+import { chamarApi } from '../../utils/api'
+import handler from './index.post'
 
-declare global {
-  var guiasMemoria: Guia[]
+vi.mock('../../utils/api', () => ({
+  chamarApi: vi.fn(),
+  temSessao: vi.fn(() => true),
+}))
+
+const chamar = vi.mocked(chamarApi)
+
+const criadoNaApi = {
+  id: 'g-novo',
+  type: 'dica',
+  status: 'rascunho',
+  title: 'Guia de Teste',
+  slug: 'guia-de-teste',
+  excerpt: 'Resumo',
+  content: 'Conteúdo',
+  category: { slug: 'turismo', name: 'Turismo' },
+  region: null,
+  author_name: 'Autor Teste',
+  icon: 'fas fa-lightbulb',
+  cover: 'bg-1',
+  image_url: null,
+  featured: false,
+  tags: ['turismo'],
+  reading_time: 5,
+  views: 0,
+  published_at: '2026-09-08T10:00:00',
+  updated_at: '2026-09-08T10:00:00',
+  path: '/dicas/guia-de-teste',
 }
 
-describe('API de Guias - POST /api/guias', () => {
+const formulario = {
+  status: 'rascunho',
+  titulo: 'Guia de Teste',
+  slug: 'guia-de-teste',
+  resumo: 'Resumo',
+  conteudo: 'Conteúdo',
+  categoria: 'turismo',
+  autor: 'Autor Teste',
+  icone: 'fas fa-lightbulb',
+  capa: 'bg-1',
+  imagemUrl: null,
+  destaque: false,
+  tags: ['turismo'],
+  tempoLeitura: 5,
+}
+
+describe('POST /api/guias', () => {
   beforeEach(() => {
-    globalThis.guiasMemoria = []
+    vi.clearAllMocks()
+    chamar.mockResolvedValue(criadoNaApi)
   })
 
-  afterEach(() => {
-    globalThis.guiasMemoria = []
+  it('grava a dica na API — o guia sobrevive ao restart do contêiner', async () => {
+    await handler(criarEvento({ body: formulario }))
+
+    expect(chamar).toHaveBeenCalledWith(expect.anything(), '/posts', expect.objectContaining({
+      method: 'POST',
+      requerSessao: true,
+      body: expect.objectContaining({ type: 'dica', title: 'Guia de Teste', category: 'turismo' }),
+    }))
   })
 
-  it('deve criar um novo guia com dados válidos', () => {
-    const corpo: GuiaInput = {
-      status: 'publicado',
+  it('exige sessão: criar guia é ação de painel', async () => {
+    await handler(criarEvento({ body: formulario }))
+
+    const [, , opcoes] = chamar.mock.calls[0] as any
+    expect(opcoes.requerSessao).toBe(true)
+  })
+
+  it('responde 201 com o guia já traduzido', async () => {
+    const evento = criarEvento({ body: formulario })
+
+    const guia = await handler(evento)
+
+    expect(evento.status).toBe(201)
+    expect(guia).toMatchObject({
+      id: 'g-novo',
       titulo: 'Guia de Teste',
-      slug: 'guia-de-teste',
-      resumo: 'Resumo do guia',
-      conteudo: 'Conteúdo do guia',
-      categoria: 'turismo',
-      autor: 'Autor Teste',
-      icone: 'fas fa-map',
-      capa: 'bg-1',
-      imagemUrl: null,
-      destaque: false,
-      tags: ['turismo', 'teste'],
-      tempoLeitura: 5,
-      publicadoEm: new Date().toISOString(),
-    }
-
-    const novoGuia: Guia = {
-      id: crypto.randomUUID(),
-      ...corpo,
-      categoriaNome: 'Categoria',
+      caminho: '/dicas/guia-de-teste',
       leituras: 0,
-      tempoLeitura: corpo.tempoLeitura || 3,
-      publicadoEm: corpo.publicadoEm || new Date().toISOString(),
-      atualizadoEm: new Date().toISOString(),
-      caminho: `/guias/${corpo.slug}`,
-    }
-
-    globalThis.guiasMemoria.push(novoGuia)
-
-    expect(globalThis.guiasMemoria).toHaveLength(1)
-    expect(globalThis.guiasMemoria[0].id).toBeDefined()
-    expect(globalThis.guiasMemoria[0].titulo).toBe('Guia de Teste')
-    expect(globalThis.guiasMemoria[0].leituras).toBe(0)
-    expect(globalThis.guiasMemoria[0].caminho).toBe('/guias/guia-de-teste')
+    })
   })
 
-  it('deve gerar ID único para cada guia', () => {
-    const corpo: GuiaInput = {
-      status: 'publicado',
-      titulo: 'Guia 1',
-      slug: 'guia-1',
-      resumo: 'Resumo',
-      conteudo: 'Conteúdo',
-      categoria: 'turismo',
-      autor: 'Autor',
-      icone: 'fas fa-map',
-      capa: 'bg-1',
-      imagemUrl: null,
-      destaque: false,
-      tags: [],
-    }
+  it('devolve o id do servidor — é ele que a tela de edição usa', async () => {
+    const guia = await handler(criarEvento({ body: formulario }))
 
-    const guia1: Guia = {
-      id: crypto.randomUUID(),
-      ...corpo,
-      categoriaNome: 'Categoria',
-      leituras: 0,
-      tempoLeitura: 3,
-      publicadoEm: new Date().toISOString(),
-      atualizadoEm: new Date().toISOString(),
-      caminho: `/guias/${corpo.slug}`,
-    }
-
-    const guia2: Guia = {
-      id: crypto.randomUUID(),
-      ...corpo,
-      titulo: 'Guia 2',
-      slug: 'guia-2',
-      caminho: '/guias/guia-2',
-    }
-
-    globalThis.guiasMemoria.push(guia1, guia2)
-
-    expect(globalThis.guiasMemoria[0].id).not.toBe(globalThis.guiasMemoria[1].id)
+    expect(guia.id).toBe('g-novo')
   })
 
-  it('deve definir valores padrão para campos opcionais', () => {
-    const corpo: GuiaInput = {
-      status: 'publicado',
-      titulo: 'Guia de Teste',
-      slug: 'guia-de-teste',
-      resumo: 'Resumo',
-      conteudo: 'Conteúdo',
-      categoria: 'turismo',
-      autor: 'Autor',
-      icone: 'fas fa-map',
-      capa: 'bg-1',
-      imagemUrl: null,
-      destaque: false,
-      tags: [],
-    }
+  it('não inventa corpo quando o POST chega vazio', async () => {
+    await handler(criarEvento({ body: undefined }))
 
-    const novoGuia: Guia = {
-      id: crypto.randomUUID(),
-      ...corpo,
-      categoriaNome: 'Categoria',
-      leituras: 0,
-      tempoLeitura: corpo.tempoLeitura || 3,
-      publicadoEm: corpo.publicadoEm || new Date().toISOString(),
-      atualizadoEm: new Date().toISOString(),
-      caminho: `/guias/${corpo.slug}`,
-    }
-
-    globalThis.guiasMemoria.push(novoGuia)
-
-    expect(globalThis.guiasMemoria[0].leituras).toBe(0)
-    expect(globalThis.guiasMemoria[0].tempoLeitura).toBe(3)
-    expect(globalThis.guiasMemoria[0].atualizadoEm).toBeDefined()
+    const [, , opcoes] = chamar.mock.calls[0] as any
+    expect(opcoes.body).toEqual({ type: 'dica' })
   })
 })

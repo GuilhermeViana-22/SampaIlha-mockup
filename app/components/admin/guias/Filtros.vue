@@ -38,6 +38,8 @@ const temFiltro = computed(() => {
           <SelectItem value="todos">Todos os status</SelectItem>
           <SelectItem value="publicado">Publicado</SelectItem>
           <SelectItem value="rascunho">Rascunho</SelectItem>
+          <SelectItem value="em_revisao">Em revisão</SelectItem>
+          <SelectItem value="agendado">Agendado</SelectItem>
         </SelectContent>
       </Select>
 

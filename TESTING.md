@@ -1,66 +1,65 @@
-# Testes - CRUD de Dicas & Guias
+# Testes — Dicas & Guias
 
-## Instalação das Dependências de Teste
+O painel chama de **guia** o que a API guarda como post de `type=dica`: é o
+mesmo registro que o site público lê em `/dicas`. Não existe tabela de guias, e
+as rotas de `server/api/guias/` são só um repasse para `/posts` da API Python.
 
-```bash
-npm install
-```
-
-Isso instalará as dependências de teste adicionadas:
-- `vitest` - Framework de testes
-- `@nuxt/test-utils` - Utilitários para testar Nuxt
-- `@vue/test-utils` - Utilitários para testar componentes Vue
-- `happy-dom` - Implementação leve do DOM para testes
-
-## Rodar os Testes
+## Rodar
 
 ```bash
-# Modo watch (desenvolvimento)
-npm test
-
-# Modo único (CI/CD)
-npm run test:run
+npm install        # uma vez
+npm test           # modo watch
+npm run test:run   # execução única (CI)
 ```
 
-## Estrutura dos Testes
+O runner é o **vitest** com **happy-dom**. `test/setup.ts` instala como globais
+os auto-imports que o Nuxt injeta em produção — `useRuntimeConfig`, `$fetch`, os
+ajudantes do h3 (`defineEventHandler`, `getQuery`, `readBody`…) e `ref`/`computed`
+do Vue. É o que permite importar a rota e a store **de verdade** dentro do teste,
+em vez de reescrever a lógica delas no `it()`.
 
-### Backend (API)
+Para testar uma rota, `defineEventHandler` devolve a própria função e o "evento"
+é o objeto de `criarEvento({ query, body, params })`:
 
-- `server/api/guias/index.get.test.ts` - Testes de listagem, filtros e paginação
-- `server/api/guias/index.post.test.ts` - Testes de criação de guias
+```ts
+import { criarEvento } from '../../../test/setup'
+import handler from './index.get'
 
-### Frontend (Store)
+const resposta = await handler(criarEvento({ query: { pagina: 2 } }))
+```
 
-- `app/stores/guias.test.ts` - Testes do store Pinia (placeholder, precisa de configuração adicional)
+## O que está coberto
 
-### Frontend (Componentes)
+| Arquivo | Cobre |
+| --- | --- |
+| `server/utils/guias.test.ts` | tradução API ↔ painel: `paraGuia`, `paraPayloadGuia` (força `type=dica`, descarta campos do servidor, devolve a foto ao caminho relativo) e `paramsListagemGuias` (filtros → query da API) |
+| `server/api/guias/index.get.test.ts` | listagem: busca em `/posts?type=dica`, repassa filtros, ignora `status` de quem não tem sessão, propaga erro da API |
+| `server/api/guias/index.post.test.ts` | criação: grava na API, exige sessão, responde 201 com o guia traduzido |
+| `server/api/guias/[id].test.ts` | leitura, edição, exclusão e os PATCH de status e destaque |
+| `app/stores/guias.test.ts` | store Pinia: carregar/paginar, criar, atualizar, remover, publicar, destacar, filtros, ordenação e contagens |
 
-- Testes de componentes podem ser adicionados usando `@vue/test-utils`
+## Verificação manual do CRUD
 
-## Observações
-
-1. **Dependências não instaladas**: Os erros do TypeScript atuais são porque as dependências de teste ainda não foram instaladas. Após rodar `npm install`, os erros desaparecerão.
-
-2. **Testes de API**: Os testes atuais testam a lógica de filtragem e paginação diretamente, sem mocks complexos do h3. Isso garante que a lógica de negócio está correta.
-
-3. **Testes de Store**: O teste do store é um placeholder. Para testar stores Pinia completamente, é necessário configurar o `createPinia` no setup de testes.
-
-4. **Testes de Componentes**: Testes de componentes Vue podem ser adicionados usando `@vue/test-utils` e `@nuxt/test-utils`, mas requerem configuração adicional do Nuxt.
-
-## Próximos Passos para Testes Completos
-
-1. Instalar dependências: `npm install`
-2. Configurar setup do Pinia para testes de store
-3. Adicionar testes de componentes usando `@nuxt/test-utils`
-4. Adicionar testes E2E usando Playwright (já está configurado no projeto)
-5. Configurar CI/CD para rodar testes automaticamente
-
-## Testes E2E com Playwright
-
-O projeto já tem Playwright configurado. Para testar o CRUD de forma end-to-end:
+Os testes acima não sobem servidor. Para conferir que o guia criado no painel
+chega ao site, com a API em `localhost:9041` e `npm run dev` em `localhost:3000`:
 
 ```bash
-npx playwright test
+curl -s -c /tmp/c.txt -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"admin@portalsampanailha.com.br","senha":"SUA_SENHA"}'
+
+ID=$(curl -s -b /tmp/c.txt -X POST localhost:3000/api/guias -H 'Content-Type: application/json' \
+  -d '{"status":"rascunho","titulo":"Guia de teste","slug":"guia-de-teste","resumo":"r","conteudo":"<p>c</p>","categoria":"turismo","tags":[]}' \
+  | python3 -c 'import sys,json;print(json.load(sys.stdin)["id"])')
+
+curl -s -b /tmp/c.txt -X PATCH "localhost:3000/api/guias/$ID/status?status=publicado"
+curl -s localhost:3000/dicas | grep "Guia de teste"       # site público
+curl -s -b /tmp/c.txt "localhost:3000/admin/guias/$ID" | grep "Guia de teste"   # painel
+curl -s -b /tmp/c.txt -X DELETE "localhost:3000/api/guias/$ID"
 ```
 
-Isso abrirá o navegador e testará o fluxo completo de criação, edição e exclusão de guias.
+## Ainda não coberto
+
+- Componentes (`.vue`) e navegação do painel — `@vue/test-utils` já está
+  instalado, mas nenhum componente tem teste.
+- Testes end-to-end com navegador. Não há Playwright no projeto; a verificação
+  de ponta a ponta é a sequência de `curl` acima.

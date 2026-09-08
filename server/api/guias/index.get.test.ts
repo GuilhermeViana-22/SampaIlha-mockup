@@ -1,201 +1,105 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
-import type { Guia } from '#shared/types/content'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { criarEvento } from '../../../test/setup'
+import { chamarApi, temSessao } from '../../utils/api'
+import handler from './index.get'
 
-// Mock do armazenamento global
-declare global {
-  var guiasMemoria: Guia[]
+vi.mock('../../utils/api', () => ({
+  chamarApi: vi.fn(),
+  temSessao: vi.fn(() => false),
+}))
+
+const chamar = vi.mocked(chamarApi)
+const sessao = vi.mocked(temSessao)
+
+function respostaDaApi(items: any[] = [], total = items.length) {
+  return { items, pagination: { total } }
 }
 
-describe('API de Guias - GET /api/guias', () => {
+const dicaDaApi = {
+  id: 'g-1',
+  type: 'dica',
+  status: 'publicado',
+  title: 'Como chegar a Parintins',
+  slug: 'como-chegar-a-parintins',
+  excerpt: 'Barco, avião e mala.',
+  category: { slug: 'turismo', name: 'Turismo' },
+  region: null,
+  author_name: 'Redação Portal',
+  icon: 'fas fa-lightbulb',
+  cover: 'bg-3',
+  image_url: null,
+  featured: false,
+  tags: [],
+  reading_time: 7,
+  views: 142,
+  published_at: '2026-08-01T12:00:00',
+  updated_at: '2026-08-01T12:00:00',
+  path: '/dicas/como-chegar-a-parintins',
+}
+
+describe('GET /api/guias', () => {
   beforeEach(() => {
-    globalThis.guiasMemoria = []
+    vi.clearAllMocks()
+    sessao.mockReturnValue(false)
   })
 
-  afterEach(() => {
-    globalThis.guiasMemoria = []
+  it('busca as dicas na API do portal, e não numa lista em memória', async () => {
+    chamar.mockResolvedValue(respostaDaApi([dicaDaApi]))
+
+    const resposta = await handler(criarEvento())
+
+    expect(chamar).toHaveBeenCalledWith(expect.anything(), '/posts', expect.objectContaining({
+      params: expect.objectContaining({ type: 'dica' }),
+    }))
+    expect(resposta.total).toBe(1)
+    expect(resposta.itens[0]).toMatchObject({ id: 'g-1', titulo: 'Como chegar a Parintins' })
   })
 
-  it('deve inicializar armazenamento global', () => {
-    expect(globalThis.guiasMemoria).toBeDefined()
-    expect(Array.isArray(globalThis.guiasMemoria)).toBe(true)
+  it('devolve o envelope { itens, total } que a store espera', async () => {
+    chamar.mockResolvedValue(respostaDaApi([dicaDaApi], 37))
+
+    const resposta = await handler(criarEvento())
+
+    expect(Object.keys(resposta).sort()).toEqual(['itens', 'total'])
+    // O total é o do servidor, não o tamanho da página baixada.
+    expect(resposta.total).toBe(37)
   })
 
-  it('deve adicionar guia ao armazenamento', () => {
-    const guia: Guia = {
-      id: '1',
-      status: 'publicado',
-      titulo: 'Guia de Teste',
-      slug: 'guia-de-teste',
-      resumo: 'Resumo do guia',
-      conteudo: 'Conteúdo do guia',
-      categoria: 'turismo',
-      categoriaNome: 'Turismo',
-      autor: 'Autor Teste',
-      icone: 'fas fa-map',
-      capa: 'bg-1',
-      imagemUrl: null,
-      destaque: false,
-      tags: ['turismo', 'teste'],
-      leituras: 100,
-      tempoLeitura: 5,
-      publicadoEm: new Date().toISOString(),
-      atualizadoEm: new Date().toISOString(),
-      caminho: '/guias/guia-de-teste',
-    }
+  it('repassa os filtros do painel para a API', async () => {
+    sessao.mockReturnValue(true)
+    chamar.mockResolvedValue(respostaDaApi())
 
-    globalThis.guiasMemoria.push(guia)
-    
-    expect(globalThis.guiasMemoria).toHaveLength(1)
-    expect(globalThis.guiasMemoria[0].titulo).toBe('Guia de Teste')
+    await handler(criarEvento({
+      query: { pagina: 2, limite: 60, status: 'rascunho', categoria: 'turismo', busca: 'ilha', ordenar: 'lidos' },
+    }))
+
+    expect(chamar).toHaveBeenCalledWith(expect.anything(), '/posts', expect.objectContaining({
+      auth: true,
+      params: expect.objectContaining({
+        page: 2,
+        limit: 60,
+        type: 'dica',
+        status: 'rascunho',
+        category: 'turismo',
+        search: 'ilha',
+        order: 'lidos',
+      }),
+    }))
   })
 
-  it('deve filtrar por status', () => {
-    const guiaPublicado: Guia = {
-      id: '1',
-      status: 'publicado',
-      titulo: 'Guia Publicado',
-      slug: 'guia-publicado',
-      resumo: 'Resumo',
-      conteudo: 'Conteúdo',
-      categoria: 'turismo',
-      categoriaNome: 'Turismo',
-      autor: 'Autor',
-      icone: 'fas fa-map',
-      capa: 'bg-1',
-      imagemUrl: null,
-      destaque: false,
-      tags: [],
-      leituras: 0,
-      tempoLeitura: 5,
-      publicadoEm: new Date().toISOString(),
-      atualizadoEm: new Date().toISOString(),
-      caminho: '/guias/guia-publicado',
-    }
+  it('não manda token — nem pede rascunho — para o visitante do site', async () => {
+    chamar.mockResolvedValue(respostaDaApi())
 
-    const guiaRascunho: Guia = {
-      ...guiaPublicado,
-      id: '2',
-      status: 'rascunho',
-      titulo: 'Guia Rascunho',
-      slug: 'guia-rascunho',
-      caminho: '/guias/guia-rascunho',
-    }
+    await handler(criarEvento({ query: { status: 'rascunho' } }))
 
-    globalThis.guiasMemoria.push(guiaPublicado, guiaRascunho)
-    
-    const filtrados = globalThis.guiasMemoria.filter(g => g.status === 'publicado')
-    
-    expect(filtrados).toHaveLength(1)
-    expect(filtrados[0].status).toBe('publicado')
+    const [, , opcoes] = chamar.mock.calls[0] as any
+    expect(opcoes.auth).toBe(false)
+    expect(opcoes.params.status).toBeUndefined()
   })
 
-  it('deve filtrar por categoria', () => {
-    const guiaTurismo: Guia = {
-      id: '1',
-      status: 'publicado',
-      titulo: 'Guia Turismo',
-      slug: 'guia-turismo',
-      resumo: 'Resumo',
-      conteudo: 'Conteúdo',
-      categoria: 'turismo',
-      categoriaNome: 'Turismo',
-      autor: 'Autor',
-      icone: 'fas fa-map',
-      capa: 'bg-1',
-      imagemUrl: null,
-      destaque: false,
-      tags: [],
-      leituras: 0,
-      tempoLeitura: 5,
-      publicadoEm: new Date().toISOString(),
-      atualizadoEm: new Date().toISOString(),
-      caminho: '/guias/guia-turismo',
-    }
+  it('propaga a falha da API em vez de devolver lista vazia', async () => {
+    chamar.mockRejectedValue(new Error('API fora do ar'))
 
-    const guiaCultura: Guia = {
-      ...guiaTurismo,
-      id: '2',
-      titulo: 'Guia Cultura',
-      slug: 'guia-cultura',
-      categoria: 'cultura',
-      categoriaNome: 'Cultura',
-      caminho: '/guias/guia-cultura',
-    }
-
-    globalThis.guiasMemoria.push(guiaTurismo, guiaCultura)
-    
-    const filtrados = globalThis.guiasMemoria.filter(g => g.categoria === 'turismo')
-    
-    expect(filtrados).toHaveLength(1)
-    expect(filtrados[0].categoria).toBe('turismo')
-  })
-
-  it('deve filtrar por termo de busca', () => {
-    const guiaTeste: Guia = {
-      id: '1',
-      status: 'publicado',
-      titulo: 'Guia de Parintins',
-      slug: 'guia-parintins',
-      resumo: 'Tudo sobre Parintins',
-      conteudo: 'Conteúdo',
-      categoria: 'turismo',
-      categoriaNome: 'Turismo',
-      autor: 'Autor',
-      icone: 'fas fa-map',
-      capa: 'bg-1',
-      imagemUrl: null,
-      destaque: false,
-      tags: ['parintins', 'festival'],
-      leituras: 0,
-      tempoLeitura: 5,
-      publicadoEm: new Date().toISOString(),
-      atualizadoEm: new Date().toISOString(),
-      caminho: '/guias/guia-parintins',
-    }
-
-    globalThis.guiasMemoria.push(guiaTeste)
-    
-    const termo = 'parintins'
-    const filtrados = globalThis.guiasMemoria.filter(g =>
-      g.titulo.toLowerCase().includes(termo) ||
-      g.resumo.toLowerCase().includes(termo) ||
-      g.tags.some(t => t.toLowerCase().includes(termo))
-    )
-    
-    expect(filtrados).toHaveLength(1)
-  })
-
-  it('deve paginar resultados', () => {
-    for (let i = 1; i <= 25; i++) {
-      globalThis.guiasMemoria.push({
-        id: String(i),
-        status: 'publicado',
-        titulo: `Guia ${i}`,
-        slug: `guia-${i}`,
-        resumo: 'Resumo',
-        conteudo: 'Conteúdo',
-        categoria: 'turismo',
-        categoriaNome: 'Turismo',
-        autor: 'Autor',
-        icone: 'fas fa-map',
-        capa: 'bg-1',
-        imagemUrl: null,
-        destaque: false,
-        tags: [],
-        leituras: 0,
-        tempoLeitura: 5,
-        publicadoEm: new Date().toISOString(),
-        atualizadoEm: new Date().toISOString(),
-        caminho: `/guias/guia-${i}`,
-      })
-    }
-    
-    const pagina = 2
-    const limite = 10
-    const inicio = (pagina - 1) * limite
-    const itens = globalThis.guiasMemoria.slice(inicio, inicio + limite)
-    
-    expect(itens).toHaveLength(10)
-    expect(globalThis.guiasMemoria.length).toBe(25)
+    await expect(handler(criarEvento())).rejects.toThrow('API fora do ar')
   })
 })
