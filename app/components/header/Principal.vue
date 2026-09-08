@@ -1,7 +1,12 @@
 <script setup lang="ts">
-import { CONTATO } from '~/utils/navegacao'
-
-/** Cabeçalho fixo: logo, navegação, busca e ações. */
+/**
+ * Cabeçalho fixo: logo, navegação, busca e ações.
+ *
+ * A marca aparece só como imagem. O nome e a tagline que ficavam ao lado dela
+ * saíram do topo — seguem no rodapé — e o espaço que ocupavam virou tamanho de
+ * logo, no desktop e no celular. O nome acessível do link para a home passou a
+ * ser o `alt` da imagem.
+ */
 const portal = usePortalStore()
 const marca = useMarcaStore()
 </script>
@@ -11,10 +16,6 @@ const marca = useMarcaStore()
     <div class="header-inner">
       <NuxtLink to="/" class="logo">
         <img :src="marca.logo" class="logo__img" alt="Portal Sampa na Ilha" width="235" height="240">
-        <div>
-          <div class="logo__name">Sampa na Ilha</div>
-          <div class="logo__tagline">{{ CONTATO.tagline }}</div>
-        </div>
       </NuxtLink>
 
       <HeaderNavegacao />

@@ -42,9 +42,12 @@
   }
 
   @media (max-width: 860px) {
-    .header-inner { padding: 0 16px; gap: 12px; height: 72px; }
+    :root { --altura-cabecalho: 84px; }
+    .header-inner { padding: 0 16px; gap: 12px; }
     .logo { min-width: 0; }
-    .logo__img { height: 54px; }
+    .logo__img { height: 68px; }
+    /* Estas duas já não existem no cabeçalho — valem para a marca do rodapé,
+       que mantém nome e tagline. */
     .logo__name { font-size: 1.05rem; white-space: nowrap; }
     .logo__tagline { display: none; }
     .container { padding: 0 16px; }

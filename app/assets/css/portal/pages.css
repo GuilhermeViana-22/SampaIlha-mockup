@@ -60,7 +60,9 @@
   .share-btn--x { background: #000; }
   .share-btn--copy { background: var(--cinza-4); }
   .share-bar--floating {
-    position: sticky; top: 96px; display: flex; flex-direction: column;
+    /* 5px de folga sobre a borda do cabeçalho. */
+    position: sticky; top: calc(var(--altura-cabecalho) + var(--borda-cabecalho) + 5px);
+    display: flex; flex-direction: column;
     width: fit-content; margin-bottom: 0;
   }
 

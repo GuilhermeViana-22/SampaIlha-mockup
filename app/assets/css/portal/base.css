@@ -49,6 +49,14 @@
     --sombra-md: 0 4px 16px rgba(0,0,0,.10);
     --sombra-lg: 0 12px 40px rgba(0,0,0,.15);
     --raio: 8px;
+
+    /* Altura do cabeçalho fixo. Fica aqui porque não é só o header que a usa:
+       o filtro de editorias e a barra de compartilhamento grudam logo abaixo
+       dele e precisavam repetir o número na mão — quando a logo cresceu, os
+       dois ficaram para trás. O valor do celular está em responsive.css. */
+    --altura-cabecalho: 100px;
+    /* A borda inferior azul do cabeçalho, que também cobre quem gruda nele. */
+    --borda-cabecalho: 3px;
   }
 
   html { scroll-behavior: smooth; }

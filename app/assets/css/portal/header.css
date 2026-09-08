@@ -15,11 +15,15 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    height: 88px;
+    height: var(--altura-cabecalho);
     gap: 24px;
   }
   .logo { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-  .logo__img { height: 70px; width: auto; display: block; flex-shrink: 0; }
+  /* Sem o nome e a tagline ao lado, a logo cresce para ocupar o topo: a altura
+     dela puxa a do `.header-inner`, que precisa de folga para o link não
+     encostar na borda inferior azul. */
+  .logo__img { height: 88px; width: auto; display: block; flex-shrink: 0; }
+  /* `.logo__name` e `.logo__tagline` continuam em uso no rodapé. */
   .logo__name { font-family: var(--fonte-serif); font-size: 1.25rem; font-weight: 900; color: var(--azul); line-height: 1.1; }
   .logo__tagline { font-size: .65rem; color: var(--cinza-4); text-transform: uppercase; letter-spacing: .08em; }
 
