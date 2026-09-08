@@ -35,10 +35,17 @@ ENV NODE_OPTIONS=--max-old-space-size=1536
 # commit — reinstalando tudo, e pagando a memoria disso, em todo deploy.
 COPY package.json package-lock.json ./
 
-# `--omit=dev` deixa de fora typescript e vue-tsc, que so servem ao
-# `npm run typecheck` — o `nuxt build` transpila com esbuild e nao precisa
-# deles. Sao 20 MB e alguns segundos a menos em cada deploy, e o build passa a
-# falhar de verdade se algum dia alguem importar uma dev dependency no runtime.
+# `--omit=dev` mantem o ferramental de teste (vitest, happy-dom,
+# @vue/test-utils) fora da VPS: eles sao devDependencies e nunca chegam a ser
+# baixados aqui. Medido nesta imagem, o `node_modules` do build tem 406 MB e
+# 474 pacotes com ou sem os testes declarados no package.json — a diferenca
+# fica em 0 MB, e o build passa a falhar de verdade se algum dia alguem
+# importar uma dev dependency no runtime.
+#
+# O que este flag NAO tira: `typescript` e `vue-tsc` continuam vindo de carona
+# (pinia depende de typescript; o nuxt, de vite-plugin-checker, que depende de
+# vue-tsc). Sao dependencias de producao de terceiros, nao ha como omiti-las
+# sem quebrar a instalacao.
 #
 # `--ignore-scripts` pula o postinstall (`nuxt prepare`), que nao teria como
 # rodar aqui: o nuxt.config e o app/ so chegam no COPY seguinte. O `nuxt build`

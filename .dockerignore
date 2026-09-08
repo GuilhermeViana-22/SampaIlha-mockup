@@ -11,3 +11,17 @@ dist
 .vscode
 .idea
 legacy
+
+# Ferramentas de desenvolvimento. Nada disto e lido pelo `nuxt build`, e manter
+# fora do contexto tem um efeito pratico: um commit que mexe so em teste deixa
+# de invalidar a camada do `COPY . .` e a VPS reaproveita o build anterior em
+# vez de recompilar o Nuxt do zero.
+**/*.test.ts
+**/*.spec.ts
+test
+vitest.config.ts
+
+# Sao para rodar na maquina de quem desenvolve, nao dentro da imagem.
+scripts
+docker-compose*.yml
+.github
