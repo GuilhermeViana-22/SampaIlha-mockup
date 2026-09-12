@@ -39,5 +39,5 @@
   }
   .info-card i { font-size: 1.2rem; color: var(--amarelo); flex-shrink: 0; margin-top: 3px; }
   .info-card h3 { font-family: var(--fonte-serif); font-size: 1rem; margin-bottom: 5px; }
-  .info-card p { font-size: .85rem; color: var(--cinza-4); margin: 0; line-height: 1.6; }
+  .info-card p { font-size: var(--texto-corpo); color: var(--cinza-4); margin: 0; line-height: 1.6; }
 }

@@ -58,6 +58,9 @@ export const MENU_PRINCIPAL: ItemPrincipal[] = [
   // "Dicas" é tipo de conteúdo, não editoria — não existe no banco de
   // categorias, então continua fixa aqui.
   { rotulo: 'Dicas', para: '/dicas', icone: 'fas fa-lightbulb' },
+  // O podcast deixou de ser rascunho: a seção passou a ter cadastro no painel
+  // e feed próprio, então entra no menu como qualquer outra.
+  { rotulo: 'Podcast', para: '/podcast', icone: 'fas fa-microphone-lines' },
   {
     categoria: 'cultura',
     filhos: [
@@ -91,6 +94,7 @@ export const MENU_ADMIN: ItemMenuAdmin[] = [
   // Cadastrar e tirar banner do ar é decisão comercial: a API só aceita de
   // quem administra o portal, e o menu segue a mesma régua.
   { rotulo: 'Publicidade', para: '/admin/publicidade', icone: 'Image', soChefe: true },
+  { rotulo: 'Podcast', para: '/admin/podcast', icone: 'Mic' },
   { rotulo: 'Vagas', para: '/admin/vagas', icone: 'Briefcase' },
   { rotulo: 'Workshops', para: '/admin/workshops', icone: 'GraduationCap' },
   { rotulo: 'Eventos', para: '/admin/eventos', icone: 'CalendarDays' },
@@ -109,14 +113,25 @@ export const RODAPE_EDITORIAS: ItemMenu[] = [
   { rotulo: 'Cultura', para: '/categoria/cultura' },
 ]
 
+/*
+   "Anuncie" e "Área da redação" saíram a pedido do cliente: o primeiro não
+   tinha página própria (caía em /informacoes como os vizinhos) e o segundo
+   levava o leitor direto para a tela de login do painel. O acesso da equipe
+   continua em /admin, citado na página de Informações & Serviço.
+*/
+/*
+   Termos de Uso e Política de Privacidade saíram desta lista: não são rota,
+   abrem em modal (`utils/legal.ts` + `ComumModalLegal`) pelo rodapé e pelo
+   aviso de cookies. Mandar quem quer conferir uma cláusula para /informacoes
+   tirava a pessoa da matéria e ainda dependia de alguém cadastrar o texto no
+   painel — documento jurídico não pode depender disso.
+*/
 export const RODAPE_PORTAL: ItemMenu[] = [
   { rotulo: 'Quem Somos', para: '/quem-somos' },
   { rotulo: 'Informações & Serviço', para: '/informacoes' },
   { rotulo: 'Contato', para: '/informacoes' },
-  { rotulo: 'Anuncie', para: '/informacoes' },
+  { rotulo: 'Podcast', para: '/podcast' },
   { rotulo: 'Trabalhe Conosco', para: '/vagas' },
-  { rotulo: 'Política de Privacidade', para: '/informacoes' },
-  { rotulo: 'Área da redação', para: '/admin' },
 ]
 
 /** Número oficial de atendimento, só com dígitos — é o formato do wa.me. */

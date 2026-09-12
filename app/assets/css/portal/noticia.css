@@ -10,9 +10,9 @@
   .post-capa .post-cover { margin-bottom: 0; }
   .post-cover { width: 100%; aspect-ratio: 16/9; border-radius: var(--raio); overflow: hidden; position: relative; margin-bottom: 24px; box-shadow: var(--sombra-md); }
   .post-cover .img-bg i { font-size: 4rem; }
-  .post-body p { font-size: 1rem; color: var(--escuro); margin-bottom: 18px; line-height: 1.85; }
+  .post-body p { font-size: var(--texto-corpo); color: var(--escuro); margin-bottom: 18px; line-height: 1.85; }
   .post-body ul { margin: 0 0 18px 20px; color: var(--escuro); list-style: disc; }
-  .post-body li { margin-bottom: 8px; line-height: 1.75; font-size: .97rem; }
+  .post-body li { margin-bottom: 8px; line-height: 1.75; font-size: var(--texto-corpo); }
   .post-body li::marker { color: var(--azul); }
   .post-body blockquote {
     border-left: 4px solid var(--azul); background: var(--azul-leve);
@@ -31,8 +31,28 @@
      sem isso a mesma matéria mostra o crédito em dois tamanhos diferentes,
      dependendo de a foto ser a de cima ou uma do meio do texto. */
   .post-body figcaption { font-size: .82rem; line-height: 1.45; color: var(--cinza-4); text-align: center; margin-top: 8px; }
-  /* O crédito é subordinado à legenda: linha própria e um degrau menor. */
-  .post-body .foto-texto__credito { display: block; font-size: .72rem; color: var(--cinza-3); margin-top: 3px; }
+
+  /* Legenda e crédito na mesma linha, alinhados pelo baseline.
+     Empilhados, o crédito ganhava peso de segunda legenda e afastava o texto
+     da matéria da foto sem precisar. Lado a lado eles leem como uma linha só
+     de apoio — e o `baseline` é o que faz os dois tamanhos de letra assentarem
+     na mesma régua, coisa que `center` não dá. Quebra em duas linhas quando
+     não couber, seguindo centralizado. */
+  .post-body .foto-texto {
+    display: flex; flex-wrap: wrap;
+    align-items: baseline; justify-content: center;
+    column-gap: 8px; row-gap: 2px;
+  }
+  /* O crédito continua um degrau menor: é subordinado à legenda, não par dela. */
+  .post-body .foto-texto__credito { font-size: .72rem; color: var(--cinza-3); }
+  /* Separador só quando há crédito depois — sem ele os dois textos viram uma
+     frase só ("Praia ao entardecer Divulgação"). Ele fica preso ao fim da
+     legenda, e não na frente do crédito: assim, quando a linha quebra no
+     celular, o ponto quebra junto com a legenda em vez de aparecer pendurado
+     abrindo a linha de baixo. O espaço é inquebrável pelo mesmo motivo. */
+  .post-body .foto-texto > span:has(+ .foto-texto__credito)::after {
+    content: '\00a0·'; color: var(--cinza-3);
+  }
 
   /* Alinhamento vindo da barra do editor. Chega como classe, não como
      `style="text-align"`: o valid_elements limpa atributo que o portal não

@@ -23,6 +23,18 @@
      dela puxa a do `.header-inner`, que precisa de folga para o link não
      encostar na borda inferior azul. */
   .logo__img { height: 88px; width: auto; display: block; flex-shrink: 0; }
+  /* Rótulo ao lado da marca, em caixa alta e no verde do tema. O
+     `text-transform` deixa o texto legível no código e maiúsculo na tela. */
+  .logo__portal {
+    font-family: var(--fonte-serif);
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--cor-primaria);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
   /* `.logo__name` e `.logo__tagline` continuam em uso no rodapé. */
   .logo__name { font-family: var(--fonte-serif); font-size: 1.25rem; font-weight: 900; color: var(--azul); line-height: 1.1; }
   .logo__tagline { font-size: .65rem; color: var(--cinza-4); text-transform: uppercase; letter-spacing: .08em; }

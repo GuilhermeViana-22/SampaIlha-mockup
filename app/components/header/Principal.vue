@@ -2,10 +2,10 @@
 /**
  * Cabeçalho fixo: logo, navegação, busca e ações.
  *
- * A marca aparece só como imagem. O nome e a tagline que ficavam ao lado dela
- * saíram do topo — seguem no rodapé — e o espaço que ocupavam virou tamanho de
- * logo, no desktop e no celular. O nome acessível do link para a home passou a
- * ser o `alt` da imagem.
+ * Ao lado da imagem da marca vai só "Portal de Notícias", em caixa alta e no
+ * verde da marca. O nome e a tagline que ficavam ali saíram do topo — seguem
+ * no rodapé — e o espaço que sobrou virou tamanho de logo, no desktop e no
+ * celular.
  */
 const portal = usePortalStore()
 const marca = useMarcaStore()
@@ -16,6 +16,7 @@ const marca = useMarcaStore()
     <div class="header-inner">
       <NuxtLink to="/" class="logo">
         <img :src="marca.logo" class="logo__img" alt="Portal Sampa na Ilha" width="235" height="240">
+        <span class="logo__portal">Portal de Notícias</span>
       </NuxtLink>
 
       <HeaderNavegacao />

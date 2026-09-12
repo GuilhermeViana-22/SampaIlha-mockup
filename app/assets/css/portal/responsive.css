@@ -46,6 +46,7 @@
     .header-inner { padding: 0 16px; gap: 12px; }
     .logo { min-width: 0; }
     .logo__img { height: 68px; }
+    .logo__portal { font-size: .95rem; letter-spacing: .04em; }
     /* Estas duas já não existem no cabeçalho — valem para a marca do rodapé,
        que mantém nome e tagline. */
     .logo__name { font-size: 1.05rem; white-space: nowrap; }
@@ -56,6 +57,8 @@
   }
 
   @media (max-width: 560px) {
+    /* Com os três botões de ação na mesma linha, o rótulo não cabe mais. */
+    .logo__portal { display: none; }
     .btn-subscribe__rotulo { display: none; }
     .btn-subscribe { padding: 8px 12px; }
     .header-actions { gap: 6px; }

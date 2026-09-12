@@ -45,6 +45,12 @@
        continuam porque o CSS das páginas já os referencia. */
     --fonte-serif: Arial, Helvetica, sans-serif;
     --fonte-sans:  Arial, Helvetica, sans-serif;
+    /* Corpo de texto do portal: 16px. O pedido do cliente era subir a leitura
+       de 14px para 16px, e o texto das matérias (`.post-body p`) já estava
+       nesse tamanho — o token alinha as páginas institucionais e os blocos de
+       texto corrido ao mesmo valor, sem mexer nos rótulos de interface
+       (metadados, etiquetas, menus), que seguem na escala menor de propósito. */
+    --texto-corpo: 1rem;
     --sombra-sm: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.05);
     --sombra-md: 0 4px 16px rgba(0,0,0,.10);
     --sombra-lg: 0 12px 40px rgba(0,0,0,.15);
@@ -119,7 +125,10 @@
 
   /* ── VOLTAR AO TOPO ── */
   .voltar-topo {
-    position: fixed; right: 18px; bottom: 18px; z-index: 90;
+    /* A barra de cookies mora no mesmo canto e publica a própria altura;
+       enquanto ela estiver na tela, o botão espera acima dela. */
+    position: fixed; right: 18px; bottom: calc(18px + var(--altura-aviso-cookies, 0px)); z-index: 90;
+    transition: bottom .28s ease;
     width: 46px; height: 46px; border-radius: 50%;
     border: none; cursor: pointer;
     background: var(--azul); color: var(--cor-primaria-contraste);
@@ -134,6 +143,6 @@
 
   /* No celular sobe um pouco para não brigar com a barra do navegador. */
   @media (max-width: 640px) {
-    .voltar-topo { right: 14px; bottom: calc(14px + env(safe-area-inset-bottom, 0px)); }
+    .voltar-topo { right: 14px; bottom: calc(14px + max(var(--altura-aviso-cookies, 0px), env(safe-area-inset-bottom, 0px))); }
   }
 }
