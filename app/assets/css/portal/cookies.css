@@ -1,0 +1,111 @@
+@layer portal {
+  /* ── AVISO DE COOKIES ─────────────────────────────────────────────
+     Barra presa ao rodapé da janela. Fundo escuro do rodapé para ler
+     como "conversa do site com o leitor", e não como parte da matéria.
+     ──────────────────────────────────────────────────────────────── */
+  .aviso-cookies {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 250;
+    background: var(--cor-rodape, #0d1b2a);
+    color: color-mix(in srgb, var(--cor-rodape-contraste, #fff) 78%, transparent);
+    border-top: 3px solid var(--ciano);
+    box-shadow: 0 -8px 32px rgba(0,0,0,.28);
+    padding: 18px 24px calc(18px + env(safe-area-inset-bottom, 0px));
+    /* A barra não pode crescer mais que a janela: com o painel aberto no
+       celular os botões de decisão ficariam fora da tela, sem rolagem. */
+    max-height: 85vh; overflow-y: auto;
+  }
+
+  .aviso-cookies__conteudo {
+    max-width: 1280px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 24px;
+  }
+
+  .aviso-cookies__texto { min-width: 0; }
+  .aviso-cookies__texto h2 {
+    font-size: .95rem; font-weight: 700;
+    color: var(--cor-rodape-contraste, #fff);
+    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
+  }
+  .aviso-cookies__texto h2 i { color: var(--ciano); }
+  .aviso-cookies__texto p { font-size: .84rem; line-height: 1.6; max-width: 78ch; }
+
+  /* É um <button> (abre o modal), mas tem de ler como link no meio do texto. */
+  .aviso-cookies__link {
+    font: inherit; background: none; border: 0; padding: 0; cursor: pointer;
+    color: var(--ciano); font-weight: 600; text-decoration: underline;
+    text-underline-offset: 3px; white-space: nowrap;
+  }
+
+  .aviso-cookies__acoes { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+
+  /* Aceitar e rejeitar têm o mesmo peso visual de propósito: a LGPD pede que
+     recusar seja tão fácil quanto aceitar, e o botão apagado ao lado do
+     colorido é justamente o padrão escuro que ela mira. */
+  .aviso-cookies__btn {
+    font-family: inherit; font-size: .82rem; font-weight: 600;
+    padding: 11px 18px; border-radius: var(--raio); cursor: pointer;
+    border: 1px solid color-mix(in srgb, var(--cor-rodape-contraste, #fff) 32%, transparent);
+    background: transparent;
+    color: var(--cor-rodape-contraste, #fff);
+    display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
+    transition: background .2s, border-color .2s, color .2s, transform .2s;
+  }
+  .aviso-cookies__btn:hover {
+    background: color-mix(in srgb, var(--cor-rodape-contraste, #fff) 12%, transparent);
+    transform: translateY(-1px);
+  }
+  .aviso-cookies__btn--principal {
+    background: var(--ciano); border-color: var(--ciano); color: #1a1205;
+  }
+  .aviso-cookies__btn--principal:hover {
+    background: color-mix(in srgb, var(--ciano) 85%, #fff);
+    border-color: color-mix(in srgb, var(--ciano) 85%, #fff);
+  }
+
+  /* ── PAINEL "PERSONALIZAR" ── */
+  .aviso-cookies__painel {
+    max-width: 1280px; margin: 16px auto 0;
+    padding-top: 16px;
+    border-top: 1px solid color-mix(in srgb, var(--cor-rodape-contraste, #fff) 15%, transparent);
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px 24px;
+  }
+  .aviso-cookies__categoria p { font-size: .78rem; line-height: 1.6; margin-top: 5px; }
+
+  .aviso-cookies__interruptor {
+    display: flex; align-items: center; gap: 9px; cursor: pointer;
+    font-size: .85rem; font-weight: 600; color: var(--cor-rodape-contraste, #fff);
+  }
+  .aviso-cookies__interruptor input { width: 17px; height: 17px; accent-color: var(--ciano); cursor: pointer; }
+  .aviso-cookies__interruptor input:disabled { cursor: default; opacity: .55; }
+  .aviso-cookies__interruptor em {
+    font-style: normal; font-size: .7rem; font-weight: 500; text-transform: uppercase;
+    letter-spacing: .06em; opacity: .6;
+  }
+  /* O botão de salvar ocupa a linha inteira abaixo das categorias. */
+  .aviso-cookies__painel .aviso-cookies__acoes { grid-column: 1 / -1; justify-content: flex-end; }
+
+  .aviso-cookies-enter-active, .aviso-cookies-leave-active { transition: transform .28s ease, opacity .28s ease; }
+  .aviso-cookies-enter-from, .aviso-cookies-leave-to { transform: translateY(100%); opacity: 0; }
+
+  /* ── LINK DE REABRIR, NO RODAPÉ ── */
+  .footer-cookies {
+    font: inherit; background: none; border: none; padding: 0; cursor: pointer;
+    color: inherit; text-decoration: underline; text-underline-offset: 3px;
+    transition: color .2s;
+  }
+  .footer-cookies:hover { color: var(--ciano); }
+
+  @media (max-width: 900px) {
+    .aviso-cookies__painel { grid-template-columns: 1fr 1fr; }
+  }
+
+  @media (max-width: 768px) {
+    .aviso-cookies { padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)); }
+    .aviso-cookies__conteudo { flex-direction: column; align-items: stretch; gap: 14px; }
+    .aviso-cookies__painel { grid-template-columns: 1fr; }
+    /* Empilhados, os botões dividem a largura em vez de virar uma coluna alta. */
+    .aviso-cookies__acoes { flex-wrap: wrap; }
+    .aviso-cookies__btn { flex: 1 1 40%; justify-content: center; }
+    .aviso-cookies__painel .aviso-cookies__acoes { justify-content: stretch; }
+  }
+}

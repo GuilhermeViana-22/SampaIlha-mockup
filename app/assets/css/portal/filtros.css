@@ -102,3 +102,25 @@
 
   .estado-vazio__acao { display: flex; justify-content: center; margin-top: 18px; }
 }
+
+@layer portal {
+  /* ── VER MAIS (rodapé das listagens) ── */
+  .ver-mais {
+    display: flex; flex-direction: column; align-items: center; gap: 12px;
+    padding: 28px 0 8px; text-align: center;
+  }
+  .ver-mais__contador { font-size: .85rem; color: var(--cinza-4); margin: 0; }
+  .ver-mais__contador strong { color: var(--escuro); font-weight: 700; }
+  .ver-mais__botao {
+    background: var(--azul); color: var(--cor-primaria-contraste);
+    border: none; padding: 12px 28px; border-radius: 8px;
+    font-family: var(--fonte-sans); font-size: .95rem; font-weight: 600;
+    cursor: pointer; transition: background .2s, transform .2s;
+    display: inline-flex; align-items: center; gap: 9px;
+  }
+  .ver-mais__botao:hover:not(:disabled) { background: var(--azul-mid); transform: translateY(-2px); }
+  .ver-mais__botao:disabled { opacity: .6; cursor: progress; transform: none; }
+  .ver-mais__erro { font-size: .85rem; color: var(--vermelho); font-weight: 600; margin: 0; }
+  /* O fim da lista é informação, não chamada: fica discreto. */
+  .ver-mais__fim { font-size: .8rem; color: var(--cinza-3); margin: 0; }
+}

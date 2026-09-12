@@ -10,8 +10,11 @@
 @import './cards.css';       /* cards de notícia (grid e lista) */
 @import './sidebar.css';     /* widgets: tempo, mais lidos, newsletter, tags, anúncio */
 @import './footer.css';      /* rodapé */
-@import './pages.css';       /* páginas internas: hero, conteúdo, vagas, podcast, cronograma */
+@import './pages.css';       /* páginas internas: hero, conteúdo, vagas, cronograma */
 @import './noticia.css';     /* página de matéria */
 @import './dicas.css';       /* seção de dicas & guias */
+@import './podcast.css';     /* feed de episódios e player embutido */
 @import './filtros.css';     /* trilho de filtro por editoria */
+@import './cookies.css';     /* aviso de consentimento de cookies */
+@import './legal.css';       /* termos de uso e política de privacidade (modal) */
 @import './responsive.css';  /* breakpoints — sempre por último */

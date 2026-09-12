@@ -1,4 +1,4 @@
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, isRef, reactive, ref, unref, watch } from 'vue'
 import { vi } from 'vitest'
 import type { H3Event } from 'h3'
 
@@ -37,6 +37,14 @@ export function criarEvento(parcial: Partial<EventoFalso> = {}): EventoFalso & H
 }
 
 /**
+ * O `useFetch` que os composables de página enxergam. Cada teste devolve por
+ * aqui o par `{ data, status }` que quiser — o que se quer exercitar é a
+ * lógica em volta da busca (acumular páginas, deduplicar, reiniciar no troca
+ * de filtro), não o `useFetch` do Nuxt.
+ */
+export const useFetchFalso = vi.fn()
+
+/**
  * O `$fetch` que as stores enxergam. Os testes configuram a resposta por aqui
  * (`fetchFalso.mockResolvedValue(...)`) — usar `globalThis.$fetch` traria o
  * tipo real do Nuxt, que não conhece os métodos de mock.
@@ -71,6 +79,8 @@ const globais = {
   }),
   useRequestHeaders: () => ({}),
   $fetch: fetchFalso,
+  useFetch: (...args: any[]) => useFetchFalso(...args),
+  toValue: (v: any) => (typeof v === 'function' ? v() : v?.value !== undefined || isRef(v) ? unref(v) : v),
 
   // h3
   defineEventHandler: (handler: any) => handler,

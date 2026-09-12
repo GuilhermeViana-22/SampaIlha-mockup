@@ -7,10 +7,11 @@ if (!regiao.value) {
   throw createError({ statusCode: 404, statusMessage: 'Região não encontrada.', fatal: true })
 }
 
-const { data, status } = await useListaConteudo('regiao', () => ({
+const {
+  itens, total, temMais, carregando, carregandoMais, erroMais, carregarMais,
+} = await useListaPaginada('regiao', () => ({
   regiao: rota.params.slug as string,
-  limite: 30,
-}))
+}), 24)
 
 useSeoMeta({
   title: () => `Região ${regiao.value!.nome} — Portal Sampa na Ilha`,
@@ -31,10 +32,21 @@ useSeoMeta({
       <div class="layout">
         <main>
           <ComumCabecalhoSecao :titulo="`Matérias da região ${regiao!.nome}`" />
-          <NoticiasGrade v-if="data.itens.length" :posts="data.itens.slice(0, 6)" />
-          <NoticiasLista v-if="data.itens.length > 6" :posts="data.itens.slice(6)" />
+          <NoticiasGrade v-if="itens.length" :posts="itens.slice(0, 6)" />
+          <NoticiasLista v-if="itens.length > 6" :posts="itens.slice(6)" />
+
+          <ComumVerMais
+            :mostrando="itens.length"
+            :total="total"
+            :tem-mais="temMais"
+            :carregando="carregandoMais"
+            :erro="erroMais"
+            substantivo="matérias"
+            @carregar="carregarMais"
+          />
+
           <ComumEstadoVazio
-            v-if="!data.itens.length && status !== 'pending'"
+            v-if="!itens.length && !carregando"
             titulo="Sem matérias nesta região por enquanto"
             descricao="Esta página reúne automaticamente tudo o que for publicado com a região selecionada."
             :icone="regiao!.icone"

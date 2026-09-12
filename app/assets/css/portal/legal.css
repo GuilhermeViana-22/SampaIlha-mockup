@@ -1,0 +1,161 @@
+@layer portal {
+  /* ── TERMOS DE USO / POLÍTICA DE PRIVACIDADE (modal) ──────────────
+     A caixa é alta e de leitura longa: cabeçalho e rodapé ficam fixos e só
+     o miolo rola, para o título do documento e o botão de fechar não sumirem
+     no meio da cláusula 9.
+     ──────────────────────────────────────────────────────────────── */
+  .legal-modal {
+    /* Acima do aviso de cookies (250): é de lá que sai um dos gatilhos, e a
+       barra continua na tela atrás do modal. */
+    position: fixed; inset: 0; z-index: 260;
+    background: rgba(6, 16, 30, .72);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+  }
+  .legal-modal__caixa {
+    position: relative;
+    display: flex; flex-direction: column;
+    width: 100%; max-width: 760px; max-height: min(88vh, 900px);
+    background: var(--branco);
+    border-radius: 14px;
+    box-shadow: var(--sombra-lg);
+    overflow: hidden;
+    outline: none;
+  }
+  /* Faixa da marca no topo, como no modal da newsletter. */
+  .legal-modal__caixa::before {
+    content: ''; position: absolute; inset: 0 0 auto; height: 5px;
+    background: linear-gradient(90deg, var(--azul), var(--ciano));
+  }
+
+  .legal-modal__topo {
+    display: flex; align-items: flex-start; gap: 16px;
+    padding: 28px 30px 18px;
+  }
+  .legal-modal__selo {
+    flex: none;
+    width: 48px; height: 48px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 50%;
+    background: var(--azul-leve); color: var(--azul);
+    font-size: 1.25rem;
+  }
+  .legal-modal__cabecalho { min-width: 0; padding-right: 34px; }
+  .legal-modal__titulo { font-family: var(--fonte-serif); font-size: 1.4rem; line-height: 1.25; }
+  .legal-modal__resumo { margin-top: 6px; font-size: .88rem; line-height: 1.6; color: var(--cinza-4); }
+  .legal-modal__vigencia {
+    margin-top: 8px; font-size: .74rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: .05em; color: var(--cinza-3);
+  }
+  .legal-modal__vigencia i { margin-right: 5px; }
+
+  .legal-modal__fechar {
+    position: absolute; top: 18px; right: 18px;
+    width: 32px; height: 32px; border: 0; border-radius: 8px;
+    background: var(--cinza-1); color: var(--cinza-4);
+    cursor: pointer; transition: background .2s, color .2s;
+  }
+  .legal-modal__fechar:hover { background: var(--cinza-2); color: var(--escuro); }
+
+  .legal-modal__abas {
+    display: flex; gap: 4px;
+    padding: 0 30px;
+    border-bottom: 1px solid var(--cinza-2);
+  }
+  .legal-modal__aba {
+    border: 0; background: none; cursor: pointer;
+    padding: 10px 14px; margin-bottom: -1px;
+    font-family: var(--fonte-sans); font-size: .85rem; font-weight: 600;
+    color: var(--cinza-4);
+    border-bottom: 2px solid transparent;
+    transition: color .2s, border-color .2s;
+  }
+  .legal-modal__aba:hover { color: var(--azul); }
+  .legal-modal__aba--ativa { color: var(--azul); border-bottom-color: var(--azul); }
+
+  .legal-modal__corpo {
+    flex: 1; min-height: 0; overflow-y: auto;
+    padding: 22px 30px 26px;
+    /* Rolar com o teclado precisa de foco, e o anel padrão do navegador em
+       volta do texto inteiro polui a leitura. */
+    outline: none;
+    scrollbar-width: thin;
+  }
+  .legal-modal__corpo:focus-visible { box-shadow: inset 0 0 0 2px var(--azul-leve); }
+
+  .legal-secao + .legal-secao { margin-top: 22px; }
+  .legal-secao h3 {
+    font-family: var(--fonte-serif); font-size: 1rem; line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .legal-secao p {
+    font-size: .9rem; line-height: 1.75; color: var(--cinza-4);
+  }
+  .legal-secao p + p { margin-top: 10px; }
+  .legal-secao ul {
+    margin-top: 10px; padding-left: 4px;
+    list-style: none; display: flex; flex-direction: column; gap: 8px;
+  }
+  .legal-secao li {
+    position: relative; padding-left: 20px;
+    font-size: .9rem; line-height: 1.7; color: var(--cinza-4);
+  }
+  .legal-secao li::before {
+    content: ''; position: absolute; left: 4px; top: .62em;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--ciano);
+  }
+  .legal-secao p + ul { margin-top: 8px; }
+  .legal-secao ul + p { margin-top: 12px; }
+
+  .legal-modal__rodape {
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    padding: 16px 30px;
+    border-top: 1px solid var(--cinza-2);
+    background: var(--cinza-1);
+  }
+  .legal-modal__rodape p { font-size: .8rem; color: var(--cinza-4); }
+  .legal-modal__rodape i { color: var(--ciano); margin-right: 6px; }
+  .legal-modal__rodape a { color: var(--azul); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+  .legal-modal__btn {
+    flex: none;
+    padding: 10px 20px; border: 0; border-radius: 8px;
+    background: var(--azul); color: #fff;
+    font-family: var(--fonte-sans); font-size: .88rem; font-weight: 700;
+    cursor: pointer; transition: background .2s;
+  }
+  .legal-modal__btn:hover { background: var(--azul-mid); }
+
+  .legal-modal-enter-active, .legal-modal-leave-active { transition: opacity .2s ease; }
+  .legal-modal-enter-from, .legal-modal-leave-to { opacity: 0; }
+  .legal-modal-enter-active .legal-modal__caixa { transition: transform .22s ease; }
+  .legal-modal-enter-from .legal-modal__caixa { transform: translateY(12px) scale(.97); }
+
+  /* ── Gatilhos no rodapé ── */
+  .footer-col li .footer-legal {
+    font: inherit; background: none; border: 0; padding: 0;
+    color: inherit; cursor: pointer; text-align: left;
+    display: flex; align-items: center; gap: 6px;
+    font-size: .85rem; transition: color .2s;
+  }
+  .footer-col li .footer-legal i { font-size: .7rem; color: var(--cinza-3); }
+  .footer-col li .footer-legal:hover, .footer-col li .footer-legal:hover i { color: var(--ciano); }
+
+  @media (max-width: 680px) {
+    .legal-modal { padding: 0; }
+    .legal-modal__caixa { max-width: none; max-height: 100vh; height: 100%; border-radius: 0; }
+    .legal-modal__topo { padding: 24px 20px 16px; }
+    .legal-modal__selo { width: 40px; height: 40px; font-size: 1.05rem; }
+    .legal-modal__titulo { font-size: 1.2rem; }
+    .legal-modal__abas { padding: 0 20px; }
+    .legal-modal__aba { padding: 10px; font-size: .8rem; }
+    .legal-modal__corpo { padding: 18px 20px 22px; }
+    .legal-modal__rodape {
+      flex-direction: column; align-items: stretch; gap: 10px;
+      padding: 14px 20px calc(14px + env(safe-area-inset-bottom, 0px));
+      text-align: center;
+    }
+    .legal-modal__btn { width: 100%; }
+  }
+}

@@ -255,3 +255,56 @@
     .tempo-modal__rotulo { display: none; }
   }
 }
+
+@layer portal {
+  /* ── APOIE O PORTAL ── */
+  /*
+     Visual próprio, diferente do card de publicidade: o de anúncio é escuro e
+     neutro (a arte do anunciante é que fala), este é da casa — fundo na cor da
+     marca, para o leitor ler como pedido do portal e não como mais um banner.
+  */
+  .apoio-widget {
+    background: linear-gradient(135deg, var(--azul), var(--azul-mid));
+    color: var(--cor-primaria-contraste);
+  }
+  .apoio-widget .widget-title { color: inherit; border-bottom-color: rgba(255,255,255,.2); }
+  .apoio-widget .widget-title i { color: var(--ciano); }
+  .apoio-widget__texto { font-size: .88rem; line-height: 1.65; opacity: .92; margin-bottom: 14px; }
+
+  .apoio-widget__botao {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--ciano); color: #1a1200;
+    border-radius: 8px; padding: 11px 16px;
+    font-size: .92rem; font-weight: 700;
+    transition: transform .2s, filter .2s;
+  }
+  .apoio-widget__botao:hover { transform: translateY(-2px); filter: brightness(1.06); }
+
+  .apoio-widget__pix {
+    margin-top: 14px; padding-top: 14px;
+    border-top: 1px solid rgba(255,255,255,.18);
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .apoio-widget__rotulo {
+    font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; opacity: .65;
+  }
+  /* `break-all` porque a chave pode ser um e-mail longo ou uma chave
+     aleatória de 32 caracteres — sem isso ela estoura a largura da coluna. */
+  .apoio-widget__chave {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .82rem; line-height: 1.5;
+    background: rgba(0,0,0,.22); border-radius: 6px; padding: 8px 10px;
+    word-break: break-all;
+  }
+  .apoio-widget__copiar {
+    display: flex; align-items: center; justify-content: center; gap: 7px;
+    background: rgba(255,255,255,.14); color: inherit;
+    border: 1px solid rgba(255,255,255,.25); border-radius: 6px;
+    padding: 8px 12px; font-size: .82rem; font-weight: 600;
+    font-family: var(--fonte-sans); cursor: pointer;
+    transition: background .2s;
+  }
+  .apoio-widget__copiar:hover { background: rgba(255,255,255,.24); }
+
+  .apoio-widget__nota { font-size: .75rem; opacity: .7; margin-top: 10px; }
+}

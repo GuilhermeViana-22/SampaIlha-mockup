@@ -7,6 +7,7 @@ withDefaults(defineProps<{
   newsletter?: boolean
   tags?: boolean
   anuncio?: boolean
+  apoio?: boolean
 }>(), {
   tempo: true,
   maisLidos: true,
@@ -14,6 +15,7 @@ withDefaults(defineProps<{
   newsletter: true,
   tags: true,
   anuncio: true,
+  apoio: true,
 })
 </script>
 
@@ -24,6 +26,10 @@ withDefaults(defineProps<{
     <DicasWidget v-if="dicas" />
     <SidebarWidgetNewsletter v-if="newsletter" />
     <SidebarWidgetTags v-if="tags" />
+    <!-- O apoio vem antes da publicidade: é o portal falando em nome
+         próprio, e sair depois do espaço vendido faria os dois se lerem
+         como a mesma coisa. -->
+    <SidebarWidgetApoio v-if="apoio" />
     <SidebarWidgetAnuncio v-if="anuncio" />
     <slot />
   </aside>

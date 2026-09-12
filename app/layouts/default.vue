@@ -20,5 +20,9 @@
 
     <FooterPrincipal />
     <ComumVoltarAoTopo />
+    <ComumAvisoCookies />
+    <!-- Montado uma vez aqui: o rodapé e o aviso de cookies só pedem a
+         abertura, pelo `useDocumentosLegais`. -->
+    <ComumModalLegal />
   </div>
 </template>

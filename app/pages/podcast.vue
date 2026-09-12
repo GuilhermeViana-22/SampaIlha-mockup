@@ -1,55 +1,64 @@
 <script setup lang="ts">
-/**
- * Ligue esta constante à origem real da transmissão (API do YouTube/Twitch ou
- * um campo no painel) no lançamento: é o único ponto que acende o selo "No Ar".
- */
-const aoVivo = ref(false)
+import type { Episodio } from '#shared/types/podcast'
 
+/**
+ * Feed do podcast.
+ *
+ * O layout é o de rede social, a pedido do cliente: uma coluna só, um card
+ * embaixo do outro, do episódio mais recente para o mais antigo. Diferente das
+ * notícias, que abrem em grade de três colunas — aqui cada item precisa da
+ * largura inteira porque o player mora dentro dele.
+ *
+ * Só episódios: a faixa de transmissão ao vivo saiu a pedido do cliente, e com
+ * ela o selo "No Ar", que nunca teve origem de dados.
+ */
 useSeoMeta({
-  title: 'Podcast & Ao Vivo (Rascunho) — Portal Sampa na Ilha',
-  description: 'Podcast e Ao Vivo do Portal Sampa na Ilha — página em rascunho, ainda não divulgada ao público.',
-  robots: 'noindex, nofollow',
+  title: 'Podcast — Portal Sampa na Ilha',
+  description: 'Os episódios do podcast Sampa na Ilha: conversas sobre cultura amazônica, Parintins e a vida entre São Paulo e o Norte.',
+  ogTitle: 'Podcast — Portal Sampa na Ilha',
 })
+
+const {
+  itens, total, temMais, carregando, carregandoMais, erroMais, carregarMais,
+} = await useListaPaginada<Episodio>('podcast-feed', {}, 10, '/api/podcast')
 </script>
 
 <template>
   <div>
     <ComumHeroPagina
-      titulo="Podcast & Ao Vivo"
-      descricao="Página pronta e programada na estrutura do site. Fica oculta do menu principal até o lançamento oficial do projeto, acessível apenas pelo caminho /podcast."
-      etiqueta="Rascunho — página ainda não divulgada"
-      etiqueta-icone="fas fa-eye-slash"
-      etiqueta-cor="gray"
+      titulo="Podcast Sampa na Ilha"
+      descricao="Conversas sobre cultura amazônica, Parintins e a vida entre São Paulo e o Norte. Ouça por aqui mesmo, sem sair da página."
+      etiqueta="Podcast"
+      etiqueta-icone="fas fa-microphone-lines"
+      etiqueta-cor="green"
     />
 
     <div class="container">
       <div class="layout">
         <main class="page-content">
-          <ComumAviso icone="fas fa-eye-slash">
-            <strong>Status:</strong> esta página não está linkada em nenhum menu. Para ativá-la no
-            lançamento, basta acrescentar o item “Podcast / Ao Vivo” em
-            <code>app/utils/navegacao.ts</code> apontando para <code>/podcast</code>.
-          </ComumAviso>
+          <ComumCabecalhoSecao :titulo="total === 1 ? '1 episódio publicado' : `${total} episódios publicados`" />
 
-          <ComumCabecalhoSecao titulo="Podcast" />
-          <p>
-            Espaço para os episódios do podcast Sampa na Ilha. Basta colar aqui o embed/player do
-            Spotify, Deezer ou YouTube de cada episódio.
-          </p>
-          <PodcastEpisodio
-            titulo="Episódio 01 — em breve"
-            descricao="Espaço reservado para o embed do player (Spotify / Deezer / YouTube)."
+          <!-- O feed: uma coluna, um card embaixo do outro. -->
+          <div v-if="itens.length" class="ep-feed">
+            <PodcastCard v-for="episodio in itens" :key="episodio.id" :episodio="episodio" />
+          </div>
+
+          <ComumVerMais
+            :mostrando="itens.length"
+            :total="total"
+            :tem-mais="temMais"
+            :carregando="carregandoMais"
+            :erro="erroMais"
+            substantivo="episódios"
+            @carregar="carregarMais"
           />
-          <PodcastEmbed rotulo="Player do episódio — inserir código de embed aqui" icone="fas fa-podcast" />
 
-          <ComumCabecalhoSecao titulo="Transmissão ao Vivo" />
-          <PodcastSeloAoVivo :ao-vivo="aoVivo" />
-          <p style="margin-top:12px;">
-            Bloco central para a integração/embed de transmissões ao vivo vindas do YouTube ou da
-            Twitch. O selo acima acompanha o estado da transmissão: acende como “No Ar” enquanto ela
-            estiver ativa e volta para “Fora do ar” quando termina.
-          </p>
-          <PodcastEmbed rotulo="Player de transmissão ao vivo — inserir embed do YouTube/Twitch aqui" icone="fas fa-video" />
+          <ComumEstadoVazio
+            v-if="!itens.length && !carregando"
+            titulo="Nenhum episódio publicado ainda"
+            descricao="Assim que o primeiro episódio for cadastrado no painel, ele aparece aqui — com o player do Spotify, do YouTube ou do Deezer embutido."
+            icone="fas fa-microphone-lines"
+          />
         </main>
 
         <SidebarPrincipal :tempo="false" :dicas="false" />

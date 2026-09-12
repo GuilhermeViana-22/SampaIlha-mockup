@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {
   BriefcaseIcon, CalendarDaysIcon, FileIcon, FileTextIcon, GraduationCapIcon, ImageIcon, LayoutDashboardIcon,
-  LightbulbIcon, MailIcon, MegaphoneIcon, SettingsIcon, TagsIcon, UserCircleIcon, UsersIcon,
+  LightbulbIcon, MailIcon, MegaphoneIcon, MicIcon, SettingsIcon, TagsIcon, UserCircleIcon, UsersIcon,
 } from '@lucide/vue'
 
 /**
@@ -24,6 +24,7 @@ const icones: Record<string, unknown> = {
   GraduationCap: GraduationCapIcon,
   CalendarDays: CalendarDaysIcon,
   Briefcase: BriefcaseIcon,
+  Mic: MicIcon,
 }
 
 /** Onde o menu deve continuar aceso ao entrar em uma página filha. */

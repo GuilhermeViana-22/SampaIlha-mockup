@@ -11,13 +11,18 @@ const post = computed(() => data.value!.post)
 // Contagem de audiência: dispara sozinha quando o leitor demonstra estar lendo.
 useRegistroLeitura(() => post.value.id)
 
-useSeoMeta({
-  title: () => `${post.value.titulo} — Portal Sampa na Ilha`,
-  description: () => post.value.resumo,
-  ogTitle: () => post.value.titulo,
-  ogDescription: () => post.value.resumo,
-  ogType: 'article',
-})
+// Título, resumo e — o que faltava — a foto da matéria no card do Facebook,
+// do WhatsApp e do Messenger.
+useSeoConteudo(() => ({
+  titulo: post.value.titulo,
+  resumo: post.value.resumo,
+  imagem: post.value.imagemUrl,
+  tipo: 'article',
+  publicadoEm: post.value.publicadoEm,
+  atualizadoEm: post.value.atualizadoEm,
+  autor: post.value.autor,
+  secao: post.value.categoriaNome,
+}))
 </script>
 
 <template>

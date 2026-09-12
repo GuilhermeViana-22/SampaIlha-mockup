@@ -11,10 +11,17 @@ const post = computed(() => data.value!.post)
 // Contagem de audiência: dispara sozinha quando o leitor demonstra estar lendo.
 useRegistroLeitura(() => post.value.id)
 
-useSeoMeta({
-  title: () => `${post.value.titulo} — Dicas & Guias`,
-  description: () => post.value.resumo,
-})
+useSeoConteudo(() => ({
+  titulo: post.value.titulo,
+  tituloPagina: `${post.value.titulo} — Dicas & Guias`,
+  resumo: post.value.resumo,
+  imagem: post.value.imagemUrl,
+  tipo: 'article',
+  publicadoEm: post.value.publicadoEm,
+  atualizadoEm: post.value.atualizadoEm,
+  autor: post.value.autor,
+  secao: post.value.categoriaNome,
+}))
 </script>
 
 <template>

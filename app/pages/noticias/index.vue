@@ -21,16 +21,15 @@ const categoriaAtiva = computed({
   },
 })
 
-const { data, status } = await useListaConteudo('lista-noticias', () => ({
+const {
+  itens, total, temMais, carregando, carregandoMais, erroMais, carregarMais,
+} = await useListaPaginada('lista-noticias', () => ({
   tipo: 'noticia',
   categoria: categoriaAtiva.value || undefined,
-  limite: 24,
-}))
-
-const carregando = computed(() => status.value === 'pending')
+}), 24)
 
 const titulo = computed(() => {
-  const quantidade = `${data.value.total} ${data.value.total === 1 ? 'matéria publicada' : 'matérias publicadas'}`
+  const quantidade = `${total.value} ${total.value === 1 ? 'matéria publicada' : 'matérias publicadas'}`
   return categoriaAtiva.value
     ? `${quantidade} em ${portal.nomeDaCategoria(categoriaAtiva.value)}`
     : quantidade
@@ -60,12 +59,22 @@ const titulo = computed(() => {
           <!-- A lista anterior continua visível enquanto a nova chega: trocar de
                categoria não pisca a tela em branco. -->
           <div class="lista-filtrada" :class="{ 'lista-filtrada--carregando': carregando }" :aria-busy="carregando">
-            <NoticiasGrade v-if="data.itens.length" :posts="data.itens.slice(0, 6)" />
-            <NoticiasLista v-if="data.itens.length > 6" :posts="data.itens.slice(6)" />
+            <NoticiasGrade v-if="itens.length" :posts="itens.slice(0, 6)" />
+            <NoticiasLista v-if="itens.length > 6" :posts="itens.slice(6)" />
           </div>
 
+          <ComumVerMais
+            :mostrando="itens.length"
+            :total="total"
+            :tem-mais="temMais"
+            :carregando="carregandoMais"
+            :erro="erroMais"
+            substantivo="matérias"
+            @carregar="carregarMais"
+          />
+
           <ComumEstadoVazio
-            v-if="!data.itens.length && !carregando"
+            v-if="!itens.length && !carregando"
             titulo="Nenhuma matéria nesta categoria ainda"
             descricao="Assim que uma matéria for publicada nesta categoria, ela aparece aqui."
             icone="fas fa-newspaper"

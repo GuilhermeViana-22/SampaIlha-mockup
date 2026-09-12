@@ -98,6 +98,7 @@ async function restaurar() {
       <TabsList>
         <TabsTrigger value="aparencia">Aparência</TabsTrigger>
         <TabsTrigger value="logo">Logo</TabsTrigger>
+        <TabsTrigger value="apoio">Apoio</TabsTrigger>
         <TabsTrigger value="taxonomia">Taxonomia</TabsTrigger>
         <TabsTrigger value="conta">Conta</TabsTrigger>
         <TabsTrigger value="dados">Dados</TabsTrigger>
@@ -234,6 +235,10 @@ async function restaurar() {
 
       <TabsContent value="logo" class="mt-4">
         <AdminConfiguracoesLogo />
+      </TabsContent>
+
+      <TabsContent value="apoio" class="mt-4 max-w-2xl">
+        <AdminConfiguracoesApoio />
       </TabsContent>
 
       <TabsContent value="taxonomia" class="mt-4 grid gap-4 lg:grid-cols-2">
