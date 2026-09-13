@@ -13,7 +13,10 @@
     display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 32px;
   }
   .footer-brand .logo__img { height: 68px; }
-  .footer-brand .logo__tagline { color: color-mix(in srgb, var(--cor-rodape-contraste, #fff) 45%, transparent); }
+  /* No topo o rótulo é verde sobre branco; aqui vai no contraste do rodapé,
+     junto com os títulos das colunas. */
+  .footer-brand .logo__portal { color: var(--cor-rodape-contraste, #fff); font-size: 1.05rem; }
+  .footer-brand .logo__tagline { color: color-mix(in srgb, var(--cor-rodape-contraste, #fff) 45%, transparent); margin-top: 4px; }
   .footer-brand p { font-size: .85rem; margin-top: 14px; line-height: 1.7; }
   .footer-col h4 {
     font-size: .82rem; font-weight: 700; color: var(--cor-rodape-contraste, #fff);

@@ -23,9 +23,20 @@
      dela puxa a do `.header-inner`, que precisa de folga para o link não
      encostar na borda inferior azul. */
   .logo__img { height: 88px; width: auto; display: block; flex-shrink: 0; }
-  /* Nada de texto ao lado da imagem: a arte da marca já escreve o nome e
-     "Portal de Notícias". Só o rodapé acrescenta a tagline, que não está
-     desenhada na logo. */
+  /* Rótulo ao lado da marca, em caixa alta e no verde do tema. O
+     `text-transform` deixa o texto legível no código e maiúsculo na tela.
+     A mesma classe serve o rodapé, que só troca a cor. */
+  .logo__portal {
+    font-family: var(--fonte-serif);
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--cor-primaria);
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+  /* Só o rodapé usa a tagline: no topo o espaço é da logo. */
   .logo__tagline { font-size: .65rem; color: var(--cinza-4); text-transform: uppercase; letter-spacing: .08em; }
 
   /* Classe própria em vez de `.site-header nav`: o seletor por elemento

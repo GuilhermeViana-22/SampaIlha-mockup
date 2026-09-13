@@ -118,6 +118,12 @@ export const RODAPE_EDITORIAS: ItemMenu[] = [
    tinha página própria (caía em /informacoes como os vizinhos) e o segundo
    levava o leitor direto para a tela de login do painel. O acesso da equipe
    continua em /admin, citado na página de Informações & Serviço.
+
+   "Informações & Serviço" e "Contato" saíram depois, na mesma linha de
+   limpeza: os dois apontavam para /informacoes, então a coluna gastava três
+   entradas (com "Quem Somos") para levar a duas páginas. A página segue no
+   ar, e o botão "Assinar" do cabeçalho continua levando até ela — o que mudou
+   foi o rodapé.
 */
 /*
    Termos de Uso e Política de Privacidade saíram desta lista: não são rota,
@@ -128,8 +134,6 @@ export const RODAPE_EDITORIAS: ItemMenu[] = [
 */
 export const RODAPE_PORTAL: ItemMenu[] = [
   { rotulo: 'Quem Somos', para: '/quem-somos' },
-  { rotulo: 'Informações & Serviço', para: '/informacoes' },
-  { rotulo: 'Contato', para: '/informacoes' },
   { rotulo: 'Podcast', para: '/podcast' },
   { rotulo: 'Trabalhe Conosco', para: '/vagas' },
 ]

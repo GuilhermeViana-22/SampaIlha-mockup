@@ -46,12 +46,17 @@
     .header-inner { padding: 0 16px; gap: 12px; }
     .logo { min-width: 0; }
     .logo__img { height: 68px; }
+    .logo__portal { font-size: .95rem; letter-spacing: .04em; }
     .container { padding: 0 16px; }
     .footer-top { padding: 32px 16px; }
     .page-hero { padding: 40px 18px; }
   }
 
   @media (max-width: 560px) {
+    /* Com os três botões de ação na mesma linha, o rótulo não cabe mais no
+       topo. No rodapé cabe — por isso o seletor é do cabeçalho, e não da
+       classe solta: sem ele a marca do rodapé sumiria junto. */
+    .site-header .logo__portal { display: none; }
     .btn-subscribe__rotulo { display: none; }
     .btn-subscribe { padding: 8px 12px; }
     .header-actions { gap: 6px; }
