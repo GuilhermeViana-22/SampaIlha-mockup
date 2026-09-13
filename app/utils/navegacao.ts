@@ -121,9 +121,9 @@ export const RODAPE_EDITORIAS: ItemMenu[] = [
 
    "Informações & Serviço" e "Contato" saíram depois, na mesma linha de
    limpeza: os dois apontavam para /informacoes, então a coluna gastava três
-   entradas (com "Quem Somos") para levar a duas páginas. A página segue no
-   ar, e o botão "Assinar" do cabeçalho continua levando até ela — o que mudou
-   foi o rodapé.
+   entradas (com "Quem Somos") para levar a duas páginas. Depois disso a própria
+   página saiu do ar por enquanto, junto com o botão "Assinar" que levava até
+   ela — ver `ignore` no nuxt.config e o comentário no cabeçalho.
 */
 /*
    Termos de Uso e Política de Privacidade saíram desta lista: não são rota,

@@ -5,6 +5,10 @@
  * Ao lado da imagem da marca vai "Portal de Notícias", em caixa alta e no
  * verde do tema. O mesmo rótulo aparece no rodapé, lá em branco — é a mesma
  * classe, com a cor trocada pelo contraste do rodapé.
+ *
+ * O botão "Assinar" saiu daqui: levava para /informacoes, que está desligada
+ * por enquanto (ver `ignore` no nuxt.config). O markup dele está no histórico,
+ * em `git show f73ea29:app/components/header/Principal.vue`.
  */
 const portal = usePortalStore()
 const marca = useMarcaStore()
@@ -32,9 +36,6 @@ const marca = useMarcaStore()
         >
           <i class="fas" :class="portal.buscaAberta ? 'fa-times' : 'fa-search'" />
         </button>
-        <NuxtLink class="btn-subscribe" to="/informacoes">
-          <i class="fas fa-envelope-open-text" /> <span class="btn-subscribe__rotulo">Assinar</span>
-        </NuxtLink>
         <button
           class="btn-menu"
           type="button"

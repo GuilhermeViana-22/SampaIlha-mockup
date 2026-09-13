@@ -7,6 +7,18 @@ export default defineNuxtConfig({
 
   modules: ['@pinia/nuxt', 'shadcn-nuxt'],
 
+  /**
+   * "Informações & Serviço" fora do ar por enquanto, a pedido. O arquivo
+   * continua no projeto — só não vira rota, então /informacoes responde 404 em
+   * vez de abrir uma página sem link para ela. Para trazer de volta, apague
+   * esta entrada (e descomente o botão "Assinar" no cabeçalho).
+   *
+   * Só o índice sai: `informacoes/[slug].vue` continua valendo, senão as
+   * matérias do tipo "informação" publicadas no painel quebrariam nas
+   * listagens, que apontam para /informacoes/<slug>.
+   */
+  ignore: ['app/pages/informacoes/index.vue'],
+
   css: [
     '~/assets/css/tailwind.css',
     '~/assets/css/portal/index.css',
