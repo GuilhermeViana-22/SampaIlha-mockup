@@ -19,10 +19,9 @@ const ano = new Date().getFullYear()
       <div class="footer-brand">
         <div class="logo">
           <img :src="marca.logo" class="logo__img" alt="Portal Sampa na Ilha" width="235" height="240">
-          <div>
-            <div class="logo__name">Sampa na Ilha</div>
-            <div class="logo__tagline">{{ CONTATO.tagline }}</div>
-          </div>
+          <!-- Sem o nome ao lado: a arte da logo já escreve "Sampa na Ilha" e
+               "Portal de Notícias". Fica a tagline, que não está na imagem. -->
+          <div class="logo__tagline">{{ CONTATO.tagline }}</div>
         </div>
         <p>
           O portal de referência para quem busca informação, cultura e notícias de todas as regiões

@@ -62,8 +62,8 @@ export default defineNuxtConfig({
     head: {
       htmlAttrs: { lang: 'pt-BR' },
       link: [
-        { rel: 'icon', type: 'image/jpeg', href: '/sampailha.jpg' },
-        { rel: 'apple-touch-icon', href: '/sampailha.jpg' },
+        { rel: 'icon', type: 'image/png', href: '/sampailha.png' },
+        { rel: 'apple-touch-icon', href: '/sampailha.png' },
         // Sem webfont: a tipografia do portal é Arial, que já existe no
         // sistema. O download do Google Fonts foi removido junto com ela.
         {

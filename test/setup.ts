@@ -22,6 +22,9 @@ export interface EventoFalso {
   query: Record<string, any>
   body: any
   params: Record<string, string>
+  headers: Record<string, string>
+  /** O que `getRequestIP` devolveria — usado pelas rotas que geolocalizam. */
+  ip?: string
   status?: number
 }
 
@@ -33,7 +36,7 @@ export interface EventoFalso {
  * e `params`, então o resto da interface nunca é tocado.
  */
 export function criarEvento(parcial: Partial<EventoFalso> = {}): EventoFalso & H3Event {
-  return { query: {}, body: undefined, params: {}, ...parcial } as unknown as EventoFalso & H3Event
+  return { query: {}, body: undefined, params: {}, headers: {}, ...parcial } as unknown as EventoFalso & H3Event
 }
 
 /**
@@ -78,6 +81,10 @@ const globais = {
     public: { apiOrigin: 'http://api.teste', siteUrl: 'http://portal.teste' },
   }),
   useRequestHeaders: () => ({}),
+  // Nitro. O cache é de produção: no teste a função embrulhada é a própria,
+  // senão o primeiro `it()` guardaria a resposta e os seguintes leriam ela.
+  defineCachedFunction: (fn: any) => fn,
+  defineCachedEventHandler: (handler: any) => handler,
   $fetch: fetchFalso,
   useFetch: (...args: any[]) => useFetchFalso(...args),
   toValue: (v: any) => (typeof v === 'function' ? v() : v?.value !== undefined || isRef(v) ? unref(v) : v),
@@ -87,6 +94,8 @@ const globais = {
   getQuery: (evento: EventoFalso) => evento.query,
   readBody: async (evento: EventoFalso) => evento.body,
   getRouterParam: (evento: EventoFalso, nome: string) => evento.params[nome],
+  getRequestHeader: (evento: EventoFalso, nome: string) => evento.headers?.[nome.toLowerCase()],
+  getRequestIP: (evento: EventoFalso) => evento.ip,
   setResponseStatus: (evento: EventoFalso, status: number) => { evento.status = status },
   createError: (opcoes: any) => new ErroH3(opcoes),
 }

@@ -345,8 +345,17 @@ export interface TempoDia {
   icone: string
 }
 
+/** De onde saiu a posição usada na previsão. */
+export type FonteLocal = 'gps' | 'ip' | 'padrao'
+
 export interface Previsao {
   cidade: string
+  /**
+   * `gps` quando o leitor autorizou a localização do navegador, `ip` quando a
+   * posição veio do endereço de rede e `padrao` quando nada foi descoberto e
+   * a previsão caiu em São Paulo.
+   */
+  fonte: FonteLocal
   agora: TempoAgora
   dias: TempoDia[]
 }

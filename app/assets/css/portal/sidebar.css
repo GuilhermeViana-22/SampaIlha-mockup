@@ -191,6 +191,19 @@
   }
   .weather-abrir:hover .weather-cta { opacity: 1; gap: 10px; }
 
+  /* Troca a previsão do IP pela localização exata do navegador. */
+  .weather-local {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    width: 100%; margin-top: 10px; padding: 7px 10px;
+    background: rgba(255,255,255,.12); border: 0; border-radius: 6px;
+    color: #fff; font: inherit; font-size: .74rem; font-weight: 600;
+    opacity: .85; cursor: pointer; transition: background .2s, opacity .2s;
+  }
+  .weather-local:hover:not(:disabled) { background: rgba(255,255,255,.22); opacity: 1; }
+  .weather-local:disabled { cursor: progress; }
+  .weather-local--ativo, .weather-local--erro { background: none; cursor: default; opacity: .75; }
+  .weather-local--erro { color: #ffe0e0; }
+
   /* ── Painel de 15 dias ── */
   .tempo-modal {
     position: fixed; inset: 0; z-index: 200;

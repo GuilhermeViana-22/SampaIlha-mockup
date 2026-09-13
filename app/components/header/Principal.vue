@@ -2,10 +2,10 @@
 /**
  * Cabeçalho fixo: logo, navegação, busca e ações.
  *
- * Ao lado da imagem da marca vai só "Portal de Notícias", em caixa alta e no
- * verde da marca. O nome e a tagline que ficavam ali saíram do topo — seguem
- * no rodapé — e o espaço que sobrou virou tamanho de logo, no desktop e no
- * celular.
+ * Ao lado da imagem não vai texto nenhum. A arte da marca já traz "Sampa na
+ * Ilha" e "Portal de Notícias" escritos nela, então o rótulo que ficava aqui
+ * repetia a mesma frase duas vezes, uma em imagem e outra em texto. O espaço
+ * que sobrou virou tamanho de logo, no desktop e no celular.
  */
 const portal = usePortalStore()
 const marca = useMarcaStore()
@@ -16,7 +16,6 @@ const marca = useMarcaStore()
     <div class="header-inner">
       <NuxtLink to="/" class="logo">
         <img :src="marca.logo" class="logo__img" alt="Portal Sampa na Ilha" width="235" height="240">
-        <span class="logo__portal">Portal de Notícias</span>
       </NuxtLink>
 
       <HeaderNavegacao />
