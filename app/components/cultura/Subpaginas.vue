@@ -5,7 +5,7 @@ const props = withDefaults(defineProps<{ exceto?: string }>(), { exceto: '' })
 const frentes = [
   { para: '/cultura/o-projeto', icone: 'fas fa-seedling', titulo: 'O Projeto Sampa na Ilha', texto: 'Conheça o ecossistema cultural, social e educacional do projeto.' },
   { para: '/cultura/grupo-danca', icone: 'fas fa-music', titulo: 'Grupo de Dança', texto: 'O corpo de dança que representa o boi-bumbá em São Paulo.' },
-  { para: '/cultura/workshops', icone: 'fas fa-hands-helping', titulo: 'Workshops & Artesanato', texto: 'Oficinas de confecção de adereços e formação artística.' },
+  // Workshops & Artesanato: página pública no `ignore` do nuxt.config por enquanto.
   { para: '/cultura/eventos', icone: 'fas fa-calendar-day', titulo: 'Eventos & Atrações', texto: 'Calendário de ensaios, mostras e shows com atrações do Amazonas.' },
   { para: '/cultura', icone: 'fas fa-newspaper', titulo: 'Cultura & Arte', texto: 'Cobertura jornalística e histórica da cultura amazônica.' },
 ]

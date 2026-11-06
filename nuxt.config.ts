@@ -8,16 +8,22 @@ export default defineNuxtConfig({
   modules: ['@pinia/nuxt', 'shadcn-nuxt'],
 
   /**
-   * "Informações & Serviço" fora do ar por enquanto, a pedido. O arquivo
-   * continua no projeto — só não vira rota, então /informacoes responde 404 em
-   * vez de abrir uma página sem link para ela. Para trazer de volta, apague
-   * esta entrada (e descomente o botão "Assinar" no cabeçalho).
+   * Páginas fora do ar por enquanto — o arquivo continua no projeto, só não
+   * vira rota (responde 404). Para trazer de volta, apague a entrada.
    *
-   * Só o índice sai: `informacoes/[slug].vue` continua valendo, senão as
-   * matérias do tipo "informação" publicadas no painel quebrariam nas
-   * listagens, que apontam para /informacoes/<slug>.
+   * - Informações & Serviço: a pedido. Só o índice sai; `informacoes/[slug].vue`
+   *   continua valendo, senão as matérias do tipo "informação" quebram nas
+   *   listagens. Ao reativar, descomente o botão "Assinar" no cabeçalho.
+   * - Workshops & Artesanato: ainda sem conteúdo publicado; o cadastro no
+   *   painel (/admin/workshops) segue ativo para quando a frente for ao ar.
+   * - Festival de Parintins (`/turismo`): página curada fora do ar; a editoria
+   *   continua em /categoria/turismo.
    */
-  ignore: ['app/pages/informacoes/index.vue'],
+  ignore: [
+    'app/pages/informacoes/index.vue',
+    'app/pages/cultura/workshops.vue',
+    'app/pages/turismo.vue',
+  ],
 
   css: [
     '~/assets/css/tailwind.css',

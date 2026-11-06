@@ -50,9 +50,8 @@ export const MENU_PRINCIPAL: ItemPrincipal[] = [
     categoria: 'turismo',
     filhos: [
       { rotulo: 'Todas as matérias', para: '/categoria/turismo', icone: 'fas fa-suitcase-rolling' },
-      // A página curada do Parintins continua no ar e no menu: ela tem
-      // cronograma e histórico que a listagem por editoria não mostra.
-      { rotulo: 'Festival de Parintins', para: '/turismo', icone: 'fas fa-drum' },
+      // Festival de Parintins (`/turismo`) fora do menu: página no `ignore`
+      // do nuxt.config. A editoria segue em /categoria/turismo.
     ],
   },
   // "Dicas" é tipo de conteúdo, não editoria — não existe no banco de
@@ -69,7 +68,9 @@ export const MENU_PRINCIPAL: ItemPrincipal[] = [
       { rotulo: 'Quem Somos', para: '/quem-somos', icone: 'fas fa-users' },
       { rotulo: 'O Projeto Sampa na Ilha', para: '/cultura/o-projeto', icone: 'fas fa-seedling' },
       { rotulo: 'Grupo de Dança', para: '/cultura/grupo-danca', icone: 'fas fa-music' },
-      { rotulo: 'Workshops & Artesanato', para: '/cultura/workshops', icone: 'fas fa-hands-helping' },
+      // Workshops & Artesanato fora do menu: a página pública está no `ignore`
+      // do nuxt.config enquanto não houver conteúdo. O painel continua em
+      // /admin/workshops.
       { rotulo: 'Eventos & Atrações', para: '/cultura/eventos', icone: 'fas fa-calendar-day' },
     ],
   },
